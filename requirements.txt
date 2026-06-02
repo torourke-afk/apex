@@ -1,0 +1,25 @@
+# Apex — Phase 1 dependencies
+# Pin to minimum versions (>=) for dev flexibility
+
+# UI Framework
+streamlit>=1.30.0
+
+# Data Processing
+pandas>=2.1.0
+
+# Visualization
+plotly>=5.18.0
+altair>=5.2.0
+
+# Grid Component
+streamlit-aggrid>=0.3.4
+
+# Database
+duckdb>=0.9.0
+sqlalchemy>=2.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# Testing
+pytest>=7.4.0

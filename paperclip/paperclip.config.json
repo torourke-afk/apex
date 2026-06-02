@@ -1,0 +1,25 @@
+{
+  "project_name": "apex",
+  "description": "RVGT Apex — Marketing Intelligence & Operations Platform (Streamlit + Python)",
+  "agents": ["tech-lead", "frontend", "backend", "data-engineer", "qa"],
+  "scheduler": {
+    "enabled": true,
+    "heartbeat_interval": "30m",
+    "start_agent": "tech-lead",
+    "max_concurrent_agents": 3,
+    "idle_behavior": "wait"
+  },
+  "shared_memory": {
+    "type": "filesystem",
+    "path": "./tasks"
+  },
+  "defaults": {
+    "adapter": "claude_local",
+    "adapterConfig": {
+      "model": "claude-sonnet-4-6",
+      "maxTurnsPerRun": 300,
+      "timeoutSec": 600,
+      "graceSec": 30
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "_description": "Industry benchmarks for bank customer acquisition simulator. Used by src/simulator/engine.py.",
+  "channels": {
+    "sem": {
+      "cpc": 7.50,
+      "cpl": null,
+      "use_cpl": false,
+      "brand_lift_pct": 0.08,
+      "benchmark_ctr": 0.04
+    },
+    "social": {
+      "cpc": null,
+      "cpl": 22.00,
+      "use_cpl": true,
+      "brand_lift_pct": 0.05,
+      "benchmark_ctr": 0.012
+    },
+    "display": {
+      "cpc": 3.80,
+      "cpl": null,
+      "use_cpl": false,
+      "brand_lift_pct": 0.03,
+      "benchmark_ctr": 0.0035
+    },
+    "direct_mail": {
+      "cpc": null,
+      "cpl": 65.00,
+      "use_cpl": true,
+      "brand_lift_pct": 0.02,
+      "benchmark_ctr": 0.015
+    }
+  },
+  "funnel": {
+    "visit_to_app_start": 0.06,
+    "app_start_to_apply": 0.68,
+    "apply_to_approve": 0.52,
+    "approve_to_open": 0.91,
+    "open_to_fund": 0.72
+  },
+  "retention": {
+    "mob6_rate": 0.78,
+    "mob12_rate": 0.65,
+    "pfi_conversion_rate": 0.22
+  },
+  "ltv": {
+    "ltv_per_hh": 950.00,
+    "pfi_ltv_multiplier": 2.9
+  },
+  "organic": {
+    "organic_multiplier": 0.12,
+    "aeo_rate": 0.04
+  },
+  "rvgt_improvements": {
+    "cpc_reduction_pct": 0.12,
+    "cpl_reduction_pct": 0.10,
+    "visit_to_app_start_lift": 0.20,
+    "app_start_to_apply_lift": 0.08,
+    "apply_to_approve_lift": 0.05,
+    "approve_to_open_lift": 0.03,
+    "open_to_fund_lift": 0.10,
+    "mob6_rate_lift": 0.05,
+    "mob12_rate_lift": 0.07,
+    "pfi_conversion_lift": 0.15,
+    "organic_multiplier_lift": 0.25
+  }
+}

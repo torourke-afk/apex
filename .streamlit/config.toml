@@ -1,0 +1,16 @@
+[theme]
+# RVGT Brand System — Dark Glassmorphism
+# Deep navy backgrounds, RVGT Red accent, white text
+
+primaryColor = "#FF0016"
+backgroundColor = "#060B26"
+secondaryBackgroundColor = "#0B1437"
+textColor = "#FFFFFF"
+font = "sans serif"
+
+[server]
+headless = true
+enableCORS = false
+
+[browser]
+gatherUsageStats = false

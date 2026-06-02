@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex CMO Dashboard — UX/UI Design Reference</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+/*
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  APEX CMO DASHBOARD — DESIGN REFERENCE MOCKUP                     ║
+  ║                                                                     ║
+  ║  PURPOSE: Visual design stimuli for the Apex UX/UI rebuild.        ║
+  ║  This is a static HTML/CSS/JS prototype — NOT production code.     ║
+  ║                                                                     ║
+  ║  The Apex app is built with:                                        ║
+  ║    • Streamlit (Python) for all pages and layout                   ║
+  ║    • Plotly / Altair for charts                                     ║
+  ║    • streamlit-aggrid for data tables                               ║
+  ║    • Custom CSS injected via st.markdown() from brand.py           ║
+  ║                                                                     ║
+  ║  DO NOT copy this HTML into Streamlit. Instead, use it to          ║
+  ║  understand the target aesthetic, layout hierarchy, spacing,        ║
+  ║  component proportions, and interaction patterns, then implement   ║
+  ║  them using Streamlit's native primitives + brand.py tokens.       ║
+  ║                                                                     ║
+  ║  KEY DESIGN TARGETS:                                                ║
+  ║    1. Clean card-based layout with generous whitespace              ║
+  ║    2. KPI cards: sparkline + delta + formatted value               ║
+  ║    3. Chart containers with title/subtitle + toggle controls       ║
+  ║    4. Data table with conditional formatting (ROAS badges)         ║
+  ║    5. Sticky filter bar with chip-style controls                   ║
+  ║    6. Dark/light mode support                                       ║
+  ║    7. Agent command bar at bottom (future phase)                    ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+*/
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FFFFFF;--bg2:#F8F9FA;--bg3:#F1F3F5;--tx1:#1A1A2E;--tx2:#6B7280;--tx3:#9CA3AF;--bd:#E5E7EB;--bd2:#F3F4F6;--acc:#6366F1;--acc2:#818CF8;--pos:#10B981;--pos-bg:#ECFDF5;--neg:#EF4444;--neg-bg:#FEF2F2;--warn:#F59E0B;--warn-bg:#FFFBEB;--info:#3B82F6;--ch1:#6366F1;--ch2:#8B5CF6;--ch3:#EC4899;--ch4:#F59E0B;--ch5:#10B981;--ch6:#06B6D4;--sh:0 1px 2px rgba(0,0,0,0.05);--sh2:0 4px 6px -1px rgba(0,0,0,0.07)}
+[data-t="dark"]{--bg:#0F0F1A;--bg2:#1A1A2E;--bg3:#0A0A14;--tx1:#F1F5F9;--tx2:#94A3B8;--tx3:#64748B;--bd:#2D2D4A;--bd2:#1E1E36;--acc:#818CF8;--acc2:#A78BFA;--pos:#34D399;--pos-bg:rgba(16,185,129,0.12);--neg:#F87171;--neg-bg:rgba(239,68,68,0.12);--warn:#FBBF24;--warn-bg:rgba(245,158,11,0.12);--info:#60A5FA;--ch1:#818CF8;--ch2:#A78BFA;--ch3:#F472B6;--ch4:#FBBF24;--ch5:#34D399;--ch6:#22D3EE;--sh:0 1px 2px rgba(0,0,0,0.3);--sh2:0 4px 6px -1px rgba(0,0,0,0.4)}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg3);color:var(--tx1);font-size:13px;line-height:1.4}
+.dash{min-height:100vh;display:flex}
+.side{width:56px;background:var(--bg);border-right:0.5px solid var(--bd);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+.side-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--tx2);cursor:pointer;font-size:16px;transition:all .15s}
+.side-icon:hover,.side-icon.act{background:rgba(99,102,241,0.1);color:var(--acc)}
+.side-icon.act{background:rgba(99,102,241,0.12)}
+.logo{width:32px;height:32px;border-radius:8px;background:var(--acc);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:500;font-size:14px;margin-bottom:12px}
+.main{flex:1;display:flex;flex-direction:column;margin-left:56px;min-height:100vh}
+.topbar{height:48px;background:var(--bg);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:5}
+.topbar-title{font-size:15px;font-weight:500;flex:1}
+.topbar-search{height:32px;padding:0 10px;border-radius:8px;background:var(--bg2);border:0.5px solid var(--bd);color:var(--tx2);font-size:12px;width:200px;display:flex;align-items:center;gap:6px}
+.tbtn{height:32px;padding:0 12px;border-radius:8px;border:0.5px solid var(--bd);background:var(--bg);color:var(--tx1);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.tbtn:hover{border-color:var(--acc);color:var(--acc)}
+.tbtn.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.filters{padding:10px 20px;background:var(--bg);border-bottom:0.5px solid var(--bd);display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:48px;z-index:4}
+.chip{height:30px;padding:0 12px;border-radius:8px;background:var(--bg2);border:0.5px solid var(--bd);color:var(--tx1);font-size:11.5px;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
+.chip:hover{border-color:var(--acc)}
+.chip.active{background:rgba(99,102,241,0.1);border-color:var(--acc);color:var(--acc)}
+.content{flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:16px}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--bg);border-radius:10px;padding:14px 16px;border:0.5px solid var(--bd);cursor:pointer;transition:all .15s}
+.kpi:hover{box-shadow:var(--sh2);transform:translateY(-1px)}
+.kpi-label{font-size:11px;color:var(--tx2);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.kpi-val{font-size:22px;font-weight:600;letter-spacing:-0.02em;margin-bottom:4px}
+.kpi-delta{font-size:11px;display:flex;align-items:center;gap:3px}
+.kpi-delta.up{color:var(--pos)}
+.kpi-delta.down{color:var(--neg)}
+.kpi-spark{margin-top:8px;height:28px}
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.card{background:var(--bg);border-radius:10px;padding:16px;border:0.5px solid var(--bd)}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:500}
+.card-sub{font-size:11px;color:var(--tx2)}
+.canvas-wrap{position:relative;width:100%}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;color:var(--tx2);font-weight:400;font-size:11px;border-bottom:0.5px solid var(--bd);white-space:nowrap}
+.tbl td{padding:8px 10px;border-bottom:0.5px solid var(--bd2);white-space:nowrap}
+.tbl tr:hover{background:var(--bg2)}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:500}
+.badge.green{background:var(--pos-bg);color:var(--pos)}
+.badge.red{background:var(--neg-bg);color:var(--neg)}
+.badge.amber{background:var(--warn-bg);color:var(--warn)}
+.inline-bar{height:6px;border-radius:3px;background:var(--bg3);overflow:hidden;width:80px;display:inline-block;vertical-align:middle}
+.inline-bar-fill{height:100%;border-radius:3px}
+.agent-bar{background:var(--bg);border-top:0.5px solid var(--bd);padding:10px 20px;display:flex;gap:10px;align-items:center;position:sticky;bottom:0}
+.agent-input{flex:1;height:38px;border-radius:10px;background:var(--bg2);border:0.5px solid var(--bd);padding:0 14px;color:var(--tx1);font-size:13px;display:flex;align-items:center;gap:8px;cursor:text}
+.agent-input:hover{border-color:var(--acc)}
+.agent-input span{color:var(--tx3)}
+.agent-input .kbd{font-size:10px;background:var(--bg);border:0.5px solid var(--bd);border-radius:4px;padding:2px 6px;color:var(--tx3);margin-left:auto}
+.agent-send{width:38px;height:38px;border-radius:10px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:none}
+.donut-legend{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="dash" id="dash">
+<div class="side">
+<div class="logo">A</div>
+<div class="side-icon act" title="Overview"><i class="ti ti-layout-dashboard"></i></div>
+<div class="side-icon" title="Spend"><i class="ti ti-wallet"></i></div>
+<div class="side-icon" title="Funnel"><i class="ti ti-chart-funnel"></i></div>
+<div class="side-icon" title="Retention"><i class="ti ti-users"></i></div>
+<div class="side-icon" title="Channels"><i class="ti ti-broadcast"></i></div>
+<div class="side-icon" title="Organic"><i class="ti ti-search"></i></div>
+<div class="side-icon" title="Product"><i class="ti ti-settings"></i></div>
+<div class="side-icon" title="Ops"><i class="ti ti-terminal"></i></div>
+<div class="side-icon" title="Simulator"><i class="ti ti-calculator"></i></div>
+<div style="flex:1"></div>
+<div class="side-icon" title="Settings"><i class="ti ti-adjustments"></i></div>
+</div>
+<div class="main">
+<div class="topbar">
+<span class="topbar-title">Executive scorecard</span>
+<div class="topbar-search"><i class="ti ti-search" style="font-size:14px"></i><span>Search metrics...</span></div>
+<button class="tbtn" id="themeBtn"><i class="ti ti-moon" style="font-size:14px" id="themeIcon"></i></button>
+<button class="tbtn"><i class="ti ti-bell" style="font-size:14px"></i><span style="width:6px;height:6px;border-radius:50%;background:var(--neg);display:inline-block"></span></button>
+<div class="avatar">TO</div>
+</div>
+<div class="filters">
+<div class="chip active"><i class="ti ti-calendar" style="font-size:13px"></i>Last 30 days<i class="ti ti-chevron-down" style="font-size:11px"></i></div>
+<div class="chip"><i class="ti ti-map-pin" style="font-size:13px"></i>All DMAs<i class="ti ti-chevron-down" style="font-size:11px"></i></div>
+<div class="chip"><i class="ti ti-broadcast" style="font-size:13px"></i>All channels<i class="ti ti-chevron-down" style="font-size:11px"></i></div>
+<div class="chip"><i class="ti ti-package" style="font-size:13px"></i>All products<i class="ti ti-chevron-down" style="font-size:11px"></i></div>
+<div style="flex:1"></div>
+<button class="tbtn"><i class="ti ti-refresh" style="font-size:13px"></i>Refresh</button>
+<button class="tbtn primary"><i class="ti ti-download" style="font-size:13px"></i>Export</button>
+</div>
+<div class="content">
+<div class="kpi-row">
+<div class="kpi"><div class="kpi-label"><i class="ti ti-currency-dollar" style="font-size:13px"></i>Total media spend</div><div class="kpi-val">$4.2M</div><div class="kpi-delta up"><i class="ti ti-trending-up" style="font-size:12px"></i>3.1% vs prior</div><div class="kpi-spark"><canvas id="s1" height="28"></canvas></div></div>
+<div class="kpi"><div class="kpi-label"><i class="ti ti-file-check" style="font-size:13px"></i>Applications</div><div class="kpi-val">12,841</div><div class="kpi-delta up"><i class="ti ti-trending-up" style="font-size:12px"></i>8.4% vs prior</div><div class="kpi-spark"><canvas id="s2" height="28"></canvas></div></div>
+<div class="kpi"><div class="kpi-label"><i class="ti ti-home" style="font-size:13px"></i>Funded accounts</div><div class="kpi-val">6,204</div><div class="kpi-delta up"><i class="ti ti-trending-up" style="font-size:12px"></i>12.1% vs prior</div><div class="kpi-spark"><canvas id="s3" height="28"></canvas></div></div>
+<div class="kpi"><div class="kpi-label"><i class="ti ti-receipt" style="font-size:13px"></i>CPIHH</div><div class="kpi-val">$677</div><div class="kpi-delta down"><i class="ti ti-trending-up" style="font-size:12px"></i>5.2% (over target)</div><div class="kpi-spark"><canvas id="s4" height="28"></canvas></div></div>
+<div class="kpi"><div class="kpi-label"><i class="ti ti-chart-arrows" style="font-size:13px"></i>ROAS</div><div class="kpi-val">3.8x</div><div class="kpi-delta up"><i class="ti ti-trending-up" style="font-size:12px"></i>0.3x vs target</div><div class="kpi-spark"><canvas id="s5" height="28"></canvas></div></div>
+</div>
+<div class="charts-row">
+<div class="card">
+<div class="card-head"><div><div class="card-title">Funded account trend by channel</div><div class="card-sub">Last 6 months, stacked area</div></div></div>
+<div class="canvas-wrap" style="height:200px"><canvas id="areaChart"></canvas></div>
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:11px;color:var(--tx2)">
+<span style="display:flex;align-items:center;gap:4px"><span class="legend-dot" style="background:var(--ch1)"></span>Digital</span>
+<span style="display:flex;align-items:center;gap:4px"><span class="legend-dot" style="background:var(--ch2)"></span>Direct mail</span>
+<span style="display:flex;align-items:center;gap:4px"><span class="legend-dot" style="background:var(--ch3)"></span>Branch</span>
+<span style="display:flex;align-items:center;gap:4px"><span class="legend-dot" style="background:var(--ch4)"></span>Call center</span>
+</div>
+</div>
+<div class="card">
+<div class="card-head"><div><div class="card-title">Channel mix</div><div class="card-sub">Funded account attribution %</div></div></div>
+<div class="canvas-wrap" style="height:160px"><canvas id="donutChart"></canvas></div>
+<div class="donut-legend">
+<div class="legend-item"><span class="legend-dot" style="background:var(--ch1)"></span>Digital — 52%</div>
+<div class="legend-item"><span class="legend-dot" style="background:var(--ch2)"></span>Direct mail — 23%</div>
+<div class="legend-item"><span class="legend-dot" style="background:var(--ch3)"></span>Branch — 16%</div>
+<div class="legend-item"><span class="legend-dot" style="background:var(--ch4)"></span>Call center — 9%</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-head"><div><div class="card-title">Campaign performance</div><div class="card-sub">Top campaigns by ROAS</div></div></div>
+<table class="tbl">
+<thead><tr><th>Campaign</th><th>Status</th><th>Spend</th><th>Revenue</th><th>ROAS</th><th>Funded</th><th>Budget pace</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:500">Q2 checking acquisition</td><td><span class="status-dot" style="background:var(--pos)"></span>Active</td><td>$1.2M</td><td>$5.7M</td><td><span class="badge green">4.75x</span></td><td>2,841</td><td><span class="inline-bar"><span class="inline-bar-fill" style="width:72%;background:var(--pos)"></span></span> 72%</td></tr>
+<tr><td style="font-weight:500">Savings rate promo</td><td><span class="status-dot" style="background:var(--pos)"></span>Active</td><td>$680K</td><td>$2.4M</td><td><span class="badge green">3.53x</span></td><td>1,204</td><td><span class="inline-bar"><span class="inline-bar-fill" style="width:88%;background:var(--warn)"></span></span> 88%</td></tr>
+<tr><td style="font-weight:500">Brand awareness — national</td><td><span class="status-dot" style="background:var(--pos)"></span>Active</td><td>$890K</td><td>$1.1M</td><td><span class="badge amber">1.24x</span></td><td>412</td><td><span class="inline-bar"><span class="inline-bar-fill" style="width:95%;background:var(--neg)"></span></span> 95%</td></tr>
+<tr><td style="font-weight:500">Mortgage refinance retarget</td><td><span class="status-dot" style="background:var(--warn)"></span>Paused</td><td>$340K</td><td>$204K</td><td><span class="badge red">0.60x</span></td><td>87</td><td><span class="inline-bar"><span class="inline-bar-fill" style="width:100%;background:var(--neg)"></span></span> 100%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="agent-bar">
+<div style="font-size:16px;color:var(--acc)"><i class="ti ti-robot"></i></div>
+<div class="agent-input"><span>Ask or command your marketing agent...</span><span class="kbd">⌘K</span></div>
+<button class="agent-send"><i class="ti ti-send"></i></button>
+</div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var dash=document.getElementById('dash');
+var isDark=false;
+document.getElementById('themeBtn').onclick=function(){isDark=!isDark;if(isDark)dash.setAttribute('data-t','dark');else dash.removeAttribute('data-t');document.getElementById('themeIcon').className=isDark?'ti ti-sun':'ti ti-moon';renderCharts()};
+function getV(v){return getComputedStyle(dash).getPropertyValue(v).trim()}
+function sparkline(id,data,color){var c=document.getElementById(id);if(!c)return;var ctx=c.getContext('2d');c.width=c.parentElement.offsetWidth;c.height=28;ctx.clearRect(0,0,c.width,c.height);var max=Math.max(...data),min=Math.min(...data),range=max-min||1,step=c.width/(data.length-1);ctx.beginPath();data.forEach(function(v,i){var x=i*step,y=26-((v-min)/range)*24;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();ctx.lineTo(c.width,28);ctx.lineTo(0,28);ctx.closePath();ctx.fillStyle=color+'18';ctx.fill()}
+var aI,dI;
+function renderCharts(){
+var ch1=getV('--ch1'),ch2=getV('--ch2'),ch3=getV('--ch3'),ch4=getV('--ch4'),tx2=getV('--tx2'),bd=getV('--bd');
+sparkline('s1',[3800,3850,3900,3950,4000,4050,4100,4120,4150,4180,4200,4200],getV('--pos'));
+sparkline('s2',[9200,9500,9800,10100,10500,10900,11300,11700,12000,12300,12600,12841],getV('--pos'));
+sparkline('s3',[4200,4400,4600,4800,5000,5200,5400,5600,5800,5900,6100,6204],getV('--pos'));
+sparkline('s4',[620,625,630,640,650,655,660,665,670,672,675,677],getV('--neg'));
+sparkline('s5',[3.1,3.2,3.3,3.3,3.4,3.5,3.5,3.6,3.7,3.7,3.8,3.8],getV('--pos'));
+if(aI)aI.destroy();if(dI)dI.destroy();
+aI=new Chart(document.getElementById('areaChart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Digital',data:[2200,2350,2500,2600,2750,2900],borderColor:ch1,backgroundColor:ch1+'20',fill:true,tension:.35,borderWidth:1.5,pointRadius:0},{label:'Direct mail',data:[900,920,950,970,990,1010],borderColor:ch2,backgroundColor:ch2+'20',fill:true,tension:.35,borderWidth:1.5,pointRadius:0},{label:'Branch',data:[600,620,640,650,660,680],borderColor:ch3,backgroundColor:ch3+'20',fill:true,tension:.35,borderWidth:1.5,pointRadius:0},{label:'Call center',data:[300,310,320,330,340,350],borderColor:ch4,backgroundColor:ch4+'20',fill:true,tension:.35,borderWidth:1.5,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{display:false},ticks:{color:tx2,font:{size:10}},border:{display:false}},y:{grid:{color:bd+'60'},ticks:{color:tx2,font:{size:10}},border:{display:false}}},plugins:{legend:{display:false}}}});
+dI=new Chart(document.getElementById('donutChart'),{type:'doughnut',data:{labels:['Digital','Direct mail','Branch','Call center'],datasets:[{data:[52,23,16,9],backgroundColor:[ch1,ch2,ch3,ch4],borderWidth:0,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}});
+}
+requestAnimationFrame(renderCharts);
+</script>
+</body>
+</html>
