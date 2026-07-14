@@ -7,7 +7,10 @@ DATABASE_URL env var selects the backend:
 
 import os
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
+
+load_dotenv()
 from sqlalchemy.orm import sessionmaker
 
 _default_db = os.getenv("APEX_DB_PATH", "apex_clean.duckdb")
