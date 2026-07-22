@@ -46,6 +46,7 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import YESTERDAY as TODAY, TRAILING_90D_START as DAY_0
 
 # ---------------------------------------------------------------------------
 # RNG + temporal window (trailing 90 days, aligned with seed_campaigns)
@@ -53,8 +54,6 @@ from src.data.init_db import get_connection  # noqa: E402
 SEED = 42
 rng = np.random.default_rng(SEED)
 
-TODAY = date(2026, 5, 7)
-DAY_0 = TODAY - timedelta(days=89)
 DATES: List[date] = [DAY_0 + timedelta(days=i) for i in range(90)]
 
 # ---------------------------------------------------------------------------

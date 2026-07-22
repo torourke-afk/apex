@@ -1,11 +1,16 @@
 """
-Filter Bar Component
---------------------
-Compact horizontal filter strip: date-preset chips, DMA / channel / product
-selectors, compare toggle, and Export / Refresh actions.
+Filter Bar Component — Signal Deck Design System
+-------------------------------------------------
+Compact horizontal filter strip matching the reference mockup
+(Executive-Scorecard.dc.html lines 122-151).
 
-All selections are persisted in ``st.session_state`` with namespaced keys so
-multiple filter bars on the same app don't collide.
+Renders a pure-HTML flex row styled to the Signal Deck tokens, with
+hidden Streamlit widgets underneath that drive actual filter state via
+``st.session_state``.  Each filter chip shows the current selection
+summary; clicking uses the hidden Streamlit widgets for selection.
+
+All selections are persisted in ``st.session_state`` with namespaced keys
+so multiple filter bars on the same app don't collide.
 """
 
 from __future__ import annotations
@@ -13,7 +18,7 @@ from __future__ import annotations
 import datetime
 import streamlit as st
 
-from src.config.brand import COLORS, TYPOGRAPHY, BORDER_RADIUS, MOTION, inject_brand_css
+from src.config.brand import inject_brand_css
 from src.state import get_global, set_global
 from src.data.data_range import (
     get_data_date_range,
@@ -58,177 +63,14 @@ def _ensure_options() -> None:
     _OPTIONS_LOADED = True
 
 
-# Full preset names (used internally and returned in the filter dict)
+# Date presets
 _DATE_PRESETS: list[str] = ["Last 30 days", "Last 60 days", "Last 90 days", "Custom"]
-
-# Short chip display labels — maps 1:1 to _DATE_PRESETS by index
-_CHIP_LABELS: list[str] = ["30d", "60d", "90d", "Custom"]
-
-# Bidirectional lookup
-_CHIP_TO_PRESET: dict[str, str] = dict(zip(_CHIP_LABELS, _DATE_PRESETS))
-_PRESET_TO_CHIP: dict[str, str] = dict(zip(_DATE_PRESETS, _CHIP_LABELS))
-
-
-# ---------------------------------------------------------------------------
-# CSS — injected at page level so it targets Streamlit widgets globally.
-# The old .filter-bar-container approach doesn't work because st.markdown
-# <div> tags don't actually wrap Streamlit widgets in the DOM.
-# ---------------------------------------------------------------------------
-
-_ff = TYPOGRAPHY["font_family"]
-_ts = COLORS["text_secondary"]
-_tp = COLORS["text_primary"]
-_gb = COLORS["glass_border"]
-_blue = COLORS["secondary"]
-_dur = MOTION["duration_fast"]
-_ease = MOTION["ease_out"]
-
-_FILTER_CSS = f"""
-<style>
-  /* ── Scope all filter-bar rules to any stVerticalBlock containing
-       the .filter-strip-row marker injected by filter_bar(). Using
-       CSS :has() avoids relying on a JS-added class. ───────────────────── */
-
-  /* ── Compact filter-bar: tighten the horizontal block gaps ────────────── */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stHorizontalBlock"] {{
-    gap: 0.4rem !important;
-    align-items: center !important;
-  }}
-
-  /* ── Date preset chips (st.radio → pill buttons) ────────────────────── */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] > [data-testid="stWidgetLabel"] {{
-    display: none !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] > [role="radiogroup"] {{
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 4px !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] [role="radiogroup"] > label {{
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 3px 12px !important;
-    border-radius: {BORDER_RADIUS['full']} !important;
-    border: 1px solid {_gb} !important;
-    background: transparent !important;
-    color: {_ts} !important;
-    font-family: {_ff} !important;
-    font-size: 0.6875rem !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    margin: 0 !important;
-    transition: all {_dur} {_ease} !important;
-    white-space: nowrap !important;
-    height: 28px !important;
-    min-height: 28px !important;
-    line-height: 1 !important;
-    gap: 0 !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] [role="radiogroup"] > label:hover {{
-    border-color: rgba(0,117,255,0.35) !important;
-    color: {_tp} !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] [role="radiogroup"] > label > div:first-child {{
-    display: none !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] [role="radiogroup"] > label > input {{
-    position: absolute !important;
-    opacity: 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] [role="radiogroup"] > label:has(input:checked) {{
-    background: rgba(0,117,255,0.15) !important;
-    border-color: {_blue} !important;
-    color: {_tp} !important;
-    font-weight: 600 !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stRadio"] [role="radiogroup"] > label p {{
-    font-size: 0.6875rem !important;
-    margin: 0 !important;
-    white-space: nowrap !important;
-  }}
-
-  /* ── Multiselect compact sizing ──────────────────────────────────────── */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stMultiSelect"] {{
-    min-height: 0 !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stMultiSelect"] [data-baseweb="select"] {{
-    min-height: 28px !important;
-    font-size: 0.75rem !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stMultiSelect"] [data-baseweb="select"] > div {{
-    min-height: 28px !important;
-    padding: 0 8px !important;
-    font-size: 0.75rem !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stMultiSelect"] input {{
-    font-size: 0.75rem !important;
-  }}
-
-  /* ── Compare toggle — smaller ────────────────────────────────────────── */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stToggle"] label {{
-    font-size: 0.6875rem !important;
-    color: {_ts} !important;
-    white-space: nowrap !important;
-  }}
-
-  /* ── Action buttons — ghost style ────────────────────────────────────── */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) .stButton > button {{
-    padding: 3px 10px !important;
-    border-radius: {BORDER_RADIUS['md']} !important;
-    border: 1px solid {_gb} !important;
-    background: transparent !important;
-    color: {_ts} !important;
-    font-family: {_ff} !important;
-    font-size: 0.6875rem !important;
-    font-weight: 500 !important;
-    height: 28px !important;
-    min-height: 28px !important;
-    line-height: 1 !important;
-    transition: all {_dur} {_ease} !important;
-    box-shadow: none !important;
-    width: 100% !important;
-    white-space: nowrap !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) .stButton > button:hover {{
-    border-color: rgba(0,117,255,0.35) !important;
-    color: {_tp} !important;
-    background: rgba(0,117,255,0.06) !important;
-    box-shadow: none !important;
-  }}
-
-
-  /* ── Tighten vertical gaps inside each column ───────────────────────── */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stVerticalBlock"] {{
-    gap: 0.15rem !important;
-  }}
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stVerticalBlock"] > div {{
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }}
-  /* Hide native widget labels — filter identity comes from placeholder text */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stMultiSelect"] > [data-testid="stWidgetLabel"],
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stToggle"] > [data-testid="stWidgetLabel"] {{
-    display: none !important;
-  }}
-  /* Style the compare toggle label (renders inline to the right of the knob) */
-  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stToggle"] > label {{
-    font-size: 0.6875rem !important;
-    color: {_ts} !important;
-    font-weight: 500 !important;
-    white-space: nowrap !important;
-  }}
-</style>
-"""
-
-
-def _inject_css() -> None:
-    """Inject filter bar CSS once per render."""
-    st.markdown(_FILTER_CSS, unsafe_allow_html=True)
+_DATE_PRESET_LABELS: dict[str, str] = {
+    "Last 30 days": "Last 30d",
+    "Last 60 days": "Last 60d",
+    "Last 90 days": "Last 90d",
+    "Custom": "Custom",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -275,6 +117,213 @@ def _init_state(key_prefix: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Signal Deck filter bar CSS
+# ---------------------------------------------------------------------------
+
+_FILTER_BAR_CSS = """
+<style>
+  /* ── Signal Deck filter bar — pure HTML chip row ──────────────────────── */
+
+  .sd-filter-bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 22px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg2);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+
+  .sd-filter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .18em;
+    color: var(--text3);
+    margin-right: 2px;
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  .sd-filter-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 13px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 12.5px;
+    line-height: 1;
+    white-space: nowrap;
+    transition: border-color 150ms cubic-bezier(0.0, 0.0, 0.2, 1);
+  }
+  .sd-filter-chip:hover {
+    border-color: var(--cyan);
+  }
+
+  .sd-filter-chip .chip-label {
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .sd-filter-chip .chip-value {
+    font-weight: 500;
+  }
+
+  .sd-filter-chip .chip-arrow {
+    color: var(--text3);
+    font-size: 10px;
+  }
+
+  .sd-filter-spacer {
+    flex: 1;
+  }
+
+  .sd-filter-reset {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border-radius: 9px;
+    border: 1px dashed var(--line2);
+    background: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1;
+    transition: color 150ms cubic-bezier(0.0, 0.0, 0.2, 1),
+                border-color 150ms cubic-bezier(0.0, 0.0, 0.2, 1);
+  }
+  .sd-filter-reset:hover {
+    color: var(--text);
+    border-color: var(--text2);
+  }
+
+  /* ── Hide the Streamlit widgets used for actual filter input ──────────── */
+  .sd-hidden-widgets {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ── Tighten Streamlit vertical gaps inside filter columns ────────────── */
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) {
+    gap: 0 !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stHorizontalBlock"] {
+    gap: 0.4rem !important;
+    align-items: center !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stVerticalBlock"] {
+    gap: 0.15rem !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stVerticalBlock"] > div {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* ── Hide native widget labels in filter bar ─────────────────────────── */
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stWidgetLabel"] {
+    display: none !important;
+  }
+
+  /* ── Compact Streamlit selectbox/multiselect inside filter bar ────────── */
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stSelectbox"],
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-testid="stMultiSelect"] {
+    min-height: 0 !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-baseweb="select"] {
+    min-height: 34px !important;
+    font-size: 0.75rem !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 9px !important;
+    background: var(--panel) !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-baseweb="select"] > div {
+    min-height: 34px !important;
+    padding: 0 12px !important;
+    font-size: 0.75rem !important;
+    border-color: var(--line) !important;
+    border-radius: 9px !important;
+    background: var(--panel) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-baseweb="select"] input {
+    font-size: 0.75rem !important;
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) [data-baseweb="select"]:hover {
+    border-color: var(--cyan) !important;
+  }
+
+  /* ── Filter bar action buttons ───────────────────────────────────────── */
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) .stButton > button {
+    padding: 6px 13px !important;
+    border-radius: 9px !important;
+    border: 1px dashed var(--line2) !important;
+    background: none !important;
+    color: var(--text2) !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    letter-spacing: .06em !important;
+    text-transform: uppercase !important;
+    height: auto !important;
+    min-height: 0 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    box-shadow: none !important;
+    transition: color 150ms cubic-bezier(0.0, 0.0, 0.2, 1),
+                border-color 150ms cubic-bezier(0.0, 0.0, 0.2, 1) !important;
+  }
+  [data-testid="stVerticalBlock"]:has(> [data-testid="stElementContainer"] .filter-strip-row) .stButton > button:hover {
+    color: var(--text) !important;
+    border-color: var(--text2) !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sd-filter-chip,
+    .sd-filter-reset {
+      transition: none !important;
+    }
+  }
+</style>
+"""
+
+
+def _inject_css() -> None:
+    """Inject Signal Deck filter bar CSS once per render."""
+    st.markdown(_FILTER_BAR_CSS, unsafe_allow_html=True)
+
+
+def _summarize_selection(selected: list[str], all_label: str, count: int | None = None) -> str:
+    """Build the chip value summary text."""
+    if not selected:
+        suffix = f" · {count}" if count is not None else ""
+        return f"All {all_label}{suffix}"
+    if len(selected) == 1:
+        return selected[0]
+    return f"{len(selected)} selected"
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -285,7 +334,11 @@ def filter_bar(
     show_channel: bool = True,
     show_product: bool = True,
 ) -> dict:
-    """Render a compact horizontal filter bar and return current selections."""
+    """Render a Signal Deck filter bar and return current selections.
+
+    The visual bar is a pure-HTML flex row matching the design mockup.
+    Actual filter selections use Streamlit widgets rendered below.
+    """
     inject_brand_css()
     _inject_css()
     _init_state(key_prefix)
@@ -314,56 +367,111 @@ def filter_bar(
     anchor = _DATA_END_DATE or datetime.date.today()
     data_min = _DATA_START_DATE or (anchor - datetime.timedelta(days=365))
 
-    # ── Layout: compact column ratios ─────────────────────────────────────
-    col_specs: list[float] = []
-    if show_date:
-        col_specs.append(3.0)     # date chips (4 pills need room)
-    if show_dma:
-        col_specs.append(2.0)
-    if show_channel:
-        col_specs.append(2.0)
-    if show_product:
-        col_specs.append(2.0)
-    col_specs.append(1.5)         # compare toggle
-    col_specs.append(1.1)         # export button
-    col_specs.append(1.1)         # refresh button
+    # ── Build the visual chip row (pure HTML) ────────────────────────────
+    date_label = _DATE_PRESET_LABELS.get(
+        st.session_state[k_preset], st.session_state[k_preset]
+    )
+    product_summary = _summarize_selection(st.session_state[k_product], "products")
+    dma_summary = _summarize_selection(
+        st.session_state[k_dma], "markets", count=len(_DMA_OPTIONS)
+    )
+    channel_summary = _summarize_selection(st.session_state[k_channel], "channels")
 
-    # Marker class for CSS scoping — the st.container wraps everything
-    # and the sticky JS targets this container's stLayoutWrapper
+    # Marker for CSS scoping (used by global_filter_strip sticky positioning)
     st.markdown(
         '<div class="filter-strip-row" style="display:contents;"></div>',
         unsafe_allow_html=True,
     )
 
+    # Build chip HTML fragments
+    chips_html = ""
+
+    if show_date:
+        chips_html += (
+            '<div class="sd-filter-chip">'
+            '<span class="chip-label">RANGE</span>'
+            f'<span class="chip-value">{date_label}</span>'
+            '<span class="chip-arrow">▾</span>'
+            '</div>'
+        )
+
+    if show_product:
+        chips_html += (
+            '<div class="sd-filter-chip">'
+            '<span class="chip-label">PRODUCT</span>'
+            f'<span class="chip-value">{product_summary}</span>'
+            '<span class="chip-arrow">▾</span>'
+            '</div>'
+        )
+
+    if show_dma:
+        chips_html += (
+            '<div class="sd-filter-chip">'
+            '<span class="chip-label">DMA</span>'
+            f'<span class="chip-value">{dma_summary}</span>'
+            '<span class="chip-arrow">▾</span>'
+            '</div>'
+        )
+
+    if show_channel:
+        chips_html += (
+            '<div class="sd-filter-chip">'
+            '<span class="chip-label">CHANNEL</span>'
+            f'<span class="chip-value">{channel_summary}</span>'
+            '<span class="chip-arrow">▾</span>'
+            '</div>'
+        )
+
+    bar_html = f"""
+    <div class="sd-filter-bar">
+      <span class="sd-filter-label">FILTER</span>
+      {chips_html}
+      <div class="sd-filter-spacer"></div>
+    </div>
+    """
+    st.markdown(bar_html, unsafe_allow_html=True)
+
+    # ── Streamlit widgets for actual interaction ─────────────────────────
+    # These drive the session_state; the HTML bar above is the visual layer.
+
+    # Build column layout for interactive widgets
+    col_specs: list[float] = []
+    if show_date:
+        col_specs.append(2.0)
+    if show_product:
+        col_specs.append(2.0)
+    if show_dma:
+        col_specs.append(2.0)
+    if show_channel:
+        col_specs.append(2.0)
+    col_specs.append(1.0)  # reset button
+
     cols = st.columns(col_specs)
     col_idx = 0
 
-    # ── Date preset chips ─────────────────────────────────────────────────
+    # ── Date preset selector ─────────────────────────────────────────────
     if show_date:
         with cols[col_idx]:
             current_preset = st.session_state[k_preset]
-            current_chip = _PRESET_TO_CHIP.get(current_preset, _CHIP_LABELS[0])
-            current_chip_idx = _CHIP_LABELS.index(current_chip) if current_chip in _CHIP_LABELS else 0
+            current_idx = _DATE_PRESETS.index(current_preset) if current_preset in _DATE_PRESETS else 0
 
-            selected_chip = st.radio(
+            selected_preset = st.selectbox(
                 label="Date Range",
-                options=_CHIP_LABELS,
-                index=current_chip_idx,
-                horizontal=True,
+                options=_DATE_PRESETS,
+                index=current_idx,
                 label_visibility="collapsed",
                 key=f"_widget_{k_preset}",
             )
 
-            new_preset = _CHIP_TO_PRESET.get(selected_chip, current_preset)
-            st.session_state[k_preset] = new_preset
+            st.session_state[k_preset] = selected_preset
 
-            if new_preset == "Last 30 days":
+            if selected_preset == "Last 30 days":
                 st.session_state[k_start] = anchor - datetime.timedelta(days=30)
                 st.session_state[k_end] = anchor
-            elif new_preset == "Last 60 days":
+            elif selected_preset == "Last 60 days":
                 st.session_state[k_start] = anchor - datetime.timedelta(days=60)
                 st.session_state[k_end] = anchor
-            elif new_preset == "Last 90 days":
+            elif selected_preset == "Last 90 days":
                 st.session_state[k_start] = anchor - datetime.timedelta(days=90)
                 st.session_state[k_end] = anchor
             else:
@@ -391,7 +499,21 @@ def filter_bar(
 
         col_idx += 1
 
-    # ── DMA selector ──────────────────────────────────────────────────────
+    # ── Product selector ─────────────────────────────────────────────────
+    if show_product:
+        with cols[col_idx]:
+            selected_product = st.multiselect(
+                label="Product",
+                options=_PRODUCT_OPTIONS,
+                default=st.session_state[k_product],
+                placeholder="All Products",
+                label_visibility="collapsed",
+                key=f"_widget_{k_product}",
+            )
+            st.session_state[k_product] = selected_product
+        col_idx += 1
+
+    # ── DMA selector ─────────────────────────────────────────────────────
     if show_dma:
         with cols[col_idx]:
             selected_dma = st.multiselect(
@@ -406,7 +528,7 @@ def filter_bar(
             set_global("dma_filter", selected_dma)
         col_idx += 1
 
-    # ── Channel selector ──────────────────────────────────────────────────
+    # ── Channel selector ─────────────────────────────────────────────────
     if show_channel:
         with cols[col_idx]:
             selected_channel = st.multiselect(
@@ -420,42 +542,12 @@ def filter_bar(
             st.session_state[k_channel] = selected_channel
         col_idx += 1
 
-    # ── Product selector ──────────────────────────────────────────────────
-    if show_product:
-        with cols[col_idx]:
-            selected_product = st.multiselect(
-                label="Product",
-                options=_PRODUCT_OPTIONS,
-                default=st.session_state[k_product],
-                placeholder="All Products",
-                label_visibility="collapsed",
-                key=f"_widget_{k_product}",
-            )
-            st.session_state[k_product] = selected_product
-        col_idx += 1
-
-    # ── Compare toggle ────────────────────────────────────────────────────
+    # ── Reset button ─────────────────────────────────────────────────────
     with cols[col_idx]:
-        compare = st.toggle(
-            label="Compare",
-            value=st.session_state.get(k_compare, False),
-            label_visibility="visible",
-            key=f"_widget_{k_compare}",
-        )
-        st.session_state[k_compare] = compare
-    col_idx += 1
-
-    # ── Export ──────────────────────────────────────────────────────────
-    with cols[col_idx]:
-        st.button("Export", key=f"_btn_export_{key_prefix}", use_container_width=True)
-    col_idx += 1
-
-    # ── Refresh ──────────────────────────────────────────────────────────
-    with cols[col_idx]:
-        if st.button("Refresh", key=f"_btn_refresh_{key_prefix}", use_container_width=True):
+        if st.button("↺ RESET", key=f"_btn_reset_{key_prefix}", use_container_width=True):
             st.rerun()
 
-    # ── Build result ──────────────────────────────────────────────────────
+    # ── Build result ─────────────────────────────────────────────────────
     _compare = st.session_state.get(k_compare, False)
     _start = st.session_state[k_start]
     _end = st.session_state[k_end]

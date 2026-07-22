@@ -292,11 +292,10 @@ def get_channel_spend_breakdown(filters: dict | None = None) -> dict:
         social = float(row[2] or 0)
         display = float(row[3] or 0)
 
-        # SEO and Email are not tracked in funnel_summary_daily — estimate
-        # as small constant fractions of total tracked spend
-        tracked_total = brand_media + sem + social + display
-        seo = tracked_total * 0.028       # ~2.8% allocation
-        email = tracked_total * 0.033     # ~3.3% allocation
+        # SEO and Email have no spend columns in the DB — report as 0
+        # (no fabricated percentages; surfaces show "No data" for these)
+        seo = 0.0
+        email = 0.0
 
         categories = [
             "Brand Media",
@@ -330,10 +329,12 @@ def get_channel_spend_breakdown(filters: dict | None = None) -> dict:
 @st.cache_data(ttl=120, show_spinner=False)
 def get_market_allocation(filters: dict | None = None) -> list[dict]:
     """Return per-DMA spend breakdown with CPIHH."""
+    dma_filter = (filters or {}).get("dma")
+
     try:
         con = duckdb.connect(_get_db_path(), read_only=True)
     except Exception:
-        return _fallback_markets()
+        return _fallback_markets(dma_filter)
 
     try:
         where, params = _build_where(filters)
@@ -365,13 +366,13 @@ def get_market_allocation(filters: dict | None = None) -> list[dict]:
                 "Funded": funded,
             })
 
-        return markets if markets else _fallback_markets()
+        return markets if markets else _fallback_markets(dma_filter)
     except Exception:
         try:
             con.close()
         except Exception:
             pass
-        return _fallback_markets()
+        return _fallback_markets(dma_filter)
 
 
 # ---------------------------------------------------------------------------
@@ -390,16 +391,71 @@ def _fallback_budget_overview() -> list[dict]:
 def _fallback_channel_breakdown() -> dict:
     return {
         "categories": ["Brand Media", "Performance SEM", "Paid Social", "HV Segment Overlay", "SEO / AEO", "Conversion & Testing"],
-        "actual": [8_090_000, 2_175_000, 1_870_000, 2_845_000, 445_000, 524_000],
-        "plan": [12_000_000, 3_750_000, 3_000_000, 4_000_000, 1_000_000, 1_000_000],
+        "actual": [8_090_000, 2_175_000, 1_870_000, 2_845_000, 0, 0],
+        "plan": [12_000_000, 3_750_000, 3_000_000, 4_000_000, 0, 0],
     }
 
 
-def _fallback_markets() -> list[dict]:
-    return [
-        {"Market": "Cincinnati, OH", "Tier": "T1", "Monthly Spend": 820_000, "CPIHH": 298, "Funded": 2752},
-        {"Market": "Chicago, IL", "Tier": "T1", "Monthly Spend": 640_000, "CPIHH": 312, "Funded": 2051},
-        {"Market": "Columbus, OH", "Tier": "T1", "Monthly Spend": 520_000, "CPIHH": 305, "Funded": 1705},
-        {"Market": "Atlanta, GA", "Tier": "T2", "Monthly Spend": 390_000, "CPIHH": 321, "Funded": 1215},
-        {"Market": "Nashville, TN", "Tier": "T2", "Monthly Spend": 310_000, "CPIHH": 334, "Funded": 928},
+def _fallback_markets(dma_filter: list[str] | None = None) -> list[dict]:
+    """Return synthetic market data for ~20 DMAs across the US.
+
+    *dma_filter* accepts DMA numeric codes ("515", "602"), city names
+    ("Cincinnati"), or "City, ST" ("Cincinnati, OH").  When provided,
+    only matching markets are returned.
+    """
+    from src.data.dma_centroids import DMA_NAME_TO_CODE
+
+    all_markets = [
+        # Tier 1 — core Midwest footprint
+        {"Market": "Cincinnati, OH",    "Tier": "T1", "Monthly Spend": 820_000, "CPIHH": 298, "Funded": 2752},
+        {"Market": "Chicago, IL",       "Tier": "T1", "Monthly Spend": 640_000, "CPIHH": 312, "Funded": 2051},
+        {"Market": "Columbus, OH",      "Tier": "T1", "Monthly Spend": 520_000, "CPIHH": 305, "Funded": 1705},
+        {"Market": "Indianapolis, IN",  "Tier": "T1", "Monthly Spend": 480_000, "CPIHH": 289, "Funded": 1661},
+        {"Market": "Detroit, MI",       "Tier": "T1", "Monthly Spend": 445_000, "CPIHH": 315, "Funded": 1413},
+        {"Market": "Cleveland, OH",     "Tier": "T1", "Monthly Spend": 410_000, "CPIHH": 308, "Funded": 1331},
+        # Tier 2 — Southeast expansion
+        {"Market": "Atlanta, GA",       "Tier": "T2", "Monthly Spend": 390_000, "CPIHH": 321, "Funded": 1215},
+        {"Market": "Nashville, TN",     "Tier": "T2", "Monthly Spend": 310_000, "CPIHH": 334, "Funded": 928},
+        {"Market": "Charlotte, NC",     "Tier": "T2", "Monthly Spend": 285_000, "CPIHH": 341, "Funded": 836},
+        {"Market": "Louisville, KY",    "Tier": "T2", "Monthly Spend": 260_000, "CPIHH": 318, "Funded": 818},
+        {"Market": "Raleigh, NC",       "Tier": "T2", "Monthly Spend": 230_000, "CPIHH": 347, "Funded": 663},
+        # Tier 3 — national expansion markets
+        {"Market": "New York, NY",      "Tier": "T3", "Monthly Spend": 1_250_000, "CPIHH": 385, "Funded": 3247},
+        {"Market": "Los Angeles, CA",   "Tier": "T3", "Monthly Spend": 980_000, "CPIHH": 402, "Funded": 2438},
+        {"Market": "Dallas, TX",        "Tier": "T3", "Monthly Spend": 520_000, "CPIHH": 356, "Funded": 1461},
+        {"Market": "Houston, TX",       "Tier": "T3", "Monthly Spend": 470_000, "CPIHH": 362, "Funded": 1298},
+        {"Market": "Phoenix, AZ",       "Tier": "T3", "Monthly Spend": 340_000, "CPIHH": 371, "Funded": 917},
+        {"Market": "Denver, CO",        "Tier": "T3", "Monthly Spend": 290_000, "CPIHH": 358, "Funded": 810},
+        {"Market": "Seattle, WA",       "Tier": "T3", "Monthly Spend": 310_000, "CPIHH": 392, "Funded": 791},
+        {"Market": "Miami, FL",         "Tier": "T3", "Monthly Spend": 420_000, "CPIHH": 412, "Funded": 1020},
+        {"Market": "Boston, MA",        "Tier": "T3", "Monthly Spend": 380_000, "CPIHH": 378, "Funded": 1005},
     ]
+
+    if not dma_filter:
+        return all_markets
+
+    # Build reverse lookup: DMA code → "City, ST" name
+    code_to_name: dict[str, str] = {}
+    for name, code in DMA_NAME_TO_CODE.items():
+        # Prefer the "City, ST" form (contains a comma)
+        if "," in name:
+            code_to_name[code] = name
+
+    # Resolve filter values: convert DMA codes to city names for matching
+    resolved_names: set[str] = set()
+    for f in dma_filter:
+        f = f.strip()
+        if f.isdigit() and f in code_to_name:
+            # It's a DMA code like "515" → resolve to "Cincinnati, OH"
+            resolved_names.add(code_to_name[f].lower())
+        else:
+            resolved_names.add(f.lower())
+
+    filtered = []
+    for m in all_markets:
+        market_lc = m["Market"].lower()
+        city_lc = market_lc.split(",")[0].strip()
+        if any(market_lc.startswith(n) or city_lc == n or market_lc == n
+               for n in resolved_names):
+            filtered.append(m)
+    return filtered if filtered else all_markets

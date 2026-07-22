@@ -11,6 +11,12 @@ from src.config.brand import apply_brand, COLORS, TYPOGRAPHY, BORDER_RADIUS, MOT
 from src.config.settings import APP_NAME, APP_VERSION, APP_DESCRIPTION, PAGES
 from src.state import init_state
 from src.components.global_filter_strip import render_global_filters
+from src.components.app_chrome import (
+    inject_chrome_css,
+    render_sidebar_branding,
+    render_sidebar_collapse_label,
+    render_agent_console,
+)
 
 # ---------------------------------------------------------------------------
 # Brand (must be first st call)
@@ -29,6 +35,17 @@ apply_brand(
 # ---------------------------------------------------------------------------
 
 init_state()
+
+# ---------------------------------------------------------------------------
+# Shared chrome — sidebar branding, icon tiles, agent console CSS
+# ---------------------------------------------------------------------------
+
+inject_chrome_css()
+
+# Sidebar branding (APEX logo + wordmark above nav) + collapse label at bottom
+with st.sidebar:
+    render_sidebar_branding()
+    render_sidebar_collapse_label()
 
 # ---------------------------------------------------------------------------
 # Persistent global filter bar — renders above all pages
@@ -50,7 +67,8 @@ _PAGE_FILES = [
     "src/pages/3_Acquisition_Funnel.py",
     "src/pages/7_Product_Experience.py",
     "src/pages/8_Operations_Command.py",
-    "src/pages/9_Simulator.py",
+    "src/pages/10_Retention_Forecast.py",
+    "src/pages/12_Brand_Awareness.py",
     "src/pages/11_Settings.py",
 ]
 
@@ -74,3 +92,9 @@ nav = st.navigation(_pages)
 # Chat drawer is rendered inside each page: src/components/chat_drawer.py
 
 nav.run()
+
+# ---------------------------------------------------------------------------
+# Agent console — persistent bottom command bar
+# ---------------------------------------------------------------------------
+
+render_agent_console()

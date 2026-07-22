@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Apex — 3 Front-End Design Directions</title>
+<style>
+:root{--bg:#0c0d12;--surf:#15161e;--bd:#262838;--tx:#e8eaf2;--tx2:#9aa0b5;--acc:#7c5cff;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 ui-sans-serif,system-ui,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 22px 70px}
+.kick{color:var(--acc);font-weight:700;font-size:12.5px;letter-spacing:1.6px;text-transform:uppercase}
+h1{font-size:30px;margin:8px 0 6px;font-weight:800}
+.lede{color:var(--tx2);max-width:760px;margin:0 0 8px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 22px}
+.tab{padding:8px 15px;border-radius:999px;border:1px solid var(--bd);background:var(--surf);color:var(--tx2);cursor:pointer;font-size:13.5px;font-weight:600}
+.tab.on{background:var(--acc);border-color:var(--acc);color:#0b0b12}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.col{border:1px solid var(--bd);border-radius:16px;overflow:hidden;background:var(--surf);display:flex;flex-direction:column}
+.col h3{margin:0;padding:14px 16px;font-size:15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.dotc{width:9px;height:9px;border-radius:999px}
+.preview{height:280px;position:relative;overflow:hidden}
+.meta{padding:14px 16px;font-size:13px;color:var(--tx2)}
+.meta b{color:var(--tx)}
+.meta ul{margin:8px 0 0;padding-left:16px}
+.meta li{margin:4px 0}
+.full{display:none}
+.full.on{display:block}
+.detail{border:1px solid var(--bd);border-radius:16px;padding:20px 22px;margin-top:20px;background:var(--surf)}
+.detail h2{margin:0 0 4px;font-size:22px}
+.detail .swatches{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.sw{width:42px;height:42px;border-radius:9px;border:1px solid rgba(255,255,255,.1);display:flex;align-items:flex-end;justify-content:center;font-size:8.5px;color:rgba(255,255,255,.7);padding-bottom:2px}
+.detail h4{margin:16px 0 4px;font-size:14px;color:var(--acc)}
+.detail p,.detail li{color:var(--tx2);font-size:13.5px}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--bd);vertical-align:top}
+th{color:var(--tx2);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px}
+.foot{color:var(--tx2);font-size:12.5px;border-top:1px solid var(--bd);margin-top:26px;padding-top:18px}
+
+/* ---- mini live previews ---- */
+/* D1 editorial */
+.p1{background:#16130f;font-family:Georgia,'Times New Roman',serif;padding:18px}
+.p1 .lbl{font-family:ui-sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#a39b8c}
+.p1 .hero{font-size:46px;color:#ede8df;font-weight:300;line-height:1;margin:2px 0 0;border-left:2px solid #ff4438;padding-left:10px}
+.p1 .hero b{font-weight:700}
+.p1 .rule{height:.5px;background:#322c24;margin:14px 0}
+.p1 .row{display:flex;gap:18px}
+.p1 .k{flex:1}
+.p1 .kv{font-size:18px;color:#ede8df;font-family:ui-monospace,monospace}
+.p1 .kd{font-size:10px;color:#4fb783;font-family:ui-sans-serif}
+
+/* D2 neo-terminal */
+.p2{background:#0A0B12;padding:16px;font-family:ui-sans-serif}
+.p2 .card{background:#0E1018;border:1px solid #262B3A;border-radius:12px;padding:12px;margin-bottom:10px}
+.p2 .lbl{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#7E869B}
+.p2 .v{font-size:24px;color:#EDF0F7;font-family:ui-monospace,monospace;font-weight:600}
+.p2 .v .d{font-size:12px;color:#34D39E;margin-left:6px}
+.p2 .chips{display:flex;gap:6px;margin-top:4px}
+.p2 .chip{font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(124,92,255,.16);color:#A78BFF;border:1px solid rgba(124,92,255,.3)}
+.p2 .bar2{height:6px;border-radius:99px;background:#1E2230;margin-top:8px;overflow:hidden}
+.p2 .bar2 i{display:block;height:100%;width:68%;background:linear-gradient(90deg,#7C5CFF,#16C8E8)}
+
+/* D3 mission control */
+.p3{background:#0B0E16;padding:16px;font-family:ui-sans-serif;position:relative}
+.p3 .hud{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#7E869B;border-bottom:1px solid #1c2030;padding-bottom:8px}
+.p3 .ok{color:#3FE0FF}
+.p3 .gauge{width:118px;height:118px;border-radius:999px;margin:16px auto 8px;display:flex;align-items:center;justify-content:center;
+  background:conic-gradient(#3FE0FF 0 78%, #1c2030 78% 100%);position:relative}
+.p3 .gauge::after{content:"";position:absolute;inset:10px;border-radius:999px;background:#0B0E16}
+.p3 .gv{position:relative;z-index:1;text-align:center}
+.p3 .gv .n{font-size:22px;color:#e8eaf2;font-family:ui-monospace,monospace;font-weight:700}
+.p3 .gv .s{font-size:8px;color:#9aa0b5;text-transform:uppercase;letter-spacing:.1em}
+.p3 .track{display:flex;gap:4px;margin-top:6px}
+.p3 .seg{flex:1;height:5px;border-radius:99px;background:#1c2030}
+.p3 .seg.f{background:#3FE0FF}
+.p3 .console{margin-top:12px;border:1px solid #1c2030;border-radius:8px;padding:7px 10px;font-family:ui-monospace,monospace;font-size:10px;color:#7E869B}
+.p3 .console .car{color:#3FE0FF}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kick">Apex · Front-End UX/UI · 3 Directions to Choose From</div>
+  <h1>Pick a design direction to merge into the build</h1>
+  <p class="lede">Three competing front-end design languages for the Apex marketing-intelligence platform — each a standalone memo for Claude design. Same product, same 7 domains, three distinct visual + interaction systems. Live mini-previews below; switch the toggle to read the full spec for each.</p>
+
+  <div class="bar">
+    <div class="tab on" data-v="all">Compare all 3</div>
+    <div class="tab" data-v="d1">1 · Editorial Instrument</div>
+    <div class="tab" data-v="d2">2 · Neo-Terminal System</div>
+    <div class="tab" data-v="d3">3 · Mission Control</div>
+  </div>
+
+  <!-- COMPARE GRID -->
+  <div class="full on" id="all">
+    <div class="grid">
+      <!-- D1 -->
+      <div class="col">
+        <h3><span class="dotc" style="background:#ff4438"></span> 1 · Editorial Instrument</h3>
+        <div class="preview"><div class="p1">
+          <div class="lbl">Funded accounts · MTD</div>
+          <div class="hero">12,4<b>08</b></div>
+          <div class="rule"></div>
+          <div class="row">
+            <div class="k"><div class="lbl">CAC</div><div class="kv">$214</div><div class="kd">▼ 6%</div></div>
+            <div class="k"><div class="lbl">ROAS</div><div class="kv">3.6×</div><div class="kd">▲ 0.4</div></div>
+            <div class="k"><div class="lbl">SoV</div><div class="kv">31%</div><div class="kd">▲ 3pt</div></div>
+          </div>
+        </div></div>
+        <div class="meta"><b>Broadsheet meets instrument.</b> Serif display + tabular numerals, hairline rules, one scarlet accent.
+          <ul><li>Fraunces/GT Sectra + Söhne + mono</li><li>Warm ink-on-paper, scalpel red</li><li>Page assembles "to print"</li></ul>
+        </div>
+      </div>
+      <!-- D2 -->
+      <div class="col">
+        <h3><span class="dotc" style="background:#7c5cff"></span> 2 · Neo-Terminal System</h3>
+        <div class="preview"><div class="p2">
+          <div class="card"><div class="lbl">Blended ROAS</div><div class="v">3.62×<span class="d">▲ 0.4</span></div>
+            <div class="chips"><span class="chip">AA verified</span><span class="chip">dark/light</span></div></div>
+          <div class="card"><div class="lbl">Pacing vs plan</div><div class="v">68%</div><div class="bar2"><i></i></div></div>
+        </div></div>
+        <div class="meta"><b>A real theming system.</b> 3-tier tokens, class toggle, WCAG AA guaranteed, drop-in new themes.
+          <ul><li>Geist + Geist Mono</li><li>Cyberpunk-tempered violet/cyan</li><li>White-label ready</li></ul>
+        </div>
+      </div>
+      <!-- D3 -->
+      <div class="col">
+        <h3><span class="dotc" style="background:#3FE0FF"></span> 3 · Mission Control</h3>
+        <div class="preview"><div class="p3">
+          <div class="hud"><span>● <span class="ok">all systems nominal</span></span><span>3 alerts</span></div>
+          <div class="gauge"><div class="gv"><div class="n">78%</div><div class="s">to target</div></div></div>
+          <div class="track"><span class="seg f"></span><span class="seg f"></span><span class="seg f"></span><span class="seg"></span></div>
+          <div class="console"><span class="car">▮</span> reallocate $40k → Cincinnati…</div>
+        </div></div>
+        <div class="meta"><b>Strategy-game console.</b> Celebration on real wins, progressive rewards, directive = "issue orders."
+          <ul><li>HUD + radial gauges + mission tracker</li><li>Best fit for the directive/approval loop</li><li>Motion discipline mandatory</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <tr><th>Dimension</th><th>1 · Editorial</th><th>2 · Neo-Terminal</th><th>3 · Mission Control</th></tr>
+      <tr><td>Distinctiveness</td><td>Very high</td><td>High</td><td>Very high</td></tr>
+      <tr><td>Build risk</td><td>Med (licensed fonts, type discipline)</td><td><b>Low</b> (pure system)</td><td>High (motion/QA)</td></tr>
+      <tr><td>Accessibility</td><td>Good</td><td><b>AA guaranteed by design</b></td><td>Good (reduced-motion gated)</td></tr>
+      <tr><td>White-label / themes</td><td>Hard</td><td><b>Native</b></td><td>Medium</td></tr>
+      <tr><td>Engagement</td><td>Calm authority</td><td>Clean, neutral</td><td><b>Highest</b></td></tr>
+      <tr><td>Best for</td><td>Exec gravitas</td><td>Scale + reuse</td><td>Agentic directive UX</td></tr>
+    </table>
+    <p class="meta" style="padding-left:0">A pragmatic path: adopt <b>Direction 2</b> as the token/accessibility foundation, then layer <b>Direction 3</b>'s consequence-feedback + mission-tracker on the directive/simulator surfaces, reserving <b>Direction 1</b>'s editorial hero treatment for the Executive Scorecard.</p>
+  </div>
+
+  <!-- D1 DETAIL -->
+  <div class="full" id="d1">
+    <div class="detail">
+      <h2>1 · Editorial Instrument</h2>
+      <p>Financial-broadsheet authority meets a precision instrument. Surprise through restraint and craft.</p>
+      <div class="swatches">
+        <div class="sw" style="background:#F4F1EA;color:#1a1714">paper</div>
+        <div class="sw" style="background:#1A1714">ink</div>
+        <div class="sw" style="background:#E2231A">scarlet</div>
+        <div class="sw" style="background:#1F6F4A">pos</div>
+        <div class="sw" style="background:#B8860B">warn</div>
+      </div>
+      <h4>Typography</h4><p>Fraunces / GT Sectra (display serif) · Söhne / Neue Haas (UI) · Söhne Mono (tabular numerals everywhere). Light serif label over heavy value.</p>
+      <h4>Depth</h4><p>No shadows — hairline rules + whitespace + faint ledger-grid texture. One hero metric per page on a paper gradient with a scarlet edge rule.</p>
+      <h4>Motion</h4><p>Page "assembles to print": title rises, KPIs reveal left-to-right (60ms stagger) with odometer count-up, charts draw their stroke. Approve = letterpress "APPROVED" stamp.</p>
+      <h4>Risk</h4><p>Needs licensed fonts + typographic discipline. Fallback: Fraunces + Geist (open).</p>
+    </div>
+  </div>
+
+  <!-- D2 DETAIL -->
+  <div class="full" id="d2">
+    <div class="detail">
+      <h2>2 · Neo-Terminal Theming System</h2>
+      <p>A complete, extensible CSS system — light/dark via <code>data-theme</code> class toggle, WCAG AA verified, distinctive cyberpunk-tempered palette, new themes drop in with no refactor.</p>
+      <div class="swatches">
+        <div class="sw" style="background:#0A0B12">canvas</div>
+        <div class="sw" style="background:#0E1018">surface</div>
+        <div class="sw" style="background:#7C5CFF">accent</div>
+        <div class="sw" style="background:#16C8E8">info</div>
+        <div class="sw" style="background:#34D39E">pos</div>
+        <div class="sw" style="background:#E2231A">crit</div>
+      </div>
+      <h4>Architecture</h4><p>3-tier tokens — primitives → semantic (theme-switched) → component. Components read only semantic tokens, so a theme is just a values block.</p>
+      <h4>Accessibility</h4><p>Every text/bg pairing + accent-contrast meets AA (≥4.5:1 body, ≥3:1 UI). Ships with a contrast lint in CI — it's a test, not a suggestion.</p>
+      <h4>Extensibility</h4><p>Add <code>[data-theme="rvgt-classic"]</code> or <code>[data-theme="client-acme"]</code> as one block; <code>@layer</code> lets client overrides avoid specificity wars.</p>
+      <h4>Risk</h4><p>Lowest-risk, most reusable. Maps cleanly onto the existing brand.py token approach.</p>
+    </div>
+  </div>
+
+  <!-- D3 DETAIL -->
+  <div class="full" id="d3">
+    <div class="detail">
+      <h2>3 · Mission Control</h2>
+      <p>Borrows game feedback systems (not aesthetics): celebration on real wins, progressive rewards as earned depth + operating streaks. Best fit for Apex's directive/approval loop.</p>
+      <div class="swatches">
+        <div class="sw" style="background:#0B0E16">ground</div>
+        <div class="sw" style="background:#3FE0FF;color:#04222a">signal</div>
+        <div class="sw" style="background:#34D39E">win</div>
+        <div class="sw" style="background:#E2231A">crit</div>
+      </div>
+      <h4>Mechanic 1 — Consequence feedback</h4><p>Celebrate only objectively-good, rare events (KPI hits target, directive completes, scenario beats plan): ≤600ms flourish, ring completion, over-shoot count-up. Never blocks, never on routine refresh.</p>
+      <h4>Mechanic 2 — Progressive rewards</h4><p>Operating streaks ("on-pace 6 weeks"), progressive disclosure of advanced levers, a mission tracker for multi-step flows (build → review → submit → approve → executed).</p>
+      <h4>3 layouts</h4><p>A — Command Console (Scorecard: HUD + radial gauge + alert wire + console input). B — Strategy Map (Spend/Funnel: resource nodes + particle flows + "commit plan" → directive). C — Mission Debrief (Simulator: pre/post briefing + scan-line compute + debrief).</p>
+      <h4>Risk</h4><p>Most motion/QA discipline. Rarity, brevity, data-truth, opt-in sound, reduced-motion = mandatory.</p>
+    </div>
+  </div>
+
+  <div class="foot">Each direction has a full standalone memo (.md) ready for Claude design. Grounded in the real Apex codebase: Streamlit + FastAPI + DuckDB/Postgres, 12 pages / 7 domains, RVGT brand, agentic directive layer. Companion: Apex-Unified-Microservice-Architecture.md.</div>
+</div>
+<script>
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.full').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');
+  document.getElementById(t.dataset.v).classList.add('on');
+});
+</script>
+</body>
+</html>

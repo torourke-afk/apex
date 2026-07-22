@@ -12,12 +12,35 @@ Approval queries are handled directly in the router via Directive ORM.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import streamlit as st
 
 from src.config.settings import APEX_DATA_REFRESH_INTERVAL_SECONDS, APEX_DEBUG_MODE
 from src.data import cache_metrics
+from src.data.seeds._dates import YESTERDAY
+
+# Shift all hardcoded dates relative to the original anchor date
+_ORIG_ANCHOR = date(2026, 5, 8)
+_SHIFT = timedelta(days=(YESTERDAY - _ORIG_ANCHOR).days)
+
+
+def _shift_date_str(iso_str: str) -> str:
+    """Shift an ISO date string (YYYY-MM-DD) by _SHIFT days."""
+    d = date.fromisoformat(iso_str) + _SHIFT
+    return d.isoformat()
+
+
+def _shift_iso_ts(iso_ts: str) -> str:
+    """Shift an ISO timestamp string by _SHIFT days, preserving time and 'Z' suffix."""
+    dt = datetime.fromisoformat(iso_ts.replace("Z", "+00:00")) + _SHIFT
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _shift_month(ym: str) -> str:
+    """Shift a YYYY-MM month string by _SHIFT days (uses the 1st of the month)."""
+    d = date.fromisoformat(ym + "-01") + _SHIFT
+    return d.strftime("%Y-%m")
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +54,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-001",
         "title": "Q2 SEM Campaign Launch",
         "event_type": "campaign_launch",
-        "date": "2026-05-12",
+        "date": _shift_date_str("2026-05-12"),
         "channel": "sem",
         "owner": "Media - Paid Search",
         "status": "scheduled",
@@ -41,7 +64,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-002",
         "title": "Creative Asset Review — Mortgage",
         "event_type": "creative_review",
-        "date": "2026-05-09",
+        "date": _shift_date_str("2026-05-09"),
         "channel": "display",
         "owner": "Creative - Lending",
         "status": "scheduled",
@@ -51,7 +74,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-003",
         "title": "Budget Reallocation Deadline",
         "event_type": "deadline",
-        "date": "2026-05-15",
+        "date": _shift_date_str("2026-05-15"),
         "channel": "all",
         "owner": "Finance - Marketing",
         "status": "scheduled",
@@ -61,7 +84,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-004",
         "title": "Monthly Performance Review",
         "event_type": "review",
-        "date": "2026-05-20",
+        "date": _shift_date_str("2026-05-20"),
         "channel": "all",
         "owner": "Analytics",
         "status": "scheduled",
@@ -71,7 +94,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-005",
         "title": "SEO Content Sprint Kickoff",
         "event_type": "planning",
-        "date": "2026-05-13",
+        "date": _shift_date_str("2026-05-13"),
         "channel": "seo",
         "owner": "Content - SEO",
         "status": "scheduled",
@@ -81,7 +104,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-006",
         "title": "Paid Social A/B Test Launch",
         "event_type": "campaign_launch",
-        "date": "2026-05-14",
+        "date": _shift_date_str("2026-05-14"),
         "channel": "paid_social",
         "owner": "Media - Paid Social",
         "status": "scheduled",
@@ -91,7 +114,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-007",
         "title": "LLM Visibility Audit",
         "event_type": "review",
-        "date": "2026-05-22",
+        "date": _shift_date_str("2026-05-22"),
         "channel": "llm",
         "owner": "Digital - AI Strategy",
         "status": "scheduled",
@@ -101,7 +124,7 @@ _CALENDAR_SEED: list[dict] = [
         "id": "cal-008",
         "title": "Q2 Campaign Post-Launch QA",
         "event_type": "review",
-        "date": "2026-05-16",
+        "date": _shift_date_str("2026-05-16"),
         "channel": "sem",
         "owner": "Media - Paid Search",
         "status": "completed",
@@ -142,7 +165,7 @@ _CAPACITY_SEED: list[dict] = [
         "id": "cap-001",
         "team": "Media - Paid Search",
         "channel": "sem",
-        "period": "2026-05",
+        "period": _shift_month("2026-05"),
         "allocated_hours": 160,
         "used_hours": 112,
         "available_hours": 48,
@@ -153,7 +176,7 @@ _CAPACITY_SEED: list[dict] = [
         "id": "cap-002",
         "team": "Media - Paid Social",
         "channel": "paid_social",
-        "period": "2026-05",
+        "period": _shift_month("2026-05"),
         "allocated_hours": 140,
         "used_hours": 126,
         "available_hours": 14,
@@ -164,7 +187,7 @@ _CAPACITY_SEED: list[dict] = [
         "id": "cap-003",
         "team": "Content - SEO",
         "channel": "seo",
-        "period": "2026-05",
+        "period": _shift_month("2026-05"),
         "allocated_hours": 200,
         "used_hours": 80,
         "available_hours": 120,
@@ -175,7 +198,7 @@ _CAPACITY_SEED: list[dict] = [
         "id": "cap-004",
         "team": "Creative - Display",
         "channel": "display",
-        "period": "2026-05",
+        "period": _shift_month("2026-05"),
         "allocated_hours": 120,
         "used_hours": 108,
         "available_hours": 12,
@@ -186,7 +209,7 @@ _CAPACITY_SEED: list[dict] = [
         "id": "cap-005",
         "team": "Analytics",
         "channel": "all",
-        "period": "2026-05",
+        "period": _shift_month("2026-05"),
         "allocated_hours": 180,
         "used_hours": 90,
         "available_hours": 90,
@@ -197,7 +220,7 @@ _CAPACITY_SEED: list[dict] = [
         "id": "cap-006",
         "team": "Digital - AI Strategy",
         "channel": "llm",
-        "period": "2026-05",
+        "period": _shift_month("2026-05"),
         "allocated_hours": 80,
         "used_hours": 32,
         "available_hours": 48,
@@ -246,37 +269,37 @@ _HEALTH_SEED: list[dict] = [
     {
         "name": "Database",
         "status": "healthy",
-        "last_checked": "2026-05-08T10:00:00Z",
+        "last_checked": _shift_iso_ts("2026-05-08T10:00:00Z"),
         "message": "All queries responding within SLA (p99 < 50ms).",
     },
     {
         "name": "Alert Engine",
         "status": "healthy",
-        "last_checked": "2026-05-08T09:55:00Z",
+        "last_checked": _shift_iso_ts("2026-05-08T09:55:00Z"),
         "message": "Last evaluation cycle completed in 1.2s. 0 rule errors.",
     },
     {
         "name": "SEM Data Pipeline",
         "status": "healthy",
-        "last_checked": "2026-05-08T09:50:00Z",
+        "last_checked": _shift_iso_ts("2026-05-08T09:50:00Z"),
         "message": "Google Ads & Bing feeds current. Last sync: 09:45 UTC.",
     },
     {
         "name": "Competitive Feed",
         "status": "healthy",
-        "last_checked": "2026-05-08T09:45:00Z",
+        "last_checked": _shift_iso_ts("2026-05-08T09:45:00Z"),
         "message": "12 new signals ingested in last 24h.",
     },
     {
         "name": "Simulator Engine",
         "status": "healthy",
-        "last_checked": "2026-05-08T09:40:00Z",
+        "last_checked": _shift_iso_ts("2026-05-08T09:40:00Z"),
         "message": "Idle. Last scenario run 4h ago.",
     },
     {
         "name": "Scheduler (APScheduler)",
         "status": "healthy",
-        "last_checked": "2026-05-08T10:00:00Z",
+        "last_checked": _shift_iso_ts("2026-05-08T10:00:00Z"),
         "message": "All 3 background jobs running on schedule.",
     },
 ]
@@ -319,7 +342,7 @@ _COMPETITIVE_FEED_SEED: list[dict] = [
             "Likely response to KeyBank's $400 offer expansion."
         ),
         "source": "chase.com",
-        "detected_at": "2026-05-07T14:22:00Z",
+        "detected_at": _shift_iso_ts("2026-05-07T14:22:00Z"),
         "impact": "high",
         "tags": ["checking", "acquisition", "bonus", "direct-deposit"],
     },
@@ -333,7 +356,7 @@ _COMPETITIVE_FEED_SEED: list[dict] = [
             "markets, directly competing with Fifth Third's retail banking footprint in the Midwest."
         ),
         "source": "huntington.com",
-        "detected_at": "2026-05-06T09:10:00Z",
+        "detected_at": _shift_iso_ts("2026-05-06T09:10:00Z"),
         "impact": "high",
         "tags": ["product", "credit", "expansion", "midwest"],
     },
@@ -347,7 +370,7 @@ _COMPETITIVE_FEED_SEED: list[dict] = [
             "search and content audiences — a direct play against Fifth Third's HELOC pipeline."
         ),
         "source": "pathmatics",
-        "detected_at": "2026-05-05T16:45:00Z",
+        "detected_at": _shift_iso_ts("2026-05-05T16:45:00Z"),
         "impact": "medium",
         "tags": ["campaign", "video", "heloc", "youtube"],
     },
@@ -362,7 +385,7 @@ _COMPETITIVE_FEED_SEED: list[dict] = [
             "in the mass-affluent segment."
         ),
         "source": "pnc.com",
-        "detected_at": "2026-05-04T11:30:00Z",
+        "detected_at": _shift_iso_ts("2026-05-04T11:30:00Z"),
         "impact": "medium",
         "tags": ["savings", "pricing", "rate", "hysa"],
     },
@@ -377,7 +400,7 @@ _COMPETITIVE_FEED_SEED: list[dict] = [
             "efficiency ahead of a product refresh."
         ),
         "source": "spyfu",
-        "detected_at": "2026-05-03T08:00:00Z",
+        "detected_at": _shift_iso_ts("2026-05-03T08:00:00Z"),
         "impact": "medium",
         "tags": ["sem", "checking", "share-of-voice", "competitive-bidding"],
     },
@@ -391,7 +414,7 @@ _COMPETITIVE_FEED_SEED: list[dict] = [
             "when paired with a US Bank credit card — a compelling bundle for mass-market customers."
         ),
         "source": "usbank.com",
-        "detected_at": "2026-05-02T13:15:00Z",
+        "detected_at": _shift_iso_ts("2026-05-02T13:15:00Z"),
         "impact": "high",
         "tags": ["checking", "product", "interest-bearing", "bundle"],
     },
@@ -406,7 +429,7 @@ _COMPETITIVE_FEED_SEED: list[dict] = [
             "Linear TV share of voice up 8 pp in May."
         ),
         "source": "ispot.tv",
-        "detected_at": "2026-05-01T17:50:00Z",
+        "detected_at": _shift_iso_ts("2026-05-01T17:50:00Z"),
         "impact": "low",
         "tags": ["brand", "tv", "campaign", "lifecycle"],
     },

@@ -37,6 +37,8 @@ import pandas as pd
 import pandera.pandas as pa
 from pandera.pandas import Column, DataFrameSchema, Check
 
+from src.data.seeds._dates import FY_MONTH_STARTS
+
 # ---------------------------------------------------------------------------
 # Path bootstrap (allows running as script or module)
 # ---------------------------------------------------------------------------
@@ -66,21 +68,8 @@ CATEGORIES = [
     ("Conversion/Testing",   "conversion_testing",      450_000.0),
 ]
 
-# Trailing 12 months: May 2025 – April 2026 (period_start = 1st of each month)
-MONTHS: List[date] = [
-    date(2025, 5, 1),
-    date(2025, 6, 1),
-    date(2025, 7, 1),
-    date(2025, 8, 1),
-    date(2025, 9, 1),
-    date(2025, 10, 1),
-    date(2025, 11, 1),
-    date(2025, 12, 1),
-    date(2026, 1, 1),
-    date(2026, 2, 1),
-    date(2026, 3, 1),
-    date(2026, 4, 1),
-]
+# Fiscal-year month starts (12 months, computed from _dates anchor)
+MONTHS: List[date] = [ts.date() for ts in FY_MONTH_STARTS]
 
 # Seasonal pacing weights per month index (0=May … 11=April).
 # Each category has a 12-element weight vector; they are normalised to sum to

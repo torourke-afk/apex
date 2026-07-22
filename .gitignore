@@ -80,3 +80,10 @@ secrets.toml
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Node
+node_modules/
+web/node_modules/
+brand-awareness-tracker/node_modules/
+.next/
+web/.next/

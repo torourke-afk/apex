@@ -1,0 +1,293 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Signal Deck Design Tokens ─────────────────────────────────────── */
+
+:root,
+[data-theme="dark"] {
+  --bg: #06080C;
+  --bg2: #0A0E14;
+  --panel: #0D1118;
+  --panel2: #10151E;
+  --elev: #151B26;
+  --line: rgba(255,255,255,.07);
+  --line2: rgba(255,255,255,.13);
+  --text: #E8ECF4;
+  --text2: #A4ADBF;
+  --text3: #6B7587;
+  --cyan: #34E1D4;
+  --cyanInk: #04100F;
+  --cyan-subtle: rgba(52,225,212,.06);
+  --cyan-hover: rgba(52,225,212,.14);
+  --cyan-active: rgba(52,225,212,.20);
+  --cyan-glow: rgba(52,225,212,.35);
+  --green: #4FD89B;
+  --amber: #F2B14C;
+  --red: #FF5C72;
+  --dot: rgba(170,205,230,.26);
+  --dotStar: rgba(190,215,235,.7);
+  --headerBg: rgba(10,13,19,.55);
+  --aura1: rgba(52,225,212,.08);
+  --aura2: rgba(60,100,220,.06);
+  --aura3: rgba(120,80,200,.05);
+}
+
+[data-theme="light"] {
+  --bg: #DDE2EA;
+  --bg2: #EAEEF4;
+  --panel: #FFF;
+  --panel2: #F4F6FA;
+  --elev: #FFF;
+  --line: rgba(12,18,28,.13);
+  --line2: rgba(12,18,28,.24);
+  --text: #0A0E16;
+  --text2: #414B5C;
+  --text3: #4E5567;
+  --cyan: #0B897E;
+  --cyanInk: #FFF;
+  --cyan-subtle: rgba(11,137,126,.07);
+  --cyan-hover: rgba(11,137,126,.12);
+  --cyan-active: rgba(11,137,126,.18);
+  --cyan-glow: rgba(11,137,126,.30);
+  --green: #0F7A4D;
+  --amber: #8A5E0A;
+  --red: #C92F47;
+  --dot: rgba(40,70,110,.22);
+  --dotStar: rgba(50,80,120,.6);
+  --headerBg: rgba(255,255,255,.7);
+  --aura1: rgba(11,137,126,.05);
+  --aura2: rgba(40,80,180,.04);
+  --aura3: rgba(100,60,180,.03);
+}
+
+/* ─── Base reset ────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular nums for all mono data */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Custom scrollbar ──────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line2);
+  border-radius: 9px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text3); background-clip: content-box; }
+
+/* ─── Range input (slider) styling ──────────────────────────────────── */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line2);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 8px rgba(52,225,212,.4);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 8px rgba(52,225,212,.4);
+  cursor: pointer;
+}
+
+/* ─── Focus ring ────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* ─── Atmosphere keyframes ──────────────────────────────────────────── */
+
+@keyframes aura1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -20px) scale(1.08); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes aura2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-25px, 15px) scale(1.05); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes aura3 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, 25px) scale(1.1); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes floatA {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(12px, -18px); }
+}
+@keyframes floatB {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-15px, 10px); }
+}
+@keyframes floatC {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(8px, 16px); }
+}
+@keyframes floatD {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-10px, -14px); }
+}
+@keyframes floatE {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(16px, 8px); }
+}
+@keyframes floatF {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-8px, -12px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes rise {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ringhero {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes ringkpi {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes pulseonce {
+  0% { box-shadow: inset 0 0 18px rgba(255,92,114,.45); }
+  100% { box-shadow: inset 0 0 0 transparent; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes wirein {
+  0% { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes drawIn {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ─── Compact density overrides ────────────────────────────────────── */
+
+[data-density="compact"] .p-5 { padding: 0.75rem; }
+[data-density="compact"] .p-4 { padding: 0.625rem; }
+[data-density="compact"] .gap-4 { gap: 0.75rem; }
+[data-density="compact"] .gap-5 { gap: 0.75rem; }
+[data-density="compact"] .gap-6 { gap: 1rem; }
+[data-density="compact"] .text-\[30px\] { font-size: 24px; }
+[data-density="compact"] .text-\[13px\] { font-size: 12px; }
+[data-density="compact"] .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+
+/* ─── Reduced motion ────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Utility: staggered rise delays ────────────────────────────────── */
+
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.10s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.20s; }
+.delay-5 { animation-delay: 0.25s; }
+.delay-6 { animation-delay: 0.30s; }
+
+/* ─── Responsive: tablet / narrow desktop (max-width: 1024px) ─────── */
+
+@media (max-width: 1024px) {
+  /* Tighten card padding */
+  .rounded-card { border-radius: 12px; }
+
+  /* Limit hero gauge size so it doesn't dominate */
+  section[class*="max-w-[330px]"] {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ─── Responsive: mobile / small tablet (max-width: 768px) ────────── */
+
+@media (max-width: 768px) {
+  /* Reduce large numeric displays */
+  .text-\[58px\] { font-size: 40px; }
+  .text-\[30px\] { font-size: 22px; }
+  .text-\[25px\] { font-size: 20px; }
+  .text-\[20px\] { font-size: 17px; }
+
+  /* Tighten card border-radius */
+  .rounded-card { border-radius: 10px; }
+  .rounded-card-lg { border-radius: 12px; }
+
+  /* Ensure SVG charts don't overflow */
+  svg[viewBox] { max-width: 100%; height: auto; }
+}
+
+/* ─── Responsive: line-clamp utility ──────────────────────────────── */
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

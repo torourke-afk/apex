@@ -28,15 +28,13 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import TWELVE_MONTH_STRINGS  # noqa: E402
 
 SEED = 42
 rng = np.random.default_rng(SEED)
 
 # 12 acquisition cohorts (months)
-COHORTS = [
-    "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10",
-    "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04",
-]
+COHORTS = TWELVE_MONTH_STRINGS
 
 # Milestone definitions: type → (target_pct, target_days, tracking_source, switching_cost)
 MILESTONES = {

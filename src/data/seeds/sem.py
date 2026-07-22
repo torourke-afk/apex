@@ -49,6 +49,7 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import YESTERDAY as END_DATE, TRAILING_90D_START as START_DATE
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -61,8 +62,6 @@ ANNUAL_TOTAL = 15_000_000.0
 SEM_BUDGET = ANNUAL_TOTAL * 0.25  # $3,750,000.00 — must match exactly
 
 DAYS = 90
-END_DATE = date(2026, 5, 7)
-START_DATE = END_DATE - timedelta(days=DAYS - 1)  # 2026-02-07
 
 PRODUCTS = [
     "checking", "savings", "credit_card", "mortgage",

@@ -25,6 +25,7 @@ import pandera.pandas as pa
 from pandera.pandas import Column, DataFrameSchema, Check
 
 from src.data.init_db import get_connection
+from src.data.seeds._dates import TWELVE_MONTH_STARTS, TWELVE_WEEK_MONDAYS
 
 # ---------------------------------------------------------------------------
 # Shared dimension constants
@@ -61,7 +62,7 @@ PRODUCTS = [
     "auto_loan", "personal_loan", "cd", "money_market",
 ]
 
-MONTHS = pd.date_range("2025-01-01", periods=12, freq="MS")
+MONTHS = TWELVE_MONTH_STARTS
 
 SEASONALITY = np.array([
     0.90, 0.88, 1.05, 1.08, 1.06, 1.00,
@@ -94,8 +95,8 @@ PRODUCT_LTV_BASE = {
 # kpi_sparklines constants (APE-10 spec)
 # ---------------------------------------------------------------------------
 
-# 12 Monday-based week starts ending near 2026-05-04
-WEEKS = pd.date_range("2026-02-09", periods=12, freq="W-MON")
+# 12 Monday-based week starts ending near yesterday
+WEEKS = TWELVE_WEEK_MONDAYS
 
 CUSTOMER_SEGMENTS = [
     "new_customers", "existing_customers", "reactivated",

@@ -35,6 +35,7 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import TWELVE_WEEK_MONDAYS  # noqa: E402
 
 SEED = 42
 rng = np.random.default_rng(SEED)
@@ -43,9 +44,8 @@ rng = np.random.default_rng(SEED)
 # Shared constants
 # ---------------------------------------------------------------------------
 
-# 12 weekly periods starting 2025-05-05 (Mondays)
-_START = date(2025, 5, 5)
-WEEKS: list[date] = [_START + timedelta(weeks=i) for i in range(12)]
+# 12 weekly periods (Mondays) from centralized date anchor
+WEEKS: list[date] = [d.date() for d in TWELVE_WEEK_MONDAYS]
 WEEK_STRS: list[str] = [str(w) for w in WEEKS]
 
 PLATFORMS = ["Meta", "TikTok", "LinkedIn", "Other"]

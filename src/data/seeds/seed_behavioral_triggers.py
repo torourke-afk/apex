@@ -27,6 +27,7 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import TWELVE_MONTH_STRINGS, TWELVE_MONTH_STARTS  # noqa: E402
 
 SEED = 42
 rng = np.random.default_rng(SEED)
@@ -35,10 +36,7 @@ rng = np.random.default_rng(SEED)
 WEEKS_PER_PERIOD = [4, 4, 5, 4, 4, 4, 4, 5, 4, 4, 4, 6]  # sums to 52
 assert sum(WEEKS_PER_PERIOD) == 52
 
-PERIODS = [
-    "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10",
-    "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04",
-]
+PERIODS = TWELVE_MONTH_STRINGS
 
 # Trigger definitions: name → (condition, action, weekly_volume_range, cvr_range)
 TRIGGERS = {
@@ -87,8 +85,9 @@ def build_behavioral_triggers() -> pd.DataFrame:
     week_num = 1
 
     for period_idx, (period, n_weeks) in enumerate(zip(PERIODS, WEEKS_PER_PERIOD)):
-        # Slight seasonal lift in Q4/Q1 for volume
-        seasonal_mult = 1.10 if period in ("2025-11", "2025-12", "2026-01") else 1.0
+        # Slight seasonal lift in Q4/Q1 for volume (Nov, Dec, Jan)
+        month_num = TWELVE_MONTH_STARTS[period_idx].month
+        seasonal_mult = 1.10 if month_num in (11, 12, 1) else 1.0
         # Gradual CVR improvement over time (optimization trend)
         cvr_trend = period_idx * 0.003
 

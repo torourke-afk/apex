@@ -32,12 +32,22 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import YESTERDAY
 
 SEED = 42
 rng = np.random.default_rng(SEED)
 
 # Reference anchor date
-TODAY = date(2026, 5, 8)
+TODAY = YESTERDAY
+
+# Shift all hardcoded dates relative to the original anchor (2026-05-08)
+_ORIG_ANCHOR = date(2026, 5, 8)
+_SHIFT = timedelta(days=(TODAY - _ORIG_ANCHOR).days)
+
+
+def _d(year, month, day):
+    """Create a date shifted relative to the original anchor."""
+    return date(year, month, day) + _SHIFT
 
 # ---------------------------------------------------------------------------
 # Static initiative IDs (stable across re-seeds for FK integrity)
@@ -56,7 +66,7 @@ _INITIATIVES_RAW = [
         "Digital Account Opening v3",
         "Redesign the digital account opening flow to reduce drop-off",
         "launched", "p0", "checking", "Sarah Chen",
-        date(2026, 2, 1), date(2026, 2, 14),
+        _d(2026, 2, 1), _d(2026, 2, 14),
         "Simplified form reduces abandonment by 20%",
         "application_completion_rate",
         Decimal("0.4200"), Decimal("0.5100"), Decimal("0.5340"),
@@ -65,7 +75,7 @@ _INITIATIVES_RAW = [
         "Savings Goal Builder",
         "In-app goal-based savings feature with automated round-up",
         "launched", "p1", "savings", "Marcus Webb",
-        date(2026, 1, 15), date(2026, 1, 22),
+        _d(2026, 1, 15), _d(2026, 1, 22),
         "Goal framing increases savings product adoption",
         "savings_product_attach_rate",
         Decimal("0.1800"), Decimal("0.2400"), Decimal("0.2610"),
@@ -74,7 +84,7 @@ _INITIATIVES_RAW = [
         "Personalized Onboarding Journey",
         "Segment-aware onboarding with dynamic content blocks",
         "in_progress", "p0", "digital_banking", "Priya Nair",
-        date(2026, 6, 1), None,
+        _d(2026, 6, 1), None,
         "Personalized onboarding drives 15% lift in 30-day PFI milestone completion",
         "pfi_30d_completion_rate",
         Decimal("0.5800"), Decimal("0.6700"), None,
@@ -83,7 +93,7 @@ _INITIATIVES_RAW = [
         "Credit Card Rewards Redesign",
         "Revamp rewards dashboard with real-time earn/redeem visibility",
         "in_progress", "p1", "credit_card", "Jordan Ellis",
-        date(2026, 5, 15), None,
+        _d(2026, 5, 15), None,
         "Visible rewards drive monthly active usage",
         "monthly_active_cardholders_pct",
         Decimal("0.5200"), Decimal("0.6000"), None,
@@ -92,7 +102,7 @@ _INITIATIVES_RAW = [
         "Mortgage Pre-Qual Chatbot",
         "AI-assisted pre-qualification flow embedded in mortgage landing page",
         "in_progress", "p1", "mortgage", "Rachel Kim",
-        date(2026, 7, 1), None,
+        _d(2026, 7, 1), None,
         "Chatbot reduces time-to-pre-qual and increases funnel entry",
         "prequalification_start_rate",
         Decimal("0.0820"), Decimal("0.1100"), None,
@@ -101,7 +111,7 @@ _INITIATIVES_RAW = [
         "Push Notification Relevance Engine",
         "ML-ranked push notifications to reduce opt-out rate",
         "in_progress", "p2", "digital_banking", "Alex Tran",
-        date(2026, 8, 1), None,
+        _d(2026, 8, 1), None,
         "Relevant notifications reduce opt-out by 30%",
         "push_opt_out_rate",
         Decimal("0.0950"), Decimal("0.0665"), None,
@@ -110,7 +120,7 @@ _INITIATIVES_RAW = [
         "Zelle Prominence Uplift",
         "Surface Zelle in-app with contextual prompts for eligible P2P moments",
         "discovery", "p1", "digital_banking", "Dana Park",
-        date(2026, 9, 1), None,
+        _d(2026, 9, 1), None,
         "Contextual prompts increase Zelle activation among eligible non-users",
         "zelle_activation_rate_eligible",
         Decimal("0.3100"), Decimal("0.4000"), None,
@@ -119,7 +129,7 @@ _INITIATIVES_RAW = [
         "Home Equity Digital App",
         "End-to-end digital HELOC application replacing paper process",
         "discovery", "p0", "mortgage", "Tom Bradley",
-        date(2026, 10, 1), None,
+        _d(2026, 10, 1), None,
         "Digital flow captures segment currently lost to competitors",
         "heloc_digital_completion_rate",
         Decimal("0.0000"), Decimal("0.3500"), None,
@@ -128,7 +138,7 @@ _INITIATIVES_RAW = [
         "CD Ladder Tool",
         "Interactive CD ladder builder inside savings hub",
         "discovery", "p2", "savings", "Yuki Mori",
-        date(2026, 11, 1), None,
+        _d(2026, 11, 1), None,
         "Visualizing CD laddering increases high-balance CD product attach",
         "cd_product_attach_rate",
         Decimal("0.0450"), Decimal("0.0720"), None,
@@ -137,7 +147,7 @@ _INITIATIVES_RAW = [
         "Business Banking Dashboard Beta",
         "Separate dashboard experience for small business segment",
         "paused", "p1", "business_banking", "Carlos Reyes",
-        date(2026, 4, 1), None,
+        _d(2026, 4, 1), None,
         "Dedicated dashboard improves SMB NPS by 10 points",
         "smb_nps_score",
         Decimal("32.0000"), Decimal("42.0000"), None,
@@ -146,7 +156,7 @@ _INITIATIVES_RAW = [
         "Spend Analytics v2",
         "Enhanced transaction categorization with merchant-level insights",
         "launched", "p2", "digital_banking", "Mia Foster",
-        date(2025, 11, 1), date(2025, 11, 8),
+        _d(2025, 11, 1), _d(2025, 11, 8),
         "Spend visibility increases cross-sell propensity",
         "cross_sell_click_rate",
         Decimal("0.0310"), Decimal("0.0430"), Decimal("0.0410"),
@@ -155,7 +165,7 @@ _INITIATIVES_RAW = [
         "Early Payoff Simulator — Auto Loan",
         "In-app tool showing interest savings from extra payments",
         "launched", "p2", "auto_loan", "David Osei",
-        date(2025, 12, 15), date(2025, 12, 20),
+        _d(2025, 12, 15), _d(2025, 12, 20),
         "Engagement with payoff tool increases loan retention",
         "auto_loan_12m_retention",
         Decimal("0.8100"), Decimal("0.8500"), Decimal("0.8390"),
@@ -164,7 +174,7 @@ _INITIATIVES_RAW = [
         "App Biometric Streamlining",
         "Remove secondary PIN after biometric auth to reduce friction",
         "launched", "p3", "digital_banking", "Leila Hassan",
-        date(2026, 3, 1), date(2026, 3, 5),
+        _d(2026, 3, 1), _d(2026, 3, 5),
         "Removing friction increases daily active sessions",
         "daily_active_users_pct",
         Decimal("0.4800"), Decimal("0.5300"), Decimal("0.5120"),
@@ -173,7 +183,7 @@ _INITIATIVES_RAW = [
         "Cross-sell Modal Sequencing",
         "Dynamic sequencing of in-app cross-sell prompts by LTV segment",
         "cancelled", "p2", "digital_banking", "Noah Wright",
-        date(2026, 3, 15), None,
+        _d(2026, 3, 15), None,
         "Sequenced prompts reduce annoyance while maintaining attach rate",
         "cross_sell_conversion_rate",
         Decimal("0.0220"), Decimal("0.0300"), None,
@@ -182,7 +192,7 @@ _INITIATIVES_RAW = [
         "Greenpath Financial Wellness Integration",
         "Embed financial wellness score and coaching tips in-app",
         "in_progress", "p1", "digital_banking", "Aisha Johnson",
-        date(2026, 6, 15), None,
+        _d(2026, 6, 15), None,
         "Wellness score visibility increases savings product consideration",
         "savings_consideration_rate",
         Decimal("0.2900"), Decimal("0.3800"), None,
@@ -221,7 +231,7 @@ _AB_TESTS_RAW = [
         "DAOv3 Short Form vs Long Form",
         "Shorter form reduces drop-off at personal-info step",
         "checking", "complete", 2,
-        date(2026, 1, 15), date(2026, 2, 14), 42000,
+        _d(2026, 1, 15), _d(2026, 2, 14), 42000,
         Decimal("0.5000"), "application_completion_rate",
         Decimal("0.420000"), Decimal("0.512000"),
         Decimal("0.2190"), Decimal("0.001200"),
@@ -231,7 +241,7 @@ _AB_TESTS_RAW = [
         "Savings Goal CTA Variants",
         "Outcome-framed CTA ('Save for a vacation') outperforms generic",
         "savings", "complete", 3,
-        date(2026, 1, 22), date(2026, 2, 28), 31000,
+        _d(2026, 1, 22), _d(2026, 2, 28), 31000,
         Decimal("0.3300"), "savings_product_attach_rate",
         Decimal("0.180000"), Decimal("0.221000"),
         Decimal("0.2278"), Decimal("0.003100"),
@@ -241,7 +251,7 @@ _AB_TESTS_RAW = [
         "Credit Card Hero Image Test",
         "Lifestyle imagery outperforms rewards-table imagery for card apply CTR",
         "credit_card", "complete", 2,
-        date(2026, 2, 1), date(2026, 3, 1), 18500,
+        _d(2026, 2, 1), _d(2026, 3, 1), 18500,
         Decimal("0.5000"), "apply_ctr",
         Decimal("0.031000"), Decimal("0.033800"),
         Decimal("0.0903"), Decimal("0.041000"),
@@ -251,7 +261,7 @@ _AB_TESTS_RAW = [
         "Push Notification Timing — AM vs PM",
         "Morning delivery increases open rate for balance alerts",
         "digital_banking", "complete", 2,
-        date(2026, 2, 14), date(2026, 3, 14), 55000,
+        _d(2026, 2, 14), _d(2026, 3, 14), 55000,
         Decimal("0.5000"), "notification_open_rate",
         Decimal("0.120000"), Decimal("0.158000"),
         Decimal("0.3167"), Decimal("0.000300"),
@@ -261,7 +271,7 @@ _AB_TESTS_RAW = [
         "Onboarding Progress Bar vs Steps",
         "Visible step count reduces early drop-off",
         "digital_banking", "running", 2,
-        date(2026, 4, 1), None, 28000,
+        _d(2026, 4, 1), None, 28000,
         Decimal("0.5000"), "onboarding_completion_rate",
         Decimal("0.620000"), None,
         None, None, None, None,
@@ -270,7 +280,7 @@ _AB_TESTS_RAW = [
         "Mortgage Chatbot Entry Point",
         "Embedded chatbot on mortgage landing page increases pre-qual starts",
         "mortgage", "running", 2,
-        date(2026, 4, 15), None, 12000,
+        _d(2026, 4, 15), None, 12000,
         Decimal("0.5000"), "prequalification_start_rate",
         Decimal("0.082000"), None,
         None, None, None, None,
@@ -279,7 +289,7 @@ _AB_TESTS_RAW = [
         "Rewards Dashboard Tabs vs Single View",
         "Tabbed layout reduces confusion and increases redemption CTA clicks",
         "credit_card", "running", 2,
-        date(2026, 5, 1), None, 21000,
+        _d(2026, 5, 1), None, 21000,
         Decimal("0.5000"), "rewards_redemption_cta_ctr",
         Decimal("0.094000"), None,
         None, None, None, None,
@@ -288,7 +298,7 @@ _AB_TESTS_RAW = [
         "Spend Analytics Tile Placement",
         "Above-fold placement increases feature discovery and engagement",
         "digital_banking", "complete", 2,
-        date(2025, 10, 15), date(2025, 11, 14), 44000,
+        _d(2025, 10, 15), _d(2025, 11, 14), 44000,
         Decimal("0.5000"), "spend_analytics_weekly_active_pct",
         Decimal("0.210000"), Decimal("0.247000"),
         Decimal("0.1762"), Decimal("0.000800"),
@@ -298,7 +308,7 @@ _AB_TESTS_RAW = [
         "Auto Loan Payoff Simulator Prompt Timing",
         "Showing payoff simulator at 6-month mark increases engagement",
         "auto_loan", "complete", 2,
-        date(2025, 11, 1), date(2025, 12, 15), 9800,
+        _d(2025, 11, 1), _d(2025, 12, 15), 9800,
         Decimal("0.5000"), "payoff_simulator_engagement_rate",
         Decimal("0.088000"), Decimal("0.121000"),
         Decimal("0.3750"), Decimal("0.002100"),
@@ -308,7 +318,7 @@ _AB_TESTS_RAW = [
         "Biometric Auth — Remove Secondary PIN",
         "Removing second factor post-biometric reduces login friction",
         "digital_banking", "complete", 2,
-        date(2026, 2, 15), date(2026, 3, 5), 67000,
+        _d(2026, 2, 15), _d(2026, 3, 5), 67000,
         Decimal("0.5000"), "daily_active_users_pct",
         Decimal("0.480000"), Decimal("0.511000"),
         Decimal("0.0646"), Decimal("0.012000"),
@@ -321,8 +331,8 @@ _AB_TESTS_RAW = [
 # ---------------------------------------------------------------------------
 
 def _velocity_week_start(offset_weeks: int) -> date:
-    # Week 11 = most recent full week ending 2026-05-03
-    anchor = date(2026, 2, 9)  # week_start of the oldest week
+    # Week 11 = most recent full week ending near TODAY
+    anchor = _d(2026, 2, 9)  # week_start of the oldest week (shifted)
     return anchor + timedelta(weeks=offset_weeks)
 
 

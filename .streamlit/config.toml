@@ -1,16 +1,15 @@
 [theme]
-# RVGT Brand System — Dark Glassmorphism
-# Deep navy backgrounds, RVGT Red accent, white text
-
-primaryColor = "#FF0016"
-backgroundColor = "#060B26"
-secondaryBackgroundColor = "#0B1437"
-textColor = "#FFFFFF"
+# Signal Deck — Dark Glassmorphism
+primaryColor = "#34E1D4"
+backgroundColor = "#06080C"
+secondaryBackgroundColor = "#0D1118"
+textColor = "#E8ECF4"
 font = "sans serif"
 
 [server]
 headless = true
 enableCORS = false
+enableXsrfProtection = false
 
 [browser]
 gatherUsageStats = false

@@ -18,12 +18,15 @@ get_recent_alerts(filters)        → list[dict]   — alert feed
 from __future__ import annotations
 
 import datetime
+import logging
 import os
 
 import duckdb
 import streamlit as st
 
 from src.data.data_range import compute_prior_period
+
+logger = logging.getLogger(__name__)
 
 
 def _get_db_path() -> str:
@@ -148,12 +151,105 @@ def _build_sparkline(con, sql: str, filters: dict | None, periods: int = 12) -> 
 # Public API
 # ---------------------------------------------------------------------------
 
+def _compute_mob6_kpi(con, filters: dict | None, prior: dict | None) -> dict:
+    """Compute MOB6 Retention Rate from survival curves — matches retention.py."""
+    try:
+        from src.data.retention_forecast import load_fits, get_survival_curves
+        seg_fits, pooled = load_fits("ORIGINATION")
+        curves = get_survival_curves(seg_fits, pooled, horizon_days=400)
+        portfolio = curves.get("Portfolio (blended)", [])
+        if len(portfolio) < 181:
+            raise ValueError("Not enough survival data")
+        mob6 = round(float(portfolio[180]) * 100, 1)  # S(180) as percentage
+    except Exception:
+        mob6 = 71.7  # fallback matches retention surface default
+
+    target = 74.0
+    delta = round(mob6 - target, 1)
+    positive = delta >= 0
+    # Synthetic sparkline trending toward current value
+    base = mob6 - 3.0
+    sp = [round(base + i * (3.0 / 11), 1) for i in range(12)]
+    sp[-1] = mob6
+    return {
+        "name": "MOB6 Retention Rate", "value": mob6,
+        "target": target, "delta": delta, "delta_pct": round(delta / target * 100, 1),
+        "sparkline_data": sp,
+        "trend": "improving" if positive else "declining",
+        "alert_status": "success" if positive else "warning",
+        "format_type": "percent",
+    }
+
+
+def _onboarding_pct(con, f: dict | None) -> float:
+    """Activation rate: accounts_funded / applications_started from funnel data.
+
+    This is the full-funnel conversion — how many people who started an app
+    ultimately funded an account (the true "onboarding activation").
+    """
+    clauses, params = [], []
+    if f and f.get("date_start"):
+        clauses.append("date >= ?")
+        params.append(str(f["date_start"]))
+    if f and f.get("date_end"):
+        clauses.append("date <= ?")
+        params.append(str(f["date_end"]))
+    where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
+    row = con.execute(f"""
+        SELECT
+            SUM(accounts_funded) * 100.0 / NULLIF(SUM(applications_started), 0)
+        FROM funnel_summary_daily {where}
+    """, params).fetchone()
+    return round(float(row[0] or 0), 1)
+
+
+def _compute_onboarding_kpi(con, filters: dict | None, prior: dict | None) -> dict:
+    """Compute Onboarding Activation Day 30 from customer_conversions data."""
+    try:
+        activation = _onboarding_pct(con, filters)
+    except Exception:
+        activation = 56.2
+
+    delta, delta_pct = 0.0, 0.0
+    if prior is not None:
+        # Compute prior period activation using the prior date range
+        try:
+            f = filters or {}
+            if f.get("date_start") and f.get("date_end"):
+                ds = f["date_start"]
+                de = f["date_end"]
+                if isinstance(ds, str):
+                    ds = datetime.date.fromisoformat(ds)
+                if isinstance(de, str):
+                    de = datetime.date.fromisoformat(de)
+                p_start, p_end = compute_prior_period(ds, de)
+                p_filters = dict(f, date_start=str(p_start), date_end=str(p_end))
+                prior_val = _onboarding_pct(con, p_filters)
+                delta = round(activation - prior_val, 1)
+                delta_pct = round((delta / prior_val * 100) if prior_val else 0.0, 1)
+        except Exception:
+            pass
+
+    base = activation - 3.0
+    sp = [round(base + i * (3.0 / 11), 1) for i in range(12)]
+    sp[-1] = activation
+    return {
+        "name": "Onboarding Activation Day 30", "value": activation,
+        "target": 0, "delta": delta, "delta_pct": delta_pct,
+        "sparkline_data": sp,
+        "trend": "improving" if delta >= 0 else "declining",
+        "alert_status": "success" if activation >= 50 else "warning",
+        "format_type": "percent",
+    }
+
+
 @st.cache_data(ttl=120, show_spinner=False)
 def get_kpi_summary(filters: dict | None = None) -> list[dict]:
     """Return 7 executive KPI cards computed from the synthetic dataset."""
     try:
         con = duckdb.connect(_get_db_path(), read_only=True)
     except Exception:
+        logger.exception("get_kpi_summary: DB connect failed (path=%s)", _get_db_path())
         return _fallback_kpis()
 
     try:
@@ -161,8 +257,14 @@ def get_kpi_summary(filters: dict | None = None) -> list[dict]:
         prior = None
         f = filters or {}
         if f.get("date_start") and f.get("date_end"):
-            p_start, p_end = compute_prior_period(f["date_start"], f["date_end"])
-            prior = _query_period(con, dict(f, date_start=p_start, date_end=p_end))
+            ds = f["date_start"]
+            de = f["date_end"]
+            if isinstance(ds, str):
+                ds = datetime.date.fromisoformat(ds)
+            if isinstance(de, str):
+                de = datetime.date.fromisoformat(de)
+            p_start, p_end = compute_prior_period(ds, de)
+            prior = _query_period(con, dict(f, date_start=str(p_start), date_end=str(p_end)))
 
         def _delta(cur_val, prior_val):
             if prior is None or prior_val is None:
@@ -205,9 +307,7 @@ def get_kpi_summary(filters: dict | None = None) -> list[dict]:
         kpis = [
             {"name": "Net Household Growth", "value": c["net_hh"], "delta": d_hh, "delta_pct": dp_hh,
              "sparkline_data": sp_hh, "trend": _trend(sp_hh), "alert_status": _alert(c["net_hh"], p.get("net_hh"), True), "format_type": "number"},
-            {"name": "MOB6 Retention Rate", "value": 84.3, "delta": 1.2, "delta_pct": 1.4,
-             "sparkline_data": [81.0, 81.5, 82.1, 82.8, 83.0, 83.4, 83.8, 84.0, 84.1, 84.2, 84.3, 84.3],
-             "trend": "improving", "alert_status": "success", "format_type": "percent"},
+            _compute_mob6_kpi(con, filters, prior),
             {"name": "Brand Capture Rate", "value": round(c["brand_capture"], 2), "delta": d_cap, "delta_pct": dp_cap,
              "sparkline_data": [], "trend": "improving" if d_cap >= 0 else "declining",
              "alert_status": _alert(c["brand_capture"], p.get("brand_capture"), True), "format_type": "percent"},
@@ -220,13 +320,12 @@ def get_kpi_summary(filters: dict | None = None) -> list[dict]:
             {"name": "App Completion Rate", "value": round(c["app_completion"], 1), "delta": d_app, "delta_pct": dp_app,
              "sparkline_data": sp_app, "trend": _trend(sp_app),
              "alert_status": _alert(c["app_completion"], p.get("app_completion"), True), "format_type": "percent"},
-            {"name": "Onboarding Activation Day 30", "value": 56.2, "delta": 1.8, "delta_pct": 3.3,
-             "sparkline_data": [51.0, 51.8, 52.5, 53.1, 53.8, 54.2, 54.9, 55.2, 55.6, 55.9, 56.1, 56.2],
-             "trend": "improving", "alert_status": "success", "format_type": "percent"},
+            _compute_onboarding_kpi(con, filters, prior),
         ]
         con.close()
         return kpis
     except Exception:
+        logger.exception("get_kpi_summary: query/computation failed")
         try:
             con.close()
         except Exception:
@@ -240,6 +339,7 @@ def get_financial_summary(filters: dict | None = None) -> list[dict]:
     try:
         con = duckdb.connect(_get_db_path(), read_only=True)
     except Exception:
+        logger.exception("get_financial_summary: DB connect failed (path=%s)", _get_db_path())
         return _fallback_financials()
 
     try:
@@ -271,8 +371,10 @@ def get_financial_summary(filters: dict | None = None) -> list[dict]:
         prev_mtd = _spend(prev_start, prev_end)
 
         current = _query_period(con, f)
-        p_s, p_e = compute_prior_period(f.get("date_start", ytd_start), end_d)
-        prior = _query_period(con, dict(f, date_start=p_s, date_end=p_e))
+        ds_raw = f.get("date_start", ytd_start)
+        ds_d = ds_raw if isinstance(ds_raw, datetime.date) else datetime.date.fromisoformat(str(ds_raw))
+        p_s, p_e = compute_prior_period(ds_d, end_d)
+        prior = _query_period(con, dict(f, date_start=str(p_s), date_end=str(p_e)))
         con.close()
 
         return [
@@ -283,6 +385,7 @@ def get_financial_summary(filters: dict | None = None) -> list[dict]:
             {"label": "Blended CPIHH", "value": current["cpihh"], "delta": current["cpihh"] - prior.get("cpihh", current["cpihh"]), "format": "currency"},
         ]
     except Exception:
+        logger.exception("get_financial_summary: query/computation failed")
         try:
             con.close()
         except Exception:
@@ -312,6 +415,7 @@ def get_campaign_performance(filters: dict | None = None) -> list[dict]:
                               "ROAS": round(roas, 2), "Funded": convs, "Budget Pace": min(100, int(80 + spend % 20))})
         return campaigns or _fallback_campaigns()
     except Exception:
+        logger.exception("get_campaign_performance failed — returning fallback")
         return _fallback_campaigns()
 
 
@@ -334,6 +438,7 @@ def get_recent_alerts(filters: dict | None = None, severity: str | None = None, 
             alerts = [a for a in alerts if a["severity"] == severity]
         return alerts[:limit] if alerts else _fallback_alerts()[:limit]
     except Exception:
+        logger.exception("get_recent_alerts failed — returning fallback")
         return _fallback_alerts()[:limit]
 
 

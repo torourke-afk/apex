@@ -30,14 +30,12 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import TWELVE_MONTH_STRINGS  # noqa: E402
 
 SEED = 42
 rng = np.random.default_rng(SEED)
 
-PERIODS = [
-    "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10",
-    "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04",
-]
+PERIODS = TWELVE_MONTH_STRINGS
 
 # Tier definitions: (center_score, half_range)
 TIER_RANGES = {

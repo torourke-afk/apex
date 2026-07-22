@@ -1,0 +1,47 @@
+services:
+  bff:
+    build:
+      context: .
+      dockerfile: Dockerfile.bff
+    ports:
+      - "8000:8000"
+    volumes:
+      - duckdb-data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "80:80"
+    depends_on:
+      bff:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # --- Future: Kamino event bus ---
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 5
+  #   restart: unless-stopped
+
+volumes:
+  duckdb-data:
+  # redis-data:

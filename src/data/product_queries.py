@@ -9,13 +9,24 @@ live data exists, so callers never see 500s in dev/demo mode.
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from typing import Literal
 
 import streamlit as st
 
 from src.config.settings import APEX_DATA_REFRESH_INTERVAL_SECONDS, APEX_DEBUG_MODE
 from src.data import cache_metrics
+from src.data.seeds._dates import YESTERDAY
+
+# Shift all hardcoded dates relative to the original anchor date
+_ORIG_ANCHOR = date(2026, 5, 8)
+_SHIFT = timedelta(days=(YESTERDAY - _ORIG_ANCHOR).days)
+
+
+def _shift_date_str(iso_str: str) -> str:
+    """Shift an ISO date string by _SHIFT days."""
+    d = date.fromisoformat(iso_str) + _SHIFT
+    return d.isoformat()
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +42,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "savings",
         "stage": "development",
         "owner": "Product - Core Banking",
-        "target_date": "2026-07-15",
+        "target_date": _shift_date_str("2026-07-15"),
         "priority": "high",
         "confidence_score": 0.82,
         "description": "ML-driven push notifications that surface personalized savings opportunities.",
@@ -42,7 +53,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "checking",
         "stage": "testing",
         "owner": "Product - Digital Onboarding",
-        "target_date": "2026-06-01",
+        "target_date": _shift_date_str("2026-06-01"),
         "priority": "critical",
         "confidence_score": 0.91,
         "description": "Sub-3-minute account opening with biometric identity verification.",
@@ -53,7 +64,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "investments",
         "stage": "discovery",
         "owner": "Product - Wealth",
-        "target_date": "2026-10-01",
+        "target_date": _shift_date_str("2026-10-01"),
         "priority": "medium",
         "confidence_score": 0.55,
         "description": "Rule-based cross-sell trigger model for primary financial institution conversion.",
@@ -64,7 +75,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "lending",
         "stage": "ideation",
         "owner": "Product - Lending",
-        "target_date": "2026-12-01",
+        "target_date": _shift_date_str("2026-12-01"),
         "priority": "low",
         "confidence_score": 0.38,
         "description": "Fully digital closing flow for home equity lines of credit.",
@@ -75,7 +86,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "cards",
         "stage": "launched",
         "owner": "Product - Cards",
-        "target_date": "2026-04-01",
+        "target_date": _shift_date_str("2026-04-01"),
         "priority": "high",
         "confidence_score": 1.0,
         "description": "Unified rewards wallet across credit card and checking products.",
@@ -86,7 +97,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "digital",
         "stage": "development",
         "owner": "Product - Digital Experience",
-        "target_date": "2026-08-15",
+        "target_date": _shift_date_str("2026-08-15"),
         "priority": "medium",
         "confidence_score": 0.70,
         "description": "Alexa/Google voice banking with balance, transfer, and bill-pay support.",
@@ -97,7 +108,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "checking",
         "stage": "testing",
         "owner": "Product - Segments",
-        "target_date": "2026-06-30",
+        "target_date": _shift_date_str("2026-06-30"),
         "priority": "high",
         "confidence_score": 0.88,
         "description": "Campus-targeted checking product with fee waivers and financial literacy tools.",
@@ -108,7 +119,7 @@ _PIPELINE_SEED: list[dict] = [
         "product_line": "business",
         "stage": "discovery",
         "owner": "Product - SMB",
-        "target_date": "2026-11-01",
+        "target_date": _shift_date_str("2026-11-01"),
         "priority": "medium",
         "confidence_score": 0.61,
         "description": "Unified cash flow dashboard for small business owners with AP/AR insights.",

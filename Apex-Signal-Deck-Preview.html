@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Apex — Signal Deck (combined direction)</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── primitives ─────────────────────────────────────────── */
+:root{
+  --violet-300:#A78BFF;--violet-700:#5B3FD6;--cyan-300:#5FE9FF;--cyan-700:#0E93AC;
+  --font-sans:'Satoshi',ui-sans-serif,system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --radius-md:10px;--radius-lg:14px;--radius-pill:999px;
+  --ease:cubic-bezier(.2,0,0,1);--t-fast:140ms;--t:220ms;--t-slow:420ms;
+}
+/* ── semantic: dark ─────────────────────────────────────── */
+[data-theme="dark"]{
+  --bg:#0A0B12;--surface:#0E1018;--raised:#151823;--sunken:#1E2230;
+  --tx:#EDF0F7;--tx2:#AEB4C7;--tx3:#7E869B;--bd:#262B3A;
+  --accent:#A78BFF;--accent-on:#0A0B12;--signal:#5FE9FF;
+  --pos:#34D39E;--warn:#F5B544;--crit:#FF5A4D;
+  --sh1:0 1px 2px rgba(0,0,0,.4);--sh2:0 8px 24px rgba(0,0,0,.45);
+}
+/* ── semantic: light ────────────────────────────────────── */
+[data-theme="light"]{
+  --bg:#F6F7FB;--surface:#FFFFFF;--raised:#FFFFFF;--sunken:#ECEEF5;
+  --tx:#14161F;--tx2:#4A4F60;--tx3:#6B7280;--bd:#DCE0EC;
+  --accent:#5B3FD6;--accent-on:#FFFFFF;--signal:#0E93AC;
+  --pos:#0E9F73;--warn:#C4870F;--crit:#E2231A;
+  --sh1:0 1px 2px rgba(16,24,40,.06);--sh2:0 8px 24px rgba(16,24,40,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font-sans);transition:background var(--t) var(--ease),color var(--t) var(--ease)}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+/* shell */
+.app{display:grid;grid-template-columns:60px 1fr;min-height:100vh}
+.rail{background:var(--surface);border-right:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:6px;position:sticky;top:0;height:100vh}
+.logo{width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--accent-on);display:flex;align-items:center;justify-content:center;font-weight:700;margin-bottom:10px}
+.ri{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--tx3);cursor:pointer;font-size:17px;transition:all var(--t-fast) var(--ease)}
+.ri:hover{background:color-mix(in oklab,var(--accent) 14%,transparent);color:var(--accent)}
+.ri.on{background:color-mix(in oklab,var(--accent) 18%,transparent);color:var(--accent)}
+.main{display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:54px;display:flex;align-items:center;gap:14px;padding:0 22px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:color-mix(in oklab,var(--bg) 86%,transparent);backdrop-filter:blur(8px);z-index:5}
+.tt{font-weight:600;font-size:16px}
+.status{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx2)}
+.pulse{width:8px;height:8px;border-radius:99px;background:var(--signal);box-shadow:0 0 0 0 color-mix(in oklab,var(--signal) 60%,transparent);animation:beacon 2.4s infinite}
+@keyframes beacon{0%{box-shadow:0 0 0 0 color-mix(in oklab,var(--signal) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.spacer{flex:1}
+.toggle{border:1px solid var(--bd);background:var(--sunken);color:var(--tx2);border-radius:var(--radius-pill);padding:6px 13px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font-sans)}
+.content{padding:20px 22px;display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+@media(max-width:920px){.content{grid-template-columns:1fr}.rail{display:none}.app{grid-template-columns:1fr}}
+
+/* HUD ribbon */
+.hud{grid-column:1/-1;display:flex;align-items:center;gap:16px;padding:10px 16px;border:1px solid var(--bd);border-radius:var(--radius-lg);background:var(--surface);font-size:12.5px}
+.hud .ok{color:var(--signal);font-weight:600}
+.streak{margin-left:auto;display:flex;gap:14px;color:var(--tx2)}
+.streak b{color:var(--tx)}
+
+/* gauge + KPIs */
+.deck{display:grid;gap:16px}
+.heroRow{display:grid;grid-template-columns:200px 1fr;gap:16px}
+@media(max-width:680px){.heroRow{grid-template-columns:1fr}}
+.gaugeCard,.card{background:var(--surface);border:1px solid var(--bd);border-radius:var(--radius-lg);box-shadow:var(--sh1)}
+.gaugeCard{padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge{width:140px;height:140px;border-radius:99px;display:flex;align-items:center;justify-content:center;position:relative;
+  background:conic-gradient(var(--signal) 0 var(--p,0%), var(--sunken) var(--p,0%) 100%);transition:--p 1s var(--ease)}
+.gauge::after{content:"";position:absolute;inset:11px;border-radius:99px;background:var(--surface)}
+.gauge .gv{position:relative;z-index:1;text-align:center}
+.gauge .gn{font-size:26px;font-weight:700}
+.gauge .gs{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--tx3)}
+.gaugeLab{margin-top:12px;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx2)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:680px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--sh1);transition:box-shadow var(--t) var(--ease)}
+.kpi:hover{box-shadow:var(--sh2)}
+.kpi .l{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx2)}
+.kpi .v{font-size:26px;font-weight:600;margin:4px 0 2px}
+.kpi .d{font-size:11.5px}
+.up{color:var(--pos)} .dn{color:var(--crit)}
+.spark{height:26px;margin-top:6px;display:flex;align-items:flex-end;gap:2px}
+.spark i{flex:1;background:color-mix(in oklab,var(--signal) 55%,transparent);border-radius:2px 2px 0 0}
+.metTag{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--pos);border:1px solid color-mix(in oklab,var(--pos) 40%,transparent);background:color-mix(in oklab,var(--pos) 12%,transparent);border-radius:99px;padding:1px 8px;margin-top:6px}
+
+/* mission tracker */
+.mission{background:var(--surface);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:14px 16px}
+.mission .h{font-size:12px;color:var(--tx2);margin-bottom:9px;display:flex;justify-content:space-between}
+.track{display:flex;gap:6px}
+.seg{flex:1;height:6px;border-radius:99px;background:var(--sunken);position:relative;overflow:hidden}
+.seg.f{background:var(--signal)}
+.seglab{display:flex;gap:6px;margin-top:7px;font-size:10px;color:var(--tx3)}
+.seglab span{flex:1}
+.seglab span.on{color:var(--tx)}
+
+/* agent console */
+.console{grid-column:1/-1;background:var(--surface);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:11px 14px;display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:13px;color:var(--tx2)}
+.console .car{color:var(--signal);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.console .chips{margin-left:auto;display:flex;gap:6px}
+.chip{font-size:10px;font-family:var(--font-sans);padding:3px 9px;border-radius:99px;background:color-mix(in oklab,var(--accent) 16%,transparent);color:var(--accent);border:1px solid color-mix(in oklab,var(--accent) 30%,transparent)}
+
+/* alert wire */
+.wire{background:var(--surface);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:14px}
+.wire h4{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--tx2)}
+.alert{border-left:3px solid var(--bd);padding:8px 11px;margin-bottom:9px;background:var(--raised);border-radius:0 8px 8px 0;font-size:12.5px}
+.alert.crit{border-left-color:var(--crit);background:color-mix(in oklab,var(--crit) 12%,var(--surface))}
+.alert.warnA{border-left-color:var(--warn)}
+.alert .m{color:var(--tx3);font-size:11px;margin-top:2px}
+.btn{border:none;border-radius:var(--radius-md);background:var(--accent);color:var(--accent-on);font-weight:600;font-size:12.5px;padding:7px 13px;cursor:pointer;font-family:var(--font-sans);margin-top:6px}
+.btn.win{animation:none}
+.sweep{position:relative;overflow:hidden}
+.sweep.go::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,color-mix(in oklab,var(--pos) 35%,transparent),transparent);transform:translateX(-100%);animation:sweep .7s var(--ease) forwards}
+@keyframes sweep{to{transform:translateX(100%)}}
+.foot{grid-column:1/-1;color:var(--tx3);font-size:12px;border-top:1px solid var(--bd);padding-top:14px;margin-top:4px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="rail">
+    <div class="logo">A</div>
+    <div class="ri on" title="Scorecard">▣</div>
+    <div class="ri" title="Spend">◧</div>
+    <div class="ri" title="Channels">◈</div>
+    <div class="ri" title="Funnel">⧗</div>
+    <div class="ri" title="Product & Ops">⚙</div>
+    <div class="ri" title="Simulator">⌗</div>
+    <div class="ri" title="Retention">◠</div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="tt">Executive Scorecard</div>
+      <div class="status"><span class="pulse"></span><span class="ok">all systems nominal</span></div>
+      <div class="spacer"></div>
+      <button class="toggle" onclick="tog()">◐ <span id="tlab">Light mode</span></button>
+    </div>
+    <div class="content">
+      <!-- HUD -->
+      <div class="hud">
+        <span class="num">Q2 · MTD</span> · Fifth Third + RV validation accounts
+        <span class="streak"><span>On-pace <b>6 wks</b></span><span>Alerts cleared <b class="num">12 d</b></span></span>
+      </div>
+
+      <!-- left deck -->
+      <div class="deck">
+        <div class="heroRow">
+          <div class="gaugeCard">
+            <div class="gauge" id="gauge"><div class="gv"><div class="gn num">78%</div><div class="gs">to target</div></div></div>
+            <div class="gaugeLab">Funded-account goal</div>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><div class="l">Funded / media $</div><div class="v num">0.0042</div><div class="d up">▲ 9%</div><div class="metTag">✓ target met</div></div>
+            <div class="kpi"><div class="l">CAC</div><div class="v num">$214</div><div class="d up">▼ 6%</div><div class="spark"><i style="height:40%"></i><i style="height:55%"></i><i style="height:48%"></i><i style="height:62%"></i><i style="height:58%"></i><i style="height:70%"></i></div></div>
+            <div class="kpi"><div class="l">Blended ROAS</div><div class="v num">3.62×</div><div class="d up">▲ 0.4</div><div class="spark"><i style="height:30%"></i><i style="height:42%"></i><i style="height:50%"></i><i style="height:46%"></i><i style="height:64%"></i><i style="height:72%"></i></div></div>
+          </div>
+        </div>
+
+        <!-- mission tracker -->
+        <div class="mission">
+          <div class="h"><span>Directive · Geo reallocation $40k/wk</span><span class="num">step 3 / 5</span></div>
+          <div class="track"><span class="seg f"></span><span class="seg f"></span><span class="seg f"></span><span class="seg"></span><span class="seg"></span></div>
+          <div class="seglab"><span class="on">Build</span><span class="on">Review</span><span class="on">Submit</span><span>Approve</span><span>Executed</span></div>
+        </div>
+      </div>
+
+      <!-- alert wire -->
+      <div class="wire">
+        <h4>Alert wire</h4>
+        <div class="alert crit">ROAS breach — "Brand · Broad"<div class="m num">1.1× &lt; 2.0× floor · 2m ago</div></div>
+        <div class="alert warnA">Pacing drift — Meta LAL<div class="m num">+14% vs plan · 18m ago</div></div>
+        <div class="alert">Whitespace found — 4 geos<div class="m num">est. +120 funded/mo · 1h ago</div></div>
+        <div class="sweep" id="apr"><button class="btn" onclick="approve()">Approve directive</button></div>
+      </div>
+
+      <!-- console -->
+      <div class="console"><span class="car">▮</span><span>reallocate $40k → Cincinnati DMA, cap CPA at $230…</span>
+        <span class="chips"><span class="chip">query_metrics</span><span class="chip">simulate_geo</span><span class="chip">propose_action</span></span>
+      </div>
+
+      <div class="foot">Signal Deck · combined direction (Neo-Terminal theming × Mission Control) · Satoshi + JetBrains Mono · toggle light/dark above · click Approve to see consequence-feedback. Full spec: Apex-Design-Memo-Combined.md</div>
+    </div>
+  </div>
+</div>
+<script>
+// animate gauge fill on load
+const g=document.getElementById('gauge');
+setTimeout(()=>{g.style.setProperty('--p','78%');g.style.background='conic-gradient(var(--signal) 0 78%, var(--sunken) 78% 100%)';},150);
+function tog(){const h=document.documentElement;const d=h.dataset.theme==='dark';h.dataset.theme=d?'light':'dark';document.getElementById('tlab').textContent=d?'Dark mode':'Light mode';try{localStorage.setItem('apex-theme',h.dataset.theme)}catch(e){}}
+function approve(){const s=document.getElementById('apr');s.classList.add('go');setTimeout(()=>s.classList.remove('go'),750);
+  // fill next mission segment
+  const segs=document.querySelectorAll('.seg');for(const x of segs){if(!x.classList.contains('f')){x.classList.add('f');break;}}
+  const labs=document.querySelectorAll('.seglab span');for(const x of labs){if(!x.classList.contains('on')){x.classList.add('on');break;}}
+}
+</script>
+</body>
+</html>

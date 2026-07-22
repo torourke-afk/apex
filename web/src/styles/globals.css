@@ -1,0 +1,73 @@
+@import "./tokens.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  background: var(--color-bg-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+/* App ground glow (matches the delivered mockup) */
+body {
+  background: radial-gradient(120% 90% at 78% -10%, var(--color-bg-base), var(--color-bg-canvas) 60%);
+  min-height: 100vh;
+}
+
+/* tabular numerals utility */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ── Atmosphere layer (DESIGN.md §4) ─────────────────────────── */
+.atmo { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.atmo__aura { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
+.atmo__aura--1 { width: 60vw; height: 60vw; left: -10vw; top: -20vh; background: radial-gradient(circle, var(--aura1), transparent 70%); animation: aura1 30s ease-in-out infinite; }
+.atmo__aura--2 { width: 55vw; height: 55vw; right: -15vw; top: 10vh; background: radial-gradient(circle, var(--aura2), transparent 70%); animation: aura2 34s ease-in-out infinite; }
+.atmo__aura--3 { width: 50vw; height: 50vw; left: 30vw; bottom: -25vh; background: radial-gradient(circle, var(--aura3), transparent 70%); animation: aura3 38s ease-in-out infinite; }
+.atmo__vignette { position: absolute; inset: 0; background: radial-gradient(120% 100% at 50% 40%, transparent 52%, var(--color-bg-canvas) 100%); }
+.atmo__dot { position: absolute; will-change: transform; }
+.atmo__dot > i { display: block; border-radius: 50%; will-change: transform; transition: transform .4s cubic-bezier(.22,1,.36,1); }
+
+@keyframes aura1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(4vw,3vh)} }
+@keyframes aura2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-3vw,4vh)} }
+@keyframes aura3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(3vw,-3vh)} }
+@keyframes floatA { 0%{transform:translate(0,0)} 100%{transform:translate(38px,-46px)} }
+@keyframes floatB { 0%{transform:translate(0,0)} 100%{transform:translate(-42px,34px)} }
+@keyframes floatC { 0%{transform:translate(0,0)} 100%{transform:translate(30px,40px)} }
+@keyframes floatD { 0%{transform:translate(0,0)} 100%{transform:translate(-34px,-30px)} }
+@keyframes floatE { 0%{transform:translate(0,0)} 100%{transform:translate(48px,12px)} }
+@keyframes floatF { 0%{transform:translate(0,0)} 100%{transform:translate(-22px,-44px)} }
+@keyframes twinkle { 0%,100%{opacity:.35} 50%{opacity:1} }
+
+/* AA-visible focus ring in both themes */
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-bg-surface) 25%, var(--color-bg-elevated) 50%, var(--color-bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--color-text-muted); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

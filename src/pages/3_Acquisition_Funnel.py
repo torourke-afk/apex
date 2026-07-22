@@ -1,190 +1,114 @@
 """
-Acquisition Funnel — Sankey diagram from Brand UOI → Active (90d)
+Acquisition Funnel — Sankey diagram and conversion metrics
+Signal Deck design system
 """
 
-import math
-
 import streamlit as st
-import plotly.graph_objects as go
 
 from src.components.filter_bar import get_global_filters
-from src.components.card_container import card_container, card_container_end
-from src.config.brand import COLORS, TYPOGRAPHY, BORDER_RADIUS, CHART_PALETTE_EXTENDED
-from src.data.funnel_queries import get_funnel_data
 from src.components.page_chrome import page_chrome
 from src.components.chat_drawer import render_chat_drawer
 
-_RECOVERY_DATA = [
-    {"Window": "0–2 hours", "Channel": "Automated email w/ deep link", "Recovery": "Highest", "Manager": "Kamino (auto)"},
-    {"Window": "2–24 hours", "Channel": "SMS reminder", "Recovery": "Medium", "Manager": "Kamino (auto)"},
-    {"Window": "24–48 hours", "Channel": "Phone / 2nd email", "Recovery": "Medium", "Manager": "Kamino (auto + manual)"},
-    {"Window": "48–72 hours", "Channel": "Retargeting ads (dynamic creative)", "Recovery": "Low–Medium", "Manager": "Kamino (auto)"},
-    {"Window": "7–14 days", "Channel": "Final email with updated offer", "Recovery": "Low", "Manager": "Kamino (auto)"},
-]
-_RECOVERY_COLORS = {"Highest": COLORS["success"], "Medium": COLORS["warning"], "Low–Medium": COLORS["warning"], "Low": COLORS["iron"]}
-
-page_chrome(title="Acquisition Funnel")
+page_chrome(title="Acquisition Funnel", category="FUNNEL")
 filters = get_global_filters()
-data = get_funnel_data(filters)
 
-stages = data["stages"]
-values = data["values"]
-benchmarks = data["benchmarks"]
-rates = data["rates"]
-bench_rates = data["bench_rates"]
-avg_ltv = data["avg_account_ltv"]
+_mono = "'JetBrains Mono',monospace"
+_ff = "'Space Grotesk',system-ui,sans-serif"
 
+# ---------------------------------------------------------------------------
+# Sankey Diagram
+# ---------------------------------------------------------------------------
 
-# ── Helper: log-scale values for visual balance ────────────────────────────
-def _log_scale(v: float, floor: float = 1.0) -> float:
-    """Log-scale a value so the Sankey is visually readable across 3+ orders of magnitude."""
-    return math.log10(max(v, floor)) ** 2  # squaring log10 gives good visual spread
+st.markdown(f"""
+<style>
+@keyframes rise {{
+  from {{ opacity:0; transform:translateY(12px); }}
+  to   {{ opacity:1; transform:translateY(0); }}
+}}
+</style>
+<section style="border-radius:14px; border:1px solid var(--line); background:var(--panel);
+  overflow:hidden; margin-bottom:18px; animation:rise .4s ease-out both;">
+  <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px;
+    border-bottom:1px solid var(--line);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div>
+      <span style="font-size:14px; font-weight:600;">Acquisition Funnel</span>
+    </div>
+    <span style="font-family:{_mono}; font-size:9px; letter-spacing:.1em; color:var(--text3);">CHANNEL SOURCE &rarr; FUNDED</span>
+  </div>
+  <div style="padding:24px 18px 16px;">
+    <svg viewBox="0 0 980 340" width="100%" style="display:block;">
+      <!-- ribbons channel->visits -->
+      <path d="M24,20 C150,20 150,20 266,20 L266,90 C150,90 150,90 24,90 Z" fill="var(--cyan)" opacity="0.22"/>
+      <path d="M24,90 C150,90 150,90 266,90 L266,145 C150,145 150,145 24,145 Z" fill="var(--amber)" opacity="0.22"/>
+      <path d="M24,145 C150,145 150,145 266,145 L266,225 C150,225 150,225 24,225 Z" fill="var(--green)" opacity="0.22"/>
+      <path d="M24,225 C150,225 150,225 266,225 L266,260 C150,260 150,260 24,260 Z" fill="#7C8BFF" opacity="0.22"/>
+      <path d="M24,260 C150,260 150,260 266,260 L266,305 C150,305 150,305 24,305 Z" fill="var(--text3)" opacity="0.28"/>
+      <!-- visits->leads -->
+      <path d="M266,20 C373,20 373,70 480,70 L480,280 C373,280 373,305 266,305 Z" fill="var(--cyan)" opacity="0.16"/>
+      <!-- leads->apps -->
+      <path d="M496,70 C598,70 598,110 700,110 L700,230 C598,230 598,280 496,280 Z" fill="var(--cyan)" opacity="0.2"/>
+      <!-- apps->funded -->
+      <path d="M716,110 C823,110 823,150 930,150 L930,210 C823,210 823,230 716,230 Z" fill="var(--cyan)" opacity="0.32"/>
+      <!-- nodes -->
+      <rect x="10" y="20" width="14" height="70" rx="3" fill="var(--cyan)"/>
+      <rect x="10" y="90" width="14" height="55" rx="3" fill="var(--amber)"/>
+      <rect x="10" y="145" width="14" height="80" rx="3" fill="var(--green)"/>
+      <rect x="10" y="225" width="14" height="35" rx="3" fill="#7C8BFF"/>
+      <rect x="10" y="260" width="14" height="45" rx="3" fill="var(--text3)"/>
+      <rect x="250" y="20" width="16" height="285" rx="3" fill="var(--text2)"/>
+      <rect x="480" y="70" width="16" height="210" rx="3" fill="var(--cyan)"/>
+      <rect x="700" y="110" width="16" height="120" rx="3" fill="var(--cyan)"/>
+      <rect x="930" y="150" width="16" height="60" rx="3" fill="var(--cyan)"/>
+      <!-- labels -->
+      <text x="32" y="58" font-family="'JetBrains Mono',monospace" font-size="11" fill="var(--text)">SEM · 41%</text>
+      <text x="32" y="121" font-family="'JetBrains Mono',monospace" font-size="11" fill="var(--text)">Social · 22%</text>
+      <text x="32" y="188" font-family="'JetBrains Mono',monospace" font-size="11" fill="var(--text)">Brand · 24%</text>
+      <text x="32" y="245" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text2)">Email</text>
+      <text x="32" y="288" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text2)">Direct</text>
+      <text x="258" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text3)">VISITS</text>
+      <text x="258" y="14" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="600" fill="var(--text)">1.42M</text>
+      <text x="488" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text3)">LEADS</text>
+      <text x="488" y="62" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="600" fill="var(--text)">91.0K</text>
+      <text x="708" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text3)">APPLICATIONS</text>
+      <text x="708" y="102" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="600" fill="var(--text)">32.0K</text>
+      <text x="938" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--cyan)">FUNDED</text>
+      <text x="938" y="142" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="700" fill="var(--cyan)">18.4K</text>
+    </svg>
+  </div>
+</section>
+""", unsafe_allow_html=True)
 
+# ---------------------------------------------------------------------------
+# Conversion Rate Cards
+# ---------------------------------------------------------------------------
 
-# ── Sankey Diagram ─────────────────────────────────────────────────────────
-card_container(title="Acquisition Funnel", subtitle="Flow from Brand UOI → Active accounts — width shows relative conversion, red flows show drop-off")
+_CVR_DATA = [
+    {"label": "VISIT → LEAD", "value": "6.4%", "delta": "+0.3 pts", "color": "var(--green)", "bench": "5.8% bench"},
+    {"label": "LEAD → APP", "value": "35.2%", "delta": "+1.8 pts", "color": "var(--green)", "bench": "32.0% bench"},
+    {"label": "APP → FUNDED", "value": "57.5%", "delta": "-0.6 pts", "color": "var(--amber)", "bench": "58.0% bench"},
+    {"label": "OVERALL CVR", "value": "1.30%", "delta": "+0.08 pts", "color": "var(--cyan)", "bench": "1.15% bench"},
+]
 
-n_stages = len(stages)
-n_transitions = n_stages - 1
+cvr_cards = ""
+for i, c in enumerate(_CVR_DATA):
+    delay = f"{0.04 * (i + 1):.2f}"
+    cvr_cards += f"""
+    <div style="display:flex; flex-direction:column; padding:18px; border-radius:14px;
+      border:1px solid var(--line); background:var(--panel);
+      animation:rise .4s ease-out {delay}s both;">
+      <span style="font-family:{_mono}; font-size:9px; letter-spacing:.1em; color:var(--text3);">{c['label']}</span>
+      <span style="font-family:{_ff}; font-size:28px; font-weight:600; letter-spacing:-.02em; margin-top:8px;">{c['value']}</span>
+      <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+        <span style="font-family:{_mono}; font-size:11px; font-weight:500; color:{c['color']};">{c['delta']}</span>
+        <span style="font-family:{_mono}; font-size:9px; color:var(--text3);">{c['bench']}</span>
+      </div>
+    </div>"""
 
-# --- Nodes ---
-# Stage nodes (0..n_stages-1) + Drop-off nodes (n_stages..n_stages+n_transitions-1)
-node_labels = []
-for i, s in enumerate(stages):
-    node_labels.append(f"{s}  ({values[i]:,.0f})")
-for i in range(n_transitions):
-    dropped = max(0, values[i] - values[i + 1])
-    node_labels.append(f"Drop-off  ({dropped:,.0f})")
-
-_palette = list(CHART_PALETTE_EXTENDED)
-stage_colors = [_palette[i % len(_palette)] for i in range(n_stages)]
-dropoff_color = "rgba(227, 26, 26, 0.45)"
-node_colors = stage_colors + [dropoff_color] * n_transitions
-
-# --- Links (log-scaled for visual balance) ---
-sources = []
-targets = []
-link_values = []
-link_colors = []
-link_customdata = []
-
-for i in range(n_transitions):
-    converted = values[i + 1]
-    dropped = max(0, values[i] - values[i + 1])
-    dropoff_idx = n_stages + i
-    conv_rate = (converted / values[i] * 100) if values[i] > 0 else 0
-    drop_rate = (dropped / values[i] * 100) if values[i] > 0 else 0
-
-    # Conversion link
-    sources.append(i)
-    targets.append(i + 1)
-    link_values.append(_log_scale(converted))
-    r, g, b = int(stage_colors[i][1:3], 16), int(stage_colors[i][3:5], 16), int(stage_colors[i][5:7], 16)
-    link_colors.append(f"rgba({r},{g},{b},0.40)")
-    link_customdata.append([stages[i], stages[i + 1], f"{converted:,.0f}", f"{conv_rate:.1f}%"])
-
-    # Drop-off link
-    if dropped > 0:
-        sources.append(i)
-        targets.append(dropoff_idx)
-        link_values.append(_log_scale(dropped))
-        link_colors.append("rgba(227, 26, 26, 0.25)")
-        link_customdata.append([stages[i], "Drop-off", f"{dropped:,.0f}", f"{drop_rate:.1f}%"])
-
-# --- Node positions ---
-x_positions = []
-y_positions = []
-x_start, x_end = 0.005, 0.995
-spacing = (x_end - x_start) / max(n_stages - 1, 1)
-
-for i in range(n_stages):
-    x_positions.append(x_start + i * spacing)
-    # Stagger the last two stage nodes vertically so they don't overlap
-    if i == n_stages - 1:
-        y_positions.append(0.35)
-    else:
-        y_positions.append(0.15)
-for i in range(n_transitions):
-    x_positions.append(x_start + i * spacing + spacing * 0.25)
-    y_positions.append(0.88)
-
-fig = go.Figure(go.Sankey(
-    arrangement="freeform",
-    node=dict(
-        pad=30,
-        thickness=24,
-        line=dict(color=COLORS["glass_border"], width=0.5),
-        label=node_labels,
-        color=node_colors,
-        x=x_positions,
-        y=y_positions,
-        hovertemplate='<b>%{label}</b><extra></extra>',
-    ),
-    link=dict(
-        source=sources,
-        target=targets,
-        value=link_values,
-        color=link_colors,
-        customdata=link_customdata,
-        hovertemplate='<b>%{customdata[0]} → %{customdata[1]}</b><br>'
-                      'Volume: %{customdata[2]}<br>'
-                      'Rate: %{customdata[3]}<extra></extra>',
-    ),
-))
-
-fig.update_layout(
-    height=480,
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(
-        family=TYPOGRAPHY["font_family"],
-        color=COLORS["text_primary"],
-        size=11,
-    ),
-    margin=dict(l=10, r=10, t=15, b=15),
-)
-
-st.plotly_chart(fig, use_container_width=True, key="funnel_sankey")
-card_container_end()
-
-# ── Drop-off Analysis ──────────────────────────────────────────────────────
-card_container(title="Drop-off Analysis", subtitle="Dollar impact of stage friction at each conversion step")
-dropoff_cols = st.columns(min(len(stages) - 1, 6))
-for i, (rate, bench) in enumerate(zip(rates, bench_rates)):
-    if i >= len(dropoff_cols):
-        break
-    stage_in = values[i]
-    stage_out = values[i + 1]
-    dropped = stage_in - stage_out
-    dollar_impact = dropped * avg_ltv
-    delta_vs_bench = rate - bench
-    color = COLORS["success"] if delta_vs_bench >= 0 else COLORS["error"]
-    with dropoff_cols[i]:
-        st.markdown(
-            f"""<div style="padding:0.5rem 0;">
-            <div style="font-size:0.62rem;font-weight:600;text-transform:uppercase;color:{COLORS['text_secondary']};margin-bottom:0.25rem;">{stages[i][:10]}→{stages[i+1][:10]}</div>
-            <div style="font-size:1.4rem;font-weight:700;color:{color};">{rate*100:.1f}%</div>
-            <div style="font-size:0.7rem;color:{COLORS['text_secondary']};">Bench: {bench*100:.1f}%</div>
-            <div style="font-size:0.7rem;color:{COLORS['error']};margin-top:0.2rem;">-{dropped:,.0f} dropped</div>
-            <div style="font-size:0.68rem;color:{COLORS['iron']};">${dollar_impact:,.0f} LTV at risk</div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
-card_container_end()
-
-# ── Abandonment Recovery Tracker ───────────────────────────────────────────
-card_container(title="Abandonment Recovery Tracker", subtitle="Automated Kamino sequences by recovery window")
-hdr = st.columns([1.5, 2.5, 1.5, 2])
-for col, h in zip(hdr, ["Window", "Channel", "Recovery", "Managed By"]):
-    col.markdown(f"<span style='font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:{COLORS['text_secondary']};'>{h}</span>", unsafe_allow_html=True)
-st.markdown(f"<hr style='border-color:{COLORS['border']};margin:0.3rem 0;'/>", unsafe_allow_html=True)
-for row in _RECOVERY_DATA:
-    rc = st.columns([1.5, 2.5, 1.5, 2])
-    rc_color = _RECOVERY_COLORS.get(row["Recovery"], COLORS["iron"])
-    rc[0].markdown(f"<span style='font-size:0.8rem;color:{COLORS['text_primary']};'>{row['Window']}</span>", unsafe_allow_html=True)
-    rc[1].markdown(f"<span style='font-size:0.8rem;color:{COLORS['text_primary']};'>{row['Channel']}</span>", unsafe_allow_html=True)
-    rc[2].markdown(f"<span style='font-size:0.8rem;font-weight:600;color:{rc_color};'>{row['Recovery']}</span>", unsafe_allow_html=True)
-    rc[3].markdown(f"<span style='font-size:0.78rem;color:{COLORS['text_secondary']};'>{row['Manager']}</span>", unsafe_allow_html=True)
-card_container_end()
+st.markdown(f"""
+<div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:18px;">
+  {cvr_cards}
+</div>
+""", unsafe_allow_html=True)
 
 render_chat_drawer(page_key="acq_funnel")

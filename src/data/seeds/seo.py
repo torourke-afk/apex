@@ -29,6 +29,8 @@ from typing import List
 import numpy as np
 import pandas as pd
 
+from src.data.seeds._dates import TWELVE_MONTH_STARTS
+
 WORKSPACE = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
@@ -52,11 +54,8 @@ PRODUCTS = [
     "credit_card", "personal_loan", "wealth_mgmt",
 ]
 
-# 12 months: Jun 2025 → May 2026
-MONTHS: list[date] = (
-    [date(2025, m, 1) for m in range(6, 13)]
-    + [date(2026, m, 1) for m in range(1, 6)]
-)
+# 12 months (computed from _dates anchor)
+MONTHS: list[date] = [ts.date() for ts in TWELVE_MONTH_STARTS]
 
 assert len(MONTHS) == 12
 

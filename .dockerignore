@@ -1,0 +1,48 @@
+# Dependencies
+web/node_modules
+__pycache__
+*.pyc
+*.pyo
+
+# Version control
+.git
+.gitignore
+
+# Environment / secrets
+.env
+.env.*
+venv
+.venv
+
+# Build artifacts
+web/dist
+web/.vite
+.pytest_cache
+htmlcov
+*.egg-info
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# DuckDB runtime files (seed db is in data/)
+*.duckdb
+*.duckdb.wal
+
+# Docs and design files (not needed in containers)
+docs
+design
+tasks
+*.docx
+*.html
+*.md
+!web/index.html
+
+# macOS
+.DS_Store
+
+# Streamlit (legacy, not used in containers)
+streamlit.log
+.streamlit

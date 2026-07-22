@@ -97,10 +97,16 @@ PAGES = [
         "description": "Launch calendar, team velocity, approval queue, system health, and competitive intel feed.",
     },
     {
-        "id": "simulator",
-        "title": "Full-Funnel Simulator",
-        "icon": ":material/science:",
-        "description": "Scenario modelling tool for forecasting marketing mix impact across the full acquisition funnel.",
+        "id": "retention_forecast",
+        "title": "Retention Forecast",
+        "icon": ":material/show_chart:",
+        "description": "Parametric survival curve modeler with segment filters and draggable observation date.",
+    },
+    {
+        "id": "brand_awareness",
+        "title": "Brand Awareness",
+        "icon": ":material/visibility:",
+        "description": "MSV-based brand awareness tracker — competitive share of search across national and DMA footprint.",
     },
     {
         "id": "settings",

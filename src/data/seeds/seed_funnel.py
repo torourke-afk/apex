@@ -30,6 +30,8 @@ import pandera as pa
 from pandera import Column, DataFrameSchema, Check
 import duckdb
 
+from src.data.seeds._dates import TRAILING_90D_START, TRAILING_90D_END
+
 # ---------------------------------------------------------------------------
 # Path setup
 # ---------------------------------------------------------------------------
@@ -93,10 +95,10 @@ PERSONA_SEGMENTS: List[str] = [
 ]
 
 # ---------------------------------------------------------------------------
-# Date range — 90 days ending today (2026-05-08)
+# Date range — trailing 90 days ending yesterday
 # ---------------------------------------------------------------------------
-END_DATE = date(2026, 5, 8)
-START_DATE = END_DATE - timedelta(days=89)   # 90 days inclusive
+START_DATE = TRAILING_90D_START
+END_DATE = TRAILING_90D_END
 DATES: List[date] = [START_DATE + timedelta(days=i) for i in range(90)]
 
 # ---------------------------------------------------------------------------

@@ -25,6 +25,8 @@ from datetime import date, timedelta
 import numpy as np
 import pandas as pd
 
+from src.data.seeds._dates import TWELVE_WEEK_START
+
 WORKSPACE = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
@@ -40,7 +42,7 @@ rng = np.random.default_rng(SEED)
 # Constants
 # ---------------------------------------------------------------------------
 
-_START = date(2025, 5, 5)
+_START = TWELVE_WEEK_START
 WEEKS: list[date] = [_START + timedelta(weeks=i) for i in range(12)]
 
 CATEGORIES = [

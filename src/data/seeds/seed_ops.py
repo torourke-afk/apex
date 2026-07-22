@@ -36,12 +36,31 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection  # noqa: E402
+from src.data.seeds._dates import (
+    YESTERDAY,
+    NOW as _NOW,
+    TWELVE_MONTH_STRINGS,
+)
 
 SEED = 2026
 rng = np.random.default_rng(SEED)
 
-TODAY = date(2026, 5, 8)
-NOW = datetime(2026, 5, 8, 9, 0, 0)
+TODAY = YESTERDAY
+NOW = _NOW
+
+# Shift all hardcoded dates relative to the original anchor (2026-05-08)
+_ORIG_ANCHOR = date(2026, 5, 8)
+_SHIFT = timedelta(days=(TODAY - _ORIG_ANCHOR).days)
+
+
+def _dt(year, month, day, hour=0, minute=0, second=0):
+    """Create a datetime shifted relative to the original anchor."""
+    return datetime(year, month, day, hour, minute, second) + _SHIFT
+
+
+def _d(year, month, day):
+    """Create a date shifted relative to the original anchor."""
+    return date(year, month, day) + _SHIFT
 
 
 # ---------------------------------------------------------------------------
@@ -55,7 +74,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Q2 Checking Acquisition Campaign Launch",
         "campaign_launch", "completed",
-        datetime(2026, 3, 3, 9, 0), datetime(2026, 3, 3, 10, 0),
+        _dt(2026, 3, 3, 9, 0), _dt(2026, 3, 3, 10, 0),
         "CMO", "Brand, Performance Media, Creative",
         "Multi-channel Q2 checking acquisition push across SEM, social, CTV. Target: 12,000 net new accounts.",
         None,
@@ -63,7 +82,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Spring Home Equity Campaign Kickoff",
         "campaign_launch", "completed",
-        datetime(2026, 3, 10, 10, 0), datetime(2026, 3, 10, 11, 0),
+        _dt(2026, 3, 10, 10, 0), _dt(2026, 3, 10, 11, 0),
         "VP Performance Media", "SEM Lead, Social Lead, Creative Director",
         "HELOC/HELOAN spring season launch. Rate-feature focus in Tier 1 markets.",
         None,
@@ -71,7 +90,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Q1 Campaign Performance Full Review",
         "review_cycle", "completed",
-        datetime(2026, 3, 5, 13, 0), datetime(2026, 3, 5, 15, 0),
+        _dt(2026, 3, 5, 13, 0), _dt(2026, 3, 5, 15, 0),
         "CMO", "CMO, Analytics, Agency Partners",
         "Q1 full-funnel retrospective: spend vs. plan, conversions, CPA by channel, brand lift results.",
         None,
@@ -79,7 +98,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Checking Creative Compliance Review",
         "review_cycle", "completed",
-        datetime(2026, 3, 12, 10, 0), datetime(2026, 3, 12, 11, 0),
+        _dt(2026, 3, 12, 10, 0), _dt(2026, 3, 12, 11, 0),
         "Creative Director", "Creative, Legal, Compliance",
         "Review updated checking creative pack. UDAP rate-claim language sign-off required before Q2.",
         None,
@@ -87,7 +106,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "UDAP Creative Compliance Deadline — Q2 Assets",
         "compliance_deadline", "completed",
-        datetime(2026, 3, 14, 17, 0), datetime(2026, 3, 14, 17, 30),
+        _dt(2026, 3, 14, 17, 0), _dt(2026, 3, 14, 17, 30),
         "Compliance Director", "Legal, Compliance, Creative, Performance Media",
         "All Q2 paid creative must receive Compliance approval before trafficking to media platforms.",
         None,
@@ -95,7 +114,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Board Marketing Update — Q1 Results",
         "exec_briefing", "completed",
-        datetime(2026, 3, 20, 15, 0), datetime(2026, 3, 20, 16, 0),
+        _dt(2026, 3, 20, 15, 0), _dt(2026, 3, 20, 16, 0),
         "CMO", "CMO, CFO, Board Members",
         "Quarterly marketing ROI brief: Q1 spend, pipeline generated, brand lift, LTV impact by cohort.",
         None,
@@ -103,7 +122,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Q1 Budget Reconciliation & Q2 Reforecast",
         "budget_review", "completed",
-        datetime(2026, 3, 25, 10, 0), datetime(2026, 3, 25, 12, 0),
+        _dt(2026, 3, 25, 10, 0), _dt(2026, 3, 25, 12, 0),
         "VP Marketing Finance", "Finance, CMO, Channel Leads",
         "Reconcile Q1 actual vs plan. Ratify Q2 channel budget allocations ($15M total).",
         None,
@@ -111,7 +130,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Marketing All-Hands — March",
         "team_sync", "completed",
-        datetime(2026, 3, 6, 12, 0), datetime(2026, 3, 6, 13, 0),
+        _dt(2026, 3, 6, 12, 0), _dt(2026, 3, 6, 13, 0),
         "CMO", "All Marketing",
         "Monthly all-hands: Q1 recap, Q2 priorities, org announcements.",
         None,
@@ -119,7 +138,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Performance Pod Weekly Sync — March W2",
         "team_sync", "completed",
-        datetime(2026, 3, 13, 9, 0), datetime(2026, 3, 13, 9, 30),
+        _dt(2026, 3, 13, 9, 0), _dt(2026, 3, 13, 9, 30),
         "VP Performance Media", "SEM, Social, Analytics",
         "Weekly pacing review: CPA by channel, A/B test status, bid strategy updates.",
         None,
@@ -127,7 +146,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Fair Lending Geo-Targeting Attestation",
         "compliance_deadline", "completed",
-        datetime(2026, 3, 28, 17, 0), datetime(2026, 3, 28, 17, 30),
+        _dt(2026, 3, 28, 17, 0), _dt(2026, 3, 28, 17, 30),
         "Chief Compliance Officer", "Legal, Performance Media",
         "Confirm geo-targeting parameters comply with CRA and fair lending requirements before Q2 launch.",
         None,
@@ -135,7 +154,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "SEO & AEO Quarterly Review",
         "review_cycle", "completed",
-        datetime(2026, 3, 19, 9, 0), datetime(2026, 3, 19, 10, 0),
+        _dt(2026, 3, 19, 9, 0), _dt(2026, 3, 19, 10, 0),
         "SEO Lead", "SEO, Analytics, Product Marketing",
         "Organic performance vs. keyword targets. LLM visibility benchmarks across ChatGPT, Perplexity, Gemini.",
         None,
@@ -143,7 +162,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Auto Loan Rate Promotion — Tier 1 Markets Launch",
         "campaign_launch", "completed",
-        datetime(2026, 3, 17, 14, 0), datetime(2026, 3, 17, 15, 0),
+        _dt(2026, 3, 17, 14, 0), _dt(2026, 3, 17, 15, 0),
         "Product Marketing Lead", "Paid Social, SEM, Email",
         "Targeted rate promo for high-HHI DMAs. 90-day window tied to spring auto season.",
         None,
@@ -152,7 +171,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Earth Day Green Banking Campaign Launch",
         "campaign_launch", "completed",
-        datetime(2026, 4, 7, 9, 0), datetime(2026, 4, 7, 10, 0),
+        _dt(2026, 4, 7, 9, 0), _dt(2026, 4, 7, 10, 0),
         "VP Brand", "Brand, Social, PR",
         "ESG brand push tied to Earth Day (Apr 22). Awareness and consideration objectives.",
         None,
@@ -160,7 +179,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Life Events Q2 Campaign Go-Live",
         "campaign_launch", "completed",
-        datetime(2026, 4, 7, 8, 0), datetime(2026, 4, 7, 9, 0),
+        _dt(2026, 4, 7, 8, 0), _dt(2026, 4, 7, 9, 0),
         "VP Performance Media", "Performance Media, Life Events Team",
         "Mover and new-parent segment campaign activation. 8 DMA expansion from Q1.",
         None,
@@ -168,7 +187,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Mid-Q2 Campaign Performance Check-In",
         "review_cycle", "completed",
-        datetime(2026, 4, 9, 14, 0), datetime(2026, 4, 9, 15, 0),
+        _dt(2026, 4, 9, 14, 0), _dt(2026, 4, 9, 15, 0),
         "CMO", "CMO, Analytics, Channel Leads",
         "Q2 pacing review at 6-week mark. Channel reallocation decisions if flagged.",
         None,
@@ -176,7 +195,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Annual Privacy Policy Review Deadline",
         "compliance_deadline", "completed",
-        datetime(2026, 4, 11, 17, 0), datetime(2026, 4, 11, 17, 30),
+        _dt(2026, 4, 11, 17, 0), _dt(2026, 4, 11, 17, 30),
         "Chief Privacy Officer", "Legal, IT, Compliance",
         "Annual review of consumer-facing privacy disclosures and cookie consent banners.",
         None,
@@ -184,7 +203,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Brand Lift Study Readout — Q1 CTV/OLV",
         "review_cycle", "completed",
-        datetime(2026, 4, 16, 10, 0), datetime(2026, 4, 16, 11, 0),
+        _dt(2026, 4, 16, 10, 0), _dt(2026, 4, 16, 11, 0),
         "VP Brand", "Brand, Insights, Media Agency",
         "Kantar brand lift results for Q1 CTV/OLV campaigns across top 10 DMAs.",
         None,
@@ -192,7 +211,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "CFO Marketing ROI Briefing — Q2 Forecast",
         "exec_briefing", "scheduled",
-        datetime(2026, 4, 22, 15, 0), datetime(2026, 4, 22, 16, 0),
+        _dt(2026, 4, 22, 15, 0), _dt(2026, 4, 22, 16, 0),
         "CMO", "CMO, CFO, VP Finance",
         "Forward-looking: Q2 projected spend, pipeline, incremental revenue model.",
         None,
@@ -200,7 +219,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Digital Budget Reallocation Review",
         "budget_review", "completed",
-        datetime(2026, 4, 8, 11, 0), datetime(2026, 4, 8, 12, 0),
+        _dt(2026, 4, 8, 11, 0), _dt(2026, 4, 8, 12, 0),
         "VP Marketing Finance", "Finance, SEM Lead, Social Lead",
         "Shift $200K from display to paid social based on Q1 CPA performance data.",
         None,
@@ -208,7 +227,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Marketing All-Hands — April",
         "team_sync", "completed",
-        datetime(2026, 4, 3, 12, 0), datetime(2026, 4, 3, 13, 0),
+        _dt(2026, 4, 3, 12, 0), _dt(2026, 4, 3, 13, 0),
         "CMO", "All Marketing",
         "Monthly all-hands: Q2 priorities, headcount updates, agency partner review.",
         None,
@@ -216,7 +235,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Creative Studio Sprint Review — April",
         "team_sync", "completed",
-        datetime(2026, 4, 17, 14, 0), datetime(2026, 4, 17, 15, 0),
+        _dt(2026, 4, 17, 14, 0), _dt(2026, 4, 17, 15, 0),
         "Creative Director", "Creative, Brand, Product Marketing",
         "Bi-weekly sprint review: asset completion, backlog grooming, Q3 kick-off prep.",
         None,
@@ -224,7 +243,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "CAN-SPAM & TCPA Audit Deadline",
         "compliance_deadline", "scheduled",
-        datetime(2026, 4, 25, 17, 0), datetime(2026, 4, 25, 17, 30),
+        _dt(2026, 4, 25, 17, 0), _dt(2026, 4, 25, 17, 30),
         "Compliance Director", "Legal, CRM, Digital Marketing",
         "Confirm all email and SMS sequences comply with CAN-SPAM opt-out and TCPA consent requirements.",
         None,
@@ -232,7 +251,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Agency QBR — Media Agency Performance Review",
         "review_cycle", "scheduled",
-        datetime(2026, 4, 30, 13, 0), datetime(2026, 4, 30, 16, 0),
+        _dt(2026, 4, 30, 13, 0), _dt(2026, 4, 30, 16, 0),
         "CMO", "CMO, Procurement, Media Agency",
         "Q1 agency performance review: SLA audit, optimization recommendations, Q2 roadmap alignment.",
         None,
@@ -240,7 +259,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Savings Rate Promotion Launch — Digital-First",
         "campaign_launch", "completed",
-        datetime(2026, 4, 14, 10, 0), datetime(2026, 4, 14, 11, 0),
+        _dt(2026, 4, 14, 10, 0), _dt(2026, 4, 14, 11, 0),
         "Product Marketing Lead", "Email, SEM, Paid Social",
         "HYSA competitive rate promotion targeting digital-first millennials and Gen Z switchers.",
         None,
@@ -249,7 +268,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Graduation Banking Package Campaign Launch",
         "campaign_launch", "in_progress",
-        datetime(2026, 5, 1, 9, 0), datetime(2026, 5, 1, 10, 0),
+        _dt(2026, 5, 1, 9, 0), _dt(2026, 5, 1, 10, 0),
         "VP Brand", "Social, Email, Branch Network",
         "Young adult acquisition tied to graduation season. First checking + savings bundle offer.",
         None,
@@ -257,7 +276,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Marketing All-Hands — May",
         "team_sync", "scheduled",
-        datetime(2026, 5, 1, 12, 0), datetime(2026, 5, 1, 13, 0),
+        _dt(2026, 5, 1, 12, 0), _dt(2026, 5, 1, 13, 0),
         "CMO", "All Marketing",
         "Monthly all-hands: Q2 pacing update, headcount news, competitive landscape.",
         None,
@@ -265,7 +284,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Q2 Pacing Review — Month 1",
         "review_cycle", "in_progress",
-        datetime(2026, 5, 6, 14, 0), datetime(2026, 5, 6, 15, 0),
+        _dt(2026, 5, 6, 14, 0), _dt(2026, 5, 6, 15, 0),
         "CMO", "CMO, Analytics, Channel Leads",
         "First-month Q2 pacing vs. plan. Early warning signals on underperforming channels.",
         None,
@@ -273,7 +292,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Performance Pod Weekly Sync — May W1",
         "team_sync", "in_progress",
-        datetime(2026, 5, 8, 9, 0), datetime(2026, 5, 8, 9, 30),
+        _dt(2026, 5, 8, 9, 0), _dt(2026, 5, 8, 9, 30),
         "VP Performance Media", "SEM, Social, Analytics",
         "Weekly pacing: CPA by channel, competitive SEM activity, A/B test updates.",
         None,
@@ -281,7 +300,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Summer Home Loan Refi Campaign Launch",
         "campaign_launch", "scheduled",
-        datetime(2026, 5, 12, 9, 0), datetime(2026, 5, 12, 10, 0),
+        _dt(2026, 5, 12, 9, 0), _dt(2026, 5, 12, 10, 0),
         "VP Performance Media", "SEM, Social, Email",
         "Rate-sensitive refinance campaign timed to summer purchasing season.",
         None,
@@ -289,7 +308,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "CMO Monthly Executive Briefing — May",
         "exec_briefing", "scheduled",
-        datetime(2026, 5, 13, 15, 0), datetime(2026, 5, 13, 16, 0),
+        _dt(2026, 5, 13, 15, 0), _dt(2026, 5, 13, 16, 0),
         "CMO", "CEO, CMO, CHRO",
         "Monthly marketing status to executive team: brand health, growth, retention metrics.",
         None,
@@ -297,7 +316,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Reg E Marketing Disclosure Review",
         "compliance_deadline", "scheduled",
-        datetime(2026, 5, 15, 17, 0), datetime(2026, 5, 15, 17, 30),
+        _dt(2026, 5, 15, 17, 0), _dt(2026, 5, 15, 17, 30),
         "Compliance Director", "Legal, Digital Marketing, Product",
         "Review all digital marketing materials referencing overdraft protection language.",
         None,
@@ -305,7 +324,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Q3 Budget Planning Kickoff",
         "budget_review", "scheduled",
-        datetime(2026, 5, 19, 10, 0), datetime(2026, 5, 19, 12, 0),
+        _dt(2026, 5, 19, 10, 0), _dt(2026, 5, 19, 12, 0),
         "VP Marketing Finance", "Finance, CMO, Channel Leads",
         "Initial Q3 channel budget allocation discussions. Lock final budget by May 30.",
         None,
@@ -313,7 +332,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "SEO Technical Audit Results Review",
         "review_cycle", "scheduled",
-        datetime(2026, 5, 20, 10, 0), datetime(2026, 5, 20, 11, 0),
+        _dt(2026, 5, 20, 10, 0), _dt(2026, 5, 20, 11, 0),
         "SEO Lead", "SEO, Engineering, Analytics",
         "Core Web Vitals audit and crawl budget analysis. Prioritize fixes for Q3.",
         None,
@@ -321,7 +340,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Investor Day Marketing Narrative Prep",
         "exec_briefing", "scheduled",
-        datetime(2026, 5, 22, 14, 0), datetime(2026, 5, 22, 16, 0),
+        _dt(2026, 5, 22, 14, 0), _dt(2026, 5, 22, 16, 0),
         "CMO", "CMO, CFO, Investor Relations",
         "Align marketing story for Investor Day (June 10). Revenue growth, digital mix, LTV.",
         None,
@@ -329,7 +348,7 @@ _CALENDAR_EVENTS_RAW: list[tuple] = [
     (
         "Annual Creative Strategy Review",
         "review_cycle", "scheduled",
-        datetime(2026, 5, 29, 9, 0), datetime(2026, 5, 29, 11, 0),
+        _dt(2026, 5, 29, 9, 0), _dt(2026, 5, 29, 11, 0),
         "CMO", "CMO, Creative Director, Brand Team",
         "Full creative strategy evaluation: messaging hierarchy, visual identity refresh considerations.",
         None,
@@ -392,7 +411,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Q2 SEM Budget Increase — Checking Acquisition +$500K",
         "budget_change", "pending", "urgent",
         "VP Performance Media", "CMO",
-        datetime(2026, 5, 10, 17, 0), None,
+        _dt(2026, 5, 10, 17, 0), None,
         Decimal("500000.00"),
         "Competitor SEM spend rising 30% in checking keywords. Defensive uplift to hold impression share.",
         None,
@@ -401,7 +420,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "MediaLink Agency Contract Renewal — $1.2M Annual",
         "vendor_contract", "pending", "high",
         "VP Marketing Finance", "CFO",
-        datetime(2026, 5, 16, 17, 0), None,
+        _dt(2026, 5, 16, 17, 0), None,
         Decimal("1200000.00"),
         "Annual media planning & buying contract renewal. 3% rate increase negotiated vs. prior year.",
         "https://contracts.example.com/medialink-renewal-2026",
@@ -410,7 +429,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Small Business Banking Campaign Brief — Q2",
         "campaign_brief", "pending", "medium",
         "Product Marketing Lead", "CMO",
-        datetime(2026, 5, 13, 17, 0), None,
+        _dt(2026, 5, 13, 17, 0), None,
         Decimal("250000.00"),
         "Full campaign brief for SMB awareness push in Midwest markets. Awaiting CMO sign-off before kick-off.",
         "https://drive.example.com/q2-smb-campaign-brief",
@@ -419,7 +438,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Summer Refi Landing Page — UDAP Compliance Review",
         "compliance", "pending", "high",
         "Digital Marketing Manager", "Compliance Director",
-        datetime(2026, 5, 14, 17, 0), None,
+        _dt(2026, 5, 14, 17, 0), None,
         Decimal("0.00"),
         "Rate claims on refi landing page must be reviewed before go-live on May 12.",
         "https://staging.example.com/home-loan/refi-summer",
@@ -428,7 +447,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Nielsen Brand Lift Study Renewal — Annual",
         "vendor_contract", "pending", "medium",
         "VP Brand", "VP Marketing Finance",
-        datetime(2026, 5, 20, 17, 0), None,
+        _dt(2026, 5, 20, 17, 0), None,
         Decimal("185000.00"),
         "Annual renewal for Nielsen Brand Impact subscription: awareness, consideration, preference tracking.",
         None,
@@ -437,7 +456,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "CTV Creative Refresh — Q3 Video Assets (30s + 15s)",
         "creative", "pending", "medium",
         "Creative Director", "CMO",
-        datetime(2026, 5, 23, 17, 0), None,
+        _dt(2026, 5, 23, 17, 0), None,
         Decimal("120000.00"),
         "Production estimate for Q3 CTV spots: 2 × 30s and 4 × 15s across checking, savings, home equity.",
         "https://drive.example.com/q3-ctv-creative-brief",
@@ -446,7 +465,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Salesforce Marketing Cloud License Upgrade",
         "budget_change", "pending", "medium",
         "Marketing Ops Director", "CFO",
-        datetime(2026, 5, 28, 17, 0), None,
+        _dt(2026, 5, 28, 17, 0), None,
         Decimal("340000.00"),
         "Upgrade to enterprise tier for AI segmentation and predictive send-time features. Annual incremental cost.",
         None,
@@ -455,7 +474,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Digital Privacy Consent Banner — Legal Sign-Off",
         "compliance", "pending", "urgent",
         "Chief Privacy Officer", "General Counsel",
-        datetime(2026, 5, 9, 17, 0), None,
+        _dt(2026, 5, 9, 17, 0), None,
         Decimal("0.00"),
         "Updated consent banner required before May 15 CCPA audit window. Covers web + mobile app.",
         "https://legal.example.com/privacy-consent-2026",
@@ -464,7 +483,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "FinFluencer Influencer Program — 6-Month Agreement",
         "vendor_contract", "pending", "low",
         "Social Media Manager", "VP Brand",
-        datetime(2026, 5, 30, 17, 0), None,
+        _dt(2026, 5, 30, 17, 0), None,
         Decimal("75000.00"),
         "6-month influencer program across 12 personal finance creators. FTC disclosure language to be confirmed.",
         "https://contracts.example.com/finfluencer-2026",
@@ -473,7 +492,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Home Equity Campaign Creative — Digital Pack v3",
         "creative", "pending", "high",
         "Creative Director", "Compliance Director",
-        datetime(2026, 5, 9, 17, 0), None,
+        _dt(2026, 5, 9, 17, 0), None,
         Decimal("0.00"),
         "Final compliance review of 8 display + 4 social assets. Rate claims updated per current offer sheet.",
         "https://drive.example.com/he-creative-v3",
@@ -483,7 +502,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Brand Media Budget Reallocation — CTV +$200K",
         "budget_change", "approved", "urgent",
         "VP Performance Media", "CFO",
-        datetime(2026, 4, 15, 17, 0), datetime(2026, 4, 14, 16, 0),
+        _dt(2026, 4, 15, 17, 0), _dt(2026, 4, 14, 16, 0),
         Decimal("200000.00"),
         "Approved. CTV performance exceeds benchmark; incremental spend authorized for Q2.",
         None,
@@ -492,7 +511,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Q2 SEM Creative — Mortgage Rate Ad Copy",
         "creative", "approved", "high",
         "SEM Manager", "CMO",
-        datetime(2026, 4, 29, 17, 0), datetime(2026, 4, 28, 14, 30),
+        _dt(2026, 4, 29, 17, 0), _dt(2026, 4, 28, 14, 30),
         Decimal("0.00"),
         "Approved. Rate claims verified against current offer. APR disclaimer updated.",
         "https://drive.example.com/sem-mortgage-apr26",
@@ -501,7 +520,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "May Social Paid Creative Batch — Meta",
         "creative", "in_review", "medium",
         "Social Media Manager", "Compliance Director",
-        datetime(2026, 5, 10, 17, 0), None,
+        _dt(2026, 5, 10, 17, 0), None,
         Decimal("0.00"),
         "Creative submitted. Compliance reviewing rate claim language on savings ads.",
         "https://drive.example.com/social-may-meta-batch",
@@ -510,7 +529,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Third-Party Data Vendor Renewal — Acxiom",
         "vendor_contract", "rejected", "high",
         "Marketing Ops Director", "CFO",
-        datetime(2026, 4, 20, 17, 0), datetime(2026, 4, 19, 10, 0),
+        _dt(2026, 4, 20, 17, 0), _dt(2026, 4, 19, 10, 0),
         Decimal("480000.00"),
         "Rejected. Current pricing 22% above market. Competitive RFP process initiated.",
         None,
@@ -519,7 +538,7 @@ _APPROVAL_ITEMS_RAW: list[tuple] = [
         "Annual HMDA Data Certification",
         "compliance", "approved", "urgent",
         "Compliance Team", "Chief Compliance Officer",
-        datetime(2026, 4, 30, 17, 0), datetime(2026, 4, 29, 11, 0),
+        _dt(2026, 4, 30, 17, 0), _dt(2026, 4, 29, 11, 0),
         Decimal("0.00"),
         "Certified and filed with CFPB on schedule.",
         None,
@@ -689,7 +708,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "JPMorgan Chase", "rate_change", "critical",
         "Chase raises HYSA to 5.10% APY — 25 bps above market",
         "Chase Savings Plus now at 5.10%, directly targeting digital-first savers. Paired with heavy SEM conquest.",
-        date(2026, 5, 5), "savings", 25,
+        _d(2026, 5, 5), "savings", 25,
         "Evaluate rate match on HYSA; pivot savings campaign to UX differentiation if rate gap holds.",
         False,
     ),
@@ -697,7 +716,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "JPMorgan Chase", "marketing_campaign", "high",
         "Chase 'Total Checking Bonus' — $300 sign-on for direct deposit",
         "Direct mail + digital push targeting switchers. Offer expires June 30. Heavy Google Search conquest on competitor brands.",
-        date(2026, 4, 18), "checking", None,
+        _d(2026, 4, 18), "checking", None,
         "Consider comparable switching incentive; increase branded SEM bids to defend against conquest traffic.",
         True,
     ),
@@ -705,7 +724,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "JPMorgan Chase", "product_launch", "high",
         "Chase expands BNPL 'Pay Over Time' to checking debit customers",
         "BNPL on debit transactions over $100. Targets non-credit card holders. Announced with $20M awareness push.",
-        date(2026, 3, 10), "checking", None,
+        _d(2026, 3, 10), "checking", None,
         "Brief product team on debit-linked installment gap. BNPL as retention feature for Gen Z segment.",
         True,
     ),
@@ -713,7 +732,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "JPMorgan Chase", "regulatory", "medium",
         "Chase settles CFPB inquiry on deceptive overdraft marketing — $95M",
         "Settlement requires Chase to revamp OD fee disclosures and pause certain overdraft promotions.",
-        date(2026, 3, 27), "checking", None,
+        _d(2026, 3, 27), "checking", None,
         "Review our own overdraft marketing language for compliance exposure; brief Legal.",
         True,
     ),
@@ -721,7 +740,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Bank of America", "product_launch", "high",
         "BofA launches AI Financial Coach in mobile for 20M+ checking customers",
         "Spending insights, budget goals, predictive savings nudges. Rolling out Q2. Internal ML model.",
-        date(2026, 5, 2), "checking", None,
+        _d(2026, 5, 2), "checking", None,
         "Benchmark against our PFM roadmap. Accelerate personalization feature backlog.",
         False,
     ),
@@ -729,7 +748,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Bank of America", "rate_change", "medium",
         "BofA raises mortgage rates +12 bps across 30-year fixed products",
         "BofA now at 7.12% on 30y fixed — above our posted rate. Spring homebuying season opportunity.",
-        date(2026, 4, 15), "mortgage", 12,
+        _d(2026, 4, 15), "mortgage", 12,
         "Promote our mortgage rate competitiveness in spring campaign creative and SEM ad copy.",
         False,
     ),
@@ -737,7 +756,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Bank of America", "branch_expansion", "low",
         "BofA pilots cashierless branch format in 5 Texas markets",
         "Fully digital self-service branches with remote teller video. Testing efficiency model for 2027 rollout.",
-        date(2026, 3, 24), "checking", None,
+        _d(2026, 3, 24), "checking", None,
         "Track pilot outcomes. No near-term competitive threat; file for branch strategy awareness.",
         False,
     ),
@@ -745,7 +764,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Bank of America", "regulatory", "high",
         "CFPB issues guidance on AI-generated marketing disclosures — BofA as pilot partner",
         "BofA collaborating with CFPB on best practices for AI-personalized offer disclosures. May set industry precedent.",
-        date(2026, 3, 6), None, None,
+        _d(2026, 3, 6), None, None,
         "Brief Legal and Compliance on AI marketing disclosure risk. Audit our AI personalization usage.",
         False,
     ),
@@ -753,7 +772,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Wells Fargo", "marketing_campaign", "high",
         "Wells Fargo 'Back to Banking' brand refresh — $80M estimated spend",
         "Nationwide brand campaign emphasizing trust and community reinvention. Heavy CTV, OOH, podcast.",
-        date(2026, 4, 28), "checking", None,
+        _d(2026, 4, 28), "checking", None,
         "Monitor brand health scores in overlapping DMAs. Consider defensive brand spend in top 5 markets.",
         True,
     ),
@@ -761,7 +780,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Wells Fargo", "product_launch", "medium",
         "Wells Fargo introduces 'Flex Savings' — no-penalty CD with 30-day liquidity",
         "Targets rate-sensitive customers who want HYSA-like liquidity at term-rate yields. Available in 45 states.",
-        date(2026, 4, 10), "savings", None,
+        _d(2026, 4, 10), "savings", None,
         "Brief product marketing on savings differentiation. Assess product positioning gap.",
         False,
     ),
@@ -769,7 +788,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Wells Fargo", "rate_change", "medium",
         "Wells Fargo raises Premier Checking relationship rate — HYSA to 4.95%",
         "Relationship pricing tied to total deposits ≥$50K. Defensive play to retain high-balance customers.",
-        date(2026, 3, 20), "savings", 10,
+        _d(2026, 3, 20), "savings", 10,
         "Consider relationship pricing tier evaluation for our high-balance checking segment.",
         False,
     ),
@@ -777,7 +796,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Wells Fargo", "partnership", "medium",
         "Wells Fargo partners with Intuit TurboTax for refund direct deposit bonus",
         "Tax season promo: $100 bonus routing refund to new WF account. Pushed in TurboTax checkout — est. 5M impressions.",
-        date(2026, 3, 3), "checking", None,
+        _d(2026, 3, 3), "checking", None,
         "Evaluate tax-season direct deposit acquisition play for 2027 marketing planning.",
         True,
     ),
@@ -785,7 +804,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "U.S. Bank", "rate_change", "medium",
         "U.S. Bank drops 12-month CD rate by 15 bps to 4.65% APY",
         "Rate reduction signals internal funding cost management. Opportunity to lead on CD rates in shared Midwest markets.",
-        date(2026, 5, 1), "cd", -15,
+        _d(2026, 5, 1), "cd", -15,
         "Flag to product team — capture CD rate-shoppers in Midwest markets with targeted SEM.",
         False,
     ),
@@ -793,7 +812,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "U.S. Bank", "marketing_campaign", "medium",
         "U.S. Bank launches SMB checking bundle with $500 new account bonus",
         "Targeting SMB segment with 0-fee business checking. LinkedIn and local radio in Midwest markets.",
-        date(2026, 4, 7), "business_checking", None,
+        _d(2026, 4, 7), "business_checking", None,
         "Align our SMB campaign brief to counter — ensure bonus offer is visible in shared markets.",
         False,
     ),
@@ -801,7 +820,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "U.S. Bank", "product_launch", "low",
         "U.S. Bank launches bi-weekly pay splitting feature in mobile app",
         "Auto-splits each paycheck into checking + savings at user-defined ratios. Targets paycheck-to-paycheck consumers.",
-        date(2026, 3, 17), "savings", None,
+        _d(2026, 3, 17), "savings", None,
         "Brief digital banking PM team. Assess auto-savings feature roadmap priority.",
         False,
     ),
@@ -809,7 +828,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "U.S. Bank", "rate_change", "low",
         "U.S. Bank raises money market rate +8 bps to 4.55% APY",
         "Small rate bump driven by local competitor pressure in Midwest. Below market leaders.",
-        date(2026, 5, 6), "savings", 8,
+        _d(2026, 5, 6), "savings", 8,
         "No immediate action. Monitor for continued upward rate movement.",
         False,
     ),
@@ -817,7 +836,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Huntington Bank", "branch_expansion", "medium",
         "Huntington announces 18 new branch openings in Columbus and Cincinnati metros",
         "Expansion in underbanked suburban corridors. Accompanied by $10M local marketing push.",
-        date(2026, 4, 22), "checking", None,
+        _d(2026, 4, 22), "checking", None,
         "Review branch density in affected DMAs. Boost SEM coverage in adjacent zip codes.",
         False,
     ),
@@ -825,7 +844,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Huntington Bank", "partnership", "low",
         "Huntington partners with DoorDash for instant pay checking promotion",
         "Embedded finance play targeting gig workers. DoorDash co-marketing includes in-app checking offer.",
-        date(2026, 4, 3), "checking", None,
+        _d(2026, 4, 3), "checking", None,
         "Monitor gig economy banking segment. Evaluate embedded distribution opportunities.",
         False,
     ),
@@ -833,7 +852,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Huntington Bank", "marketing_campaign", "low",
         "Huntington runs 'Spring Cleaning for Your Finances' digital content campaign",
         "12-part content series across YouTube, TikTok, email. Soft lead gen for checking and savings.",
-        date(2026, 3, 14), "checking", None,
+        _d(2026, 3, 14), "checking", None,
         "Benchmark content engagement. Consider similar awareness-funnel content calendar.",
         False,
     ),
@@ -841,7 +860,7 @@ _COMPETITIVE_INTEL_RAW: list[tuple] = [
         "Huntington Bank", "rate_change", "medium",
         "Huntington drops auto loan rate to 6.49% for prime borrowers",
         "Promotional rate for conquest auto loans in Ohio and Michigan. Dealer finance marketing push.",
-        date(2026, 5, 3), "auto_loan", -20,
+        _d(2026, 5, 3), "auto_loan", -20,
         "Review our auto loan rates in shared Midwest markets. Brief consumer lending on competitive positioning.",
         False,
     ),
@@ -906,10 +925,7 @@ _TEAMS = [
     ("MarTech & Data",      "other",               6, 5, 1),
 ]
 
-_PERIODS_12 = [
-    "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11",
-    "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05",
-]
+_PERIODS_12 = TWELVE_MONTH_STRINGS
 
 # Base utilization percentage by team
 _UTIL_BASE = {

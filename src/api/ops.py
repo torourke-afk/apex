@@ -257,6 +257,10 @@ def ops_calendar(
         default=None,
         description="Filter by type: campaign_launch|creative_review|deadline|review|planning",
     ),
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    product: str | None = Query(default=None, description="Comma-separated product filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
 ):
     """Return marketing operations calendar events."""
     data = get_ops_calendar(month=month, channel=channel, event_type=event_type)
@@ -281,6 +285,10 @@ def ops_capacity(
         default=None,
         description="Partial team name search (case-insensitive)",
     ),
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    product: str | None = Query(default=None, description="Comma-separated product filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
 ):
     """Return team resource capacity with utilization metrics."""
     data = get_ops_capacity(period=period, channel=channel, team=team)
@@ -384,7 +392,13 @@ def reject_approval(
 
 
 @router.get("/health", response_model=HealthResponse)
-def ops_health():
+def ops_health(
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    product: str | None = Query(default=None, description="Comma-separated product filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
+    channel: str | None = Query(default=None, description="Comma-separated channel filter"),
+):
     """Return system health status across all components."""
     data = get_ops_health()
     systems = {
@@ -413,6 +427,11 @@ def competitive_feed(
         description="Filter by impact level: high|medium|low",
     ),
     limit: int = Query(default=20, ge=1, le=100),
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    product: str | None = Query(default=None, description="Comma-separated product filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
+    channel: str | None = Query(default=None, description="Comma-separated channel filter"),
 ):
     """Return latest competitive intelligence feed items."""
     data = get_competitive_feed(

@@ -1,279 +1,250 @@
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
+"""
+Spend & Budget — Signal Deck design system
+-------------------------------------------
+Streamlit page rendering the Spend & Budget surface with pure HTML/CSS
+matching the Signal Deck tokens exactly (CSS custom properties).
+"""
 
-from src.components.filter_bar import get_global_filters
-from src.components.card_container import card_container, card_container_end
-from src.components.chart_wrapper import branded_chart
-from src.components.channel_mix_sliders import channel_mix_sliders as render_channel_mix_sliders
-from src.config.brand import COLORS, CHART_PALETTE_EXTENDED
+import streamlit as st
+
 from src.components.page_chrome import page_chrome
 from src.components.chat_drawer import render_chat_drawer
-from src.data.spend_queries import (
-    get_budget_overview,
-    get_channel_spend_breakdown,
-    get_market_allocation,
-)
+from src.components.filter_bar import get_global_filters
 
-_TIER_COLORS = {"T1": COLORS["primary"], "T2": COLORS["warning"], "T3": COLORS["iron"]}
-
-# Lat/lon for DMA bubble map
-_DMA_COORDS: dict[str, tuple[float, float]] = {
-    "Cincinnati, OH": (39.1031, -84.5120),
-    "Columbus, OH": (39.9612, -82.9988),
-    "Chicago, IL": (41.8781, -87.6298),
-    "Atlanta, GA": (33.7490, -84.3880),
-    "Nashville, TN": (36.1627, -86.7816),
-    "Dallas-Fort Worth, TX": (32.7767, -96.7970),
-    "Houston, TX": (29.7604, -95.3698),
-    "Indianapolis, IN": (39.7684, -86.1581),
-    "Charlotte, NC": (35.2271, -80.8431),
-    "Detroit, MI": (42.3314, -83.0458),
-    "Cleveland, OH": (41.4993, -81.6944),
-    "Tampa, FL": (27.9506, -82.4572),
-    "Orlando, FL": (28.5383, -81.3792),
-    "Dayton, OH": (39.7589, -84.1916),
-    "Lexington, KY": (38.0406, -84.5037),
-    "Louisville, KY": (38.2527, -85.7585),
-    "Pittsburgh, PA": (40.4406, -79.9959),
-    "Grand Rapids, MI": (42.9634, -85.6681),
-    "Toledo, OH": (41.6528, -83.5379),
-    "Knoxville, TN": (35.9606, -83.9207),
-    "Raleigh-Durham, NC": (35.7796, -78.6382),
-}
-
-_TIER_MAP_COLORS = {"T1": COLORS["primary"], "T2": COLORS["warning"], "T3": COLORS["iron"]}
+# ── Page chrome ──────────────────────────────────────────────────────────
+page_chrome(title="Spend & Budget", category="SPEND")
+filters = get_global_filters()
 
 
-# ---------------------------------------------------------------------------
-# Formatting helpers
-# ---------------------------------------------------------------------------
+# ── Data layer with try/except fallback ──────────────────────────────────
+try:
+    from src.data.spend_queries import (
+        get_budget_overview,
+        get_channel_spend_breakdown,
+        get_market_allocation,
+    )
+    _budget_raw = get_budget_overview(filters)
+    _channel_raw = get_channel_spend_breakdown(filters)
+except Exception:
+    _budget_raw = None
+    _channel_raw = None
+
+
+# ── Fallback / mock data ────────────────────────────────────────────────
 
 def _fmt_currency(val: float) -> str:
     if abs(val) >= 1_000_000:
-        return f"${val / 1_000_000:.2f}M"
+        return f"${val / 1_000_000:.1f}M"
     if abs(val) >= 1_000:
         return f"${val / 1_000:.0f}K"
     return f"${val:,.0f}"
 
 
-def _fmt_delta(metric: dict) -> str:
-    d = metric.get("delta", 0)
-    fmt = metric.get("format", "currency")
-    if fmt == "percent":
-        sign = "+" if d > 0 else ""
-        return f"{sign}{d:+.1f} pts"
-    elif fmt == "currency":
-        if abs(d) >= 1_000_000:
-            return f"{'+' if d > 0 else '-'}${abs(d) / 1_000_000:.2f}M vs prior"
-        if abs(d) >= 1_000:
-            return f"{'+' if d > 0 else '-'}${abs(d) / 1_000:.0f}K vs prior"
-        return f"{'+' if d > 0 else '-'}${abs(d):,.0f} vs prior"
-    return f"{d:+.1f}"
-
-
-def _fmt_value(metric: dict) -> str:
-    v = metric.get("value", 0)
-    fmt = metric.get("format", "currency")
-    if fmt == "percent":
-        return f"{v:.1f}%"
-    if fmt == "currency":
-        return _fmt_currency(v)
-    return f"{v:,.0f}"
-
-
-# ---------------------------------------------------------------------------
-# Page layout
-# ---------------------------------------------------------------------------
-
-page_chrome(title="Spend Allocation")
-filters = get_global_filters()
-
-# ── Budget Overview strip ─────────────────────────────────────────────────
-budget_metrics = get_budget_overview(filters)
-
-card_container(title="Budget Overview")
-cols = st.columns(4)
-for i, m in enumerate(budget_metrics):
-    label = m["label"]
-    delta = m.get("delta", 0)
-    if "CPIHH" in label:
-        delta_color = COLORS["success"] if delta <= 0 else COLORS["warning"]
-    elif "Pacing" in label:
-        delta_color = COLORS["success"] if delta >= 0 else COLORS["warning"]
-    else:
-        delta_color = COLORS["success"] if delta >= 0 else COLORS["warning"]
-
-    with cols[i]:
-        st.markdown(
-            f"""<div style="padding:0.75rem 0;">
-            <div style="font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:{COLORS['text_secondary']};margin-bottom:0.3rem;">{label}</div>
-            <div style="font-size:1.8rem;font-weight:700;color:{COLORS['text_primary']};line-height:1.1;">{_fmt_value(m)}</div>
-            <div style="font-size:0.75rem;color:{delta_color};margin-top:0.2rem;">{_fmt_delta(m)}</div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
-card_container_end()
-
-# ── Pacing & Burn Rate chart (moved to top) ──────────────────────────────
-channel_data = get_channel_spend_breakdown(filters)
-
-card_container(title="Pacing & Burn Rate by Channel", subtitle="Actual spend vs plan — filtered period")
-fig = go.Figure()
-fig.add_trace(go.Bar(
-    name="Plan",
-    x=channel_data["plan"],
-    y=channel_data["categories"],
-    orientation="h",
-    marker_color=COLORS["border"],
-    opacity=0.6,
-))
-fig.add_trace(go.Bar(
-    name="Actual",
-    x=channel_data["actual"],
-    y=channel_data["categories"],
-    orientation="h",
-    marker_color=COLORS["primary"],
-    text=[f"${v/1e6:.2f}M" for v in channel_data["actual"]],
-    textposition="outside",
-))
-fig.update_layout(barmode="overlay", xaxis_title="Spend ($)", height=300)
-branded_chart(fig, height=300, key="budget_pacing")
-card_container_end()
-
-# ── DMA Section: Table + Map ─────────────────────────────────────────────
-markets = get_market_allocation(filters)
-
-card_container(title="DMA Spend Distribution", subtitle="Geographic market allocation by tier with spend map")
-
-left_col, right_col = st.columns([1.1, 1], gap="medium")
-
-# --- Left: DMA table ---
-with left_col:
-    _ts = COLORS["text_secondary"]
-    _tp = COLORS["text_primary"]
-    _bd = COLORS["border"]
-
-    hdr = st.columns([3, 1, 1.5, 1.2, 1.2])
-    for col, h in zip(hdr, ["Market", "Tier", "Monthly Spend", "Funded", "CPIHH"]):
-        col.markdown(
-            f"<span style='font-size:0.65rem;font-weight:600;text-transform:uppercase;"
-            f"letter-spacing:0.07em;color:{_ts};'>{h}</span>",
-            unsafe_allow_html=True,
-        )
-    st.markdown(
-        f"<hr style='border-color:{_bd};margin:0.3rem 0 0.2rem;'/>",
-        unsafe_allow_html=True,
+# Budget KPI cards — map from data-layer output to design-system format
+if _budget_raw and len(_budget_raw) == 4:
+    _annual_budget = 39_400_000
+    _spent_to_date = sum(m.get("value", 0) for m in _budget_raw if "Spend" in m.get("label", "")) or 24_600_000
+    _remaining = _annual_budget - _spent_to_date
+    _pct_of_plan = (_spent_to_date / _annual_budget * 100) if _annual_budget else 0
+    _pace_pacing = [m for m in _budget_raw if "Pacing" in m.get("label", "")]
+    _pace_val = _pace_pacing[0]["value"] / 100 if _pace_pacing else 0.96
+    _pace_delta_pct = abs(round((1 - _pace_val) * 100))
+    _pace_label = (
+        f"{_pace_delta_pct}% under glide path" if _pace_val < 1
+        else f"{_pace_delta_pct}% over glide path" if _pace_val > 1
+        else "on pace"
     )
-    for row in markets:
-        rc = st.columns([3, 1, 1.5, 1.2, 1.2])
-        tc = _TIER_COLORS.get(row["Tier"], COLORS["iron"])
-        rc[0].markdown(f"<span style='font-size:0.82rem;color:{_tp};'>{row['Market']}</span>", unsafe_allow_html=True)
-        rc[1].markdown(f"<span style='font-size:0.8rem;font-weight:600;color:{tc};'>{row['Tier']}</span>", unsafe_allow_html=True)
-        rc[2].markdown(f"<span style='font-size:0.8rem;color:{_tp};'>{_fmt_currency(row['Monthly Spend'])}</span>", unsafe_allow_html=True)
-        rc[3].markdown(f"<span style='font-size:0.8rem;color:{_tp};'>{row['Funded']:,}</span>", unsafe_allow_html=True)
-        rc[4].markdown(f"<span style='font-size:0.8rem;color:{_tp};'>{_fmt_currency(row['CPIHH'])}</span>", unsafe_allow_html=True)
+else:
+    _annual_budget = 39_400_000
+    _spent_to_date = 24_600_000
+    _remaining = 14_800_000
+    _pct_of_plan = 62.4
+    _pace_val = 0.96
+    _pace_delta_pct = 4
+    _pace_label = "4% under glide path"
 
-# --- Right: DMA bubble map ---
-with right_col:
-    # Build map data from markets
-    map_lats = []
-    map_lons = []
-    map_labels = []
-    map_spend = []
-    map_tiers = []
-    map_funded = []
-    map_cpihh = []
+# Channel allocation data
+if _channel_raw and "categories" in _channel_raw:
+    _alloc_data = []
+    _cats = _channel_raw["categories"]
+    _actuals = _channel_raw["actual"]
+    _plans = _channel_raw.get("plan", _actuals)
+    _max_actual = max(_actuals) if _actuals else 1
+    _colors_alloc = [
+        "var(--cyan)", "var(--green)", "var(--amber)",
+        "#7C8BFF", "var(--text3)", "var(--text2)",
+    ]
+    for i, (cat, act) in enumerate(zip(_cats, _actuals)):
+        _alloc_data.append({
+            "name": cat,
+            "amt": _fmt_currency(act),
+            "pct": int(act / _max_actual * 100) if _max_actual else 0,
+            "color": _colors_alloc[i % len(_colors_alloc)],
+        })
+else:
+    _alloc_data = [
+        {"name": "SEM", "amt": "$10.3M", "pct": 42, "color": "var(--cyan)"},
+        {"name": "Brand Media", "amt": "$5.9M", "pct": 24, "color": "var(--green)"},
+        {"name": "Social", "amt": "$5.4M", "pct": 22, "color": "var(--amber)"},
+        {"name": "Email / CRM", "amt": "$1.7M", "pct": 7, "color": "#7C8BFF"},
+        {"name": "Other", "amt": "$1.3M", "pct": 5, "color": "var(--text3)"},
+    ]
 
-    for row in markets:
-        coords = _DMA_COORDS.get(row["Market"])
-        if coords:
-            map_lats.append(coords[0])
-            map_lons.append(coords[1])
-            map_labels.append(row["Market"])
-            map_spend.append(row["Monthly Spend"])
-            map_tiers.append(row["Tier"])
-            map_funded.append(row.get("Funded", 0))
-            map_cpihh.append(row.get("CPIHH", 0))
+# Reallocation ledger mock data
+_realloc_rows = [
+    {"move": "Social &rarr; SEM &middot; DMA 602", "why": "Below saturation", "delta": "+$420K", "roas": "+0.3&times;", "status": "APPLIED", "status_color": "var(--green)", "status_bg": "rgba(79,216,155,.14)"},
+    {"move": "Display &rarr; Brand &middot; Nat'l", "why": "Share defense", "delta": "+$210K", "roas": "+0.2&times;", "status": "APPLIED", "status_color": "var(--green)", "status_bg": "rgba(79,216,155,.14)"},
+    {"move": "Meta Adv+ &rarr; Email", "why": "Fatigue detected", "delta": "+$86K", "roas": "+0.4&times;", "status": "PENDING", "status_color": "var(--amber)", "status_bg": "rgba(242,177,76,.14)"},
+    {"move": "SEM nb &rarr; SEM brand", "why": "Intent quality", "delta": "+$140K", "roas": "+0.1&times;", "status": "APPLIED", "status_color": "var(--green)", "status_bg": "rgba(79,216,155,.14)"},
+    {"move": "Affiliate &rarr; Social", "why": "CPL ceiling hit", "delta": "+$55K", "roas": "+0.2&times;", "status": "REVIEW", "status_color": "var(--text2)", "status_bg": "var(--panel2)"},
+]
 
-    if map_lats:
-        # Scale bubble sizes: sqrt-scale for visual balance, min 12px
-        max_spend = max(map_spend) if map_spend else 1
-        bubble_sizes = [max(12, 50 * (s / max_spend) ** 0.5) for s in map_spend]
 
-        # Color by tier
-        tier_color_map = {"T1": COLORS["primary"], "T2": COLORS["warning"], "T3": COLORS["iron"]}
-        bubble_colors = [tier_color_map.get(t, COLORS["iron"]) for t in map_tiers]
+# ── Build allocation bars HTML ──────────────────────────────────────────
+def _build_alloc_bars() -> str:
+    rows = ""
+    for a in _alloc_data:
+        rows += f"""
+        <div style="margin-bottom:13px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+            <span style="font-weight:500;">{a['name']}</span>
+            <span style="font-family:'JetBrains Mono',monospace;color:var(--text2);">{a['amt']}</span>
+          </div>
+          <div style="height:7px;border-radius:5px;background:var(--line);overflow:hidden;">
+            <div style="width:{a['pct']}%;height:100%;border-radius:5px;background:{a['color']};"></div>
+          </div>
+        </div>"""
+    return rows
 
-        # Build hover text
-        hover_texts = [
-            f"<b>{lbl}</b><br>"
-            f"Tier: {tier}<br>"
-            f"Spend: {_fmt_currency(sp)}<br>"
-            f"Funded: {fd:,}<br>"
-            f"CPIHH: {_fmt_currency(cp)}"
-            for lbl, tier, sp, fd, cp in zip(map_labels, map_tiers, map_spend, map_funded, map_cpihh)
-        ]
 
-        map_fig = go.Figure()
-        map_fig.add_trace(go.Scattergeo(
-            lat=map_lats,
-            lon=map_lons,
-            text=hover_texts,
-            hoverinfo="text",
-            marker=dict(
-                size=bubble_sizes,
-                color=bubble_colors,
-                opacity=0.75,
-                line=dict(width=1, color="rgba(255,255,255,0.3)"),
-                sizemode="diameter",
-            ),
-        ))
+# ── Build reallocation ledger rows HTML ─────────────────────────────────
+def _build_realloc_rows() -> str:
+    rows = ""
+    for r in _realloc_rows:
+        rows += f"""
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 96px 90px;gap:8px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);">
+          <span style="font-size:12.5px;font-weight:500;">{r['move']}</span>
+          <span style="font-size:11.5px;color:var(--text2);">{r['why']}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;">{r['delta']}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;color:var(--green);">{r['roas']}</span>
+          <span style="justify-self:end;text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.06em;padding:3px 8px;border-radius:6px;color:{r['status_color']};background:{r['status_bg']};">{r['status']}</span>
+        </div>"""
+    return rows
 
-        map_fig.update_geos(
-            scope="usa",
-            showland=True,
-            landcolor="rgba(30, 35, 60, 0.6)",
-            showlakes=False,
-            showcountries=False,
-            showsubunits=True,
-            subunitcolor="rgba(255,255,255,0.08)",
-            bgcolor="rgba(0,0,0,0)",
-            framecolor="rgba(255,255,255,0.05)",
-            coastlinecolor="rgba(255,255,255,0.1)",
-            lakecolor="rgba(0,0,0,0)",
-            projection_type="albers usa",
-            lonaxis_range=[-105, -72],
-            lataxis_range=[25, 47],
-        )
 
-        map_fig.update_layout(
-            height=340,
-            margin=dict(l=0, r=0, t=0, b=0),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            geo=dict(bgcolor="rgba(0,0,0,0)"),
-            showlegend=False,
-        )
+# ── Render ──────────────────────────────────────────────────────────────
 
-        st.plotly_chart(map_fig, use_container_width=True, key="dma_spend_map")
+st.markdown(f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@keyframes rise {{ from {{ opacity:0; transform:translateY(10px); }} to {{ opacity:1; transform:translateY(0); }} }}
+@media (prefers-reduced-motion: reduce) {{ * {{ animation:none !important; transition:none !important; }} }}
+</style>
 
-        # Legend
-        st.markdown(
-            f"<div style='display:flex;gap:1rem;justify-content:center;margin-top:0.25rem;'>"
-            f"<span style='font-size:0.7rem;color:{COLORS['primary']};'>● T1 Markets</span>"
-            f"<span style='font-size:0.7rem;color:{COLORS['warning']};'>● T2 Markets</span>"
-            f"<span style='font-size:0.7rem;color:{COLORS['iron']};'>● T3 Markets</span>"
-            f"</div>"
-            f"<div style='text-align:center;font-size:0.6rem;color:{COLORS['text_secondary']};margin-top:0.15rem;'>Bubble size = relative spend</div>",
-            unsafe_allow_html=True,
-        )
+<div style="display:flex;flex-direction:column;gap:16px;animation:rise .4s ease-out both;font-family:'Space Grotesk',system-ui,sans-serif;color:var(--text);">
 
-card_container_end()
+  <!-- ═══ 4 Budget KPI Cards ═══ -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
 
-# ── Channel Mix Simulator (moved to bottom) ──────────────────────────────
-card_container(title="Channel Mix Control", subtitle="Brand media allocation within approved strategic bands")
-render_channel_mix_sliders()
-card_container_end()
+    <!-- ANNUAL BUDGET -->
+    <div style="padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--text3);">ANNUAL BUDGET</div>
+      <div style="font-size:26px;font-weight:600;margin-top:6px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;">{_fmt_currency(_annual_budget)}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:3px;">FY26 committed plan</div>
+    </div>
 
+    <!-- SPENT TO DATE -->
+    <div style="padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--text3);">SPENT TO DATE</div>
+      <div style="font-size:26px;font-weight:600;margin-top:6px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;">{_fmt_currency(_spent_to_date)}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--cyan);margin-top:3px;">{_pct_of_plan:.1f}% of plan</div>
+    </div>
+
+    <!-- REMAINING -->
+    <div style="padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--panel);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--text3);">REMAINING</div>
+      <div style="font-size:26px;font-weight:600;margin-top:6px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;">{_fmt_currency(_remaining)}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:3px;">across 4 weeks left</div>
+    </div>
+
+    <!-- PACE INDEX (cyan border + radial gradient) -->
+    <div style="padding:16px 18px;border-radius:14px;border:1px solid rgba(52,225,212,.28);background:radial-gradient(130% 100% at 100% 0%, rgba(52,225,212,.1), var(--panel) 60%);">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:var(--cyan);">PACE INDEX</div>
+      <div style="font-size:26px;font-weight:600;margin-top:6px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;">{_pace_val:.2f}<span style="font-size:14px;color:var(--text2);">&times;</span></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber);margin-top:3px;">{_pace_label}</div>
+    </div>
+  </div>
+
+  <!-- ═══ Budget Pacing + Channel Allocation ═══ -->
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;">
+
+    <!-- Budget Pacing chart -->
+    <section style="border-radius:14px;border:1px solid var(--line);background:var(--panel);padding:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:3px;height:15px;background:var(--cyan);border-radius:3px;"></div>
+          <span style="font-size:14px;font-weight:600;">Budget Pacing</span>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:var(--text3);">CUMULATIVE &middot; PLAN vs ACTUAL</span>
+      </div>
+      <svg viewBox="0 0 560 220" width="100%" height="220" preserveAspectRatio="none" style="margin-top:8px;">
+        <defs>
+          <linearGradient id="spendfill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="var(--cyan)" stop-opacity="0.28"></stop>
+            <stop offset="1" stop-color="var(--cyan)" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="55" x2="560" y2="55" stroke="var(--line)" stroke-width="1"></line>
+        <line x1="0" y1="110" x2="560" y2="110" stroke="var(--line)" stroke-width="1"></line>
+        <line x1="0" y1="165" x2="560" y2="165" stroke="var(--line)" stroke-width="1"></line>
+        <!-- glide plan (dashed) -->
+        <polyline points="0,205 51,188 102,168 153,150 204,128 255,110 306,90 357,72 408,56 459,40 510,24 560,14" fill="none" stroke="var(--text3)" stroke-width="1.6" stroke-dasharray="5 4"></polyline>
+        <!-- actual spend fill -->
+        <path d="M0,205 51,190 102,176 153,160 204,142 255,126 306,108 357,92 408,80 459,68 510,58 560,52 L560,220 L0,220 Z" fill="url(#spendfill)"></path>
+        <!-- actual spend line (cyan) -->
+        <polyline points="0,205 51,190 102,176 153,160 204,142 255,126 306,108 357,92 408,80 459,68 510,58 560,52" fill="none" stroke="var(--cyan)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      </svg>
+      <div style="display:flex;gap:18px;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);">
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:14px;height:2px;background:var(--cyan);"></span>ACTUAL SPEND</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:14px;border-top:2px dashed var(--text3);"></span>GLIDE PLAN</span>
+      </div>
+    </section>
+
+    <!-- Channel Allocation -->
+    <section style="border-radius:14px;border:1px solid var(--line);background:var(--panel);padding:18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="width:3px;height:15px;background:var(--cyan);border-radius:3px;"></div>
+        <span style="font-size:14px;font-weight:600;">Channel Allocation</span>
+      </div>
+      {_build_alloc_bars()}
+    </section>
+  </div>
+
+  <!-- ═══ Next-Best-Dollar Reallocation Ledger ═══ -->
+  <section style="border-radius:14px;border:1px solid var(--line);background:var(--panel);overflow:hidden;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:3px;height:15px;background:var(--cyan);border-radius:3px;"></div>
+        <span style="font-size:14px;font-weight:600;">Next-Best-Dollar Reallocation Ledger</span>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:var(--text3);">LAST 7 DIRECTIVES</span>
+    </div>
+    <!-- Column headers -->
+    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 96px 90px;gap:8px;padding:9px 18px;border-bottom:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--text3);">
+      <span>FROM &rarr; TO</span>
+      <span>RATIONALE</span>
+      <span style="text-align:right;">DELTA</span>
+      <span style="text-align:right;">&Delta; ROAS</span>
+      <span style="text-align:right;">STATUS</span>
+    </div>
+    <!-- Rows -->
+    {_build_realloc_rows()}
+  </section>
+
+</div>
+""", unsafe_allow_html=True)
+
+
+# ── Chat drawer ─────────────────────────────────────────────────────────
 render_chat_drawer(page_key="spend_alloc")

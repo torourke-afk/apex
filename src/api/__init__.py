@@ -71,12 +71,68 @@ from .retention import router as retention_router
 from .brand_awareness_api import router as brand_awareness_router
 from .simulate import router as simulate_router
 from .settings_api import router as settings_router
+from .creative import router as creative_router
+from .modeling import router as modeling_router
+from .media import media_router
+from .audience import audience_router
+from .experiments import router as experiments_router
+from .allocation import router as allocation_router
+from .launch import router as launch_router
+from .lens import router as lens_router
+from .metrics import router as metrics_router
+
+# --- Connector & Sync routers ---
+from .sync.router import router as sync_router
+
+# --- Audit router ---
+from .audit import router as audit_router
+
+# --- Export router ---
+from .export.router import router as export_router
 
 _EVAL_INTERVAL_MINUTES = int(os.getenv("APEX_ALERT_EVALUATION_INTERVAL_MINUTES", "5"))
 
 
+async def _init_connectors():
+    """Register the seed connector (and any configured external connectors)."""
+    from .connectors import registry
+    from .connectors.seed import SeedConnector
+    from .connectors.google_analytics import GoogleAnalytics4Connector, default_config as ga4_config
+    from .connectors.semrush import SEMrushConnector, default_config as semrush_config
+    from .connectors.google_ads import GoogleAdsConnector, default_config as gads_config
+    from .connectors.meta_ads import MetaAdsConnector, default_config as meta_config
+
+    # Always register the seed connector as fallback
+    seed = SeedConnector()
+    registry.register(seed, is_fallback=True)
+    await seed.connect()
+
+    # Auto-register external connectors if their env vars are set
+    for ConnectorCls, config_fn in [
+        (GoogleAnalytics4Connector, ga4_config),
+        (SEMrushConnector, semrush_config),
+        (GoogleAdsConnector, gads_config),
+        (MetaAdsConnector, meta_config),
+    ]:
+        cfg = config_fn()
+        if cfg.enabled:
+            conn = ConnectorCls(cfg)
+            registry.register(conn)
+            try:
+                await conn.connect()
+            except Exception as exc:
+                import logging
+                logging.getLogger(__name__).warning(
+                    "Failed to connect %s: %s", cfg.display_name, exc,
+                )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # --- Connector init ---
+    await _init_connectors()
+
+    # --- Background scheduler ---
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         run_evaluation,
@@ -90,6 +146,13 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         scheduler.shutdown(wait=False)
+        # Disconnect all connectors
+        from .connectors import registry
+        import asyncio
+        try:
+            await registry.disconnect_all()
+        except Exception:
+            pass
 
 
 app = FastAPI(title="Apex API", version="0.1.0", lifespan=lifespan)
@@ -129,3 +192,25 @@ app.include_router(retention_router)
 app.include_router(brand_awareness_router)
 app.include_router(simulate_router)
 app.include_router(settings_router)
+app.include_router(creative_router)
+app.include_router(modeling_router)
+app.include_router(media_router)
+app.include_router(audience_router)
+app.include_router(launch_router)
+app.include_router(allocation_router)
+app.include_router(experiments_router)
+
+# --- Lens NL-to-SQL ---
+app.include_router(lens_router)
+
+# --- Audit ---
+app.include_router(audit_router)
+
+# --- Metric Layer ---
+app.include_router(metrics_router)
+
+# --- Connector & Sync ---
+app.include_router(sync_router)
+
+# --- Export ---
+app.include_router(export_router)

@@ -20,12 +20,14 @@ tables, and finally returns hardcoded seed data if neither exists.
 from __future__ import annotations
 
 import hashlib
+from datetime import timedelta
 from typing import Optional
 
 import numpy as np
 import pandas as pd
 
 from src.data.init_db import get_connection
+from src.data.seeds._dates import YESTERDAY
 
 # ---------------------------------------------------------------------------
 # Alert benchmarks (module-level so tests can monkeypatch)
@@ -405,7 +407,7 @@ _BEI_WEEKS = 12
 def _generate_bei_seed_data(market_tier: Optional[str] = None) -> pd.DataFrame:
     """Generate deterministic seed BEI data when no table exists."""
     rows = []
-    base_date = pd.Timestamp("2026-02-23")  # 12 weeks back from ~mid-May 2026
+    base_date = pd.Timestamp(YESTERDAY - timedelta(weeks=12))  # 12 weeks back from YESTERDAY
 
     tiers = {market_tier: _BEI_MARKETS[market_tier]} if market_tier else _BEI_MARKETS
 

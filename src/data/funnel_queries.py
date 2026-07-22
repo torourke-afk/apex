@@ -257,6 +257,27 @@ def get_funnel_data(filters: dict | None = None) -> dict:
     return _seed_funnel(rng_seed=seed)
 
 
+# Map stage_idx to application_events columns for dropoff computation
+# stage_idx: 0=UOI→Capture, 1=Capture→Started, 2=Started→Submitted,
+#            3=Submitted→Approved, 4=Approved→Funded, 5=Funded→Active
+_STAGE_COLS = [
+    # (entry_col, exit_col) — for application_events based stages
+    None,  # 0: UOI→Capture not in application_events
+    None,  # 1: Capture→Started not in application_events
+    ("1", "reached_submit"),         # 2: Started→Submitted
+    ("reached_submit", "approved"),  # 3: Submitted→Approved
+    ("approved", "approved"),        # 4: Approved→Funded (funded is in funnel_summary)
+]
+
+# Map dimension to application_events column
+_DIM_COL = {
+    "channel": "channel",
+    "market": "dma_name",
+    "product": "product_name",
+    "device": "device",
+}
+
+
 @st.cache_data(ttl=300, show_spinner=False)
 def get_dropoff_by_segment(
     stage_idx: int,
@@ -266,22 +287,70 @@ def get_dropoff_by_segment(
     """
     Return drop-off volume broken down by segment for a given stage transition.
 
-    Parameters
-    ----------
-    stage_idx : int
-        0–4 index of the transition (0 = Impressions→Clicks, …, 4 = Approved→Funded).
-    dimension : str
-        One of: "channel", "market", "product", "device", "personalization".
-    filters : dict, optional
-        Same filter keys as get_funnel_data — passed through for consistency.
-
-    Returns
-    -------
-    dict
-        labels: list[str], dropoff: list[float], total_dropoff: float
+    Uses application_events for channel/market/product/device dimensions when
+    stage_idx maps to available columns. Falls back to synthetic proportions
+    for unsupported stages or dimensions.
     """
+    import os
+    import duckdb
+
+    dim_col = _DIM_COL.get(dimension)
+    can_query = dim_col is not None and stage_idx in (2, 3)
+
+    if can_query:
+        try:
+            db_path = os.environ.get("APEX_DB_PATH", "apex_clean.duckdb")
+            con = duckdb.connect(db_path, read_only=True)
+
+            # Build WHERE
+            clauses: list[str] = []
+            params: list = []
+            if filters:
+                if filters.get("date_start"):
+                    clauses.append("date >= ?")
+                    params.append(str(filters["date_start"]))
+                if filters.get("date_end"):
+                    clauses.append("date <= ?")
+                    params.append(str(filters["date_end"]))
+                if filters.get("dma"):
+                    ph = ", ".join("?" * len(filters["dma"]))
+                    clauses.append(f"dma_name IN ({ph})")
+                    params.extend(filters["dma"])
+            where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
+
+            entry_col, exit_col = _STAGE_COLS[stage_idx]  # type: ignore
+
+            rows = con.execute(f"""
+                SELECT
+                    {dim_col},
+                    SUM(CASE WHEN {entry_col} = 1 THEN 1 ELSE 0 END) -
+                    SUM(CASE WHEN {exit_col} = 1 THEN 1 ELSE 0 END) AS dropoff
+                FROM application_events
+                {where}
+                GROUP BY {dim_col}
+                HAVING dropoff > 0
+                ORDER BY dropoff DESC
+            """.replace("CASE WHEN 1 = 1", "CASE WHEN TRUE"), params).fetchall()
+
+            con.close()
+
+            labels = [r[0] for r in rows]
+            dropoff_vals = [int(r[1]) for r in rows]
+            total_dropoff = sum(dropoff_vals)
+
+            return {
+                "labels": labels,
+                "dropoff": dropoff_vals,
+                "total_dropoff": float(total_dropoff),
+            }
+        except Exception:
+            pass  # Fall through to synthetic
+
+    # Synthetic fallback for unsupported dimensions/stages
     funnel = get_funnel_data(filters)
     values = funnel["values"]
+    if stage_idx >= len(values) - 1:
+        stage_idx = len(values) - 2
     total_dropoff = max(0.0, float(values[stage_idx] - values[stage_idx + 1]))
 
     proportions = _SEGMENT_PROPORTIONS.get(dimension, _SEGMENT_PROPORTIONS["channel"])
@@ -291,7 +360,6 @@ def get_dropoff_by_segment(
     labels = list(proportions.keys())
     base_props = list(proportions.values())
 
-    # Apply ±20% noise so different stage/filter combos show distinct patterns
     noisy = [max(0.01, p * (1.0 + rng.uniform(-0.20, 0.20))) for p in base_props]
     total_noisy = sum(noisy)
     normalized = [p / total_noisy for p in noisy]

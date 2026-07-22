@@ -40,6 +40,7 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.data.init_db import get_connection, init_db  # noqa: E402
+from src.data.seeds._dates import TWELVE_WEEK_MONDAYS  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -51,9 +52,8 @@ rng = np.random.default_rng(SEED)
 TOTAL_MEDIA_BUDGET = 15_000_000.0
 BRAND_MEDIA_BUDGET = TOTAL_MEDIA_BUDGET * 0.40  # $6,000,000
 
-# 12 weekly periods starting 2025-05-05 (Mondays)
-_START = date(2025, 5, 5)
-WEEKS: list[date] = [_START + timedelta(weeks=i) for i in range(12)]
+# 12 weekly periods (Mondays) from centralized date anchor
+WEEKS: list[date] = [d.date() for d in TWELVE_WEEK_MONDAYS]
 
 # Market definitions by tier
 GROWTH_MARKETS = [
@@ -347,8 +347,8 @@ _PAIRS_DEF = [
     ("Maintain-Lexington vs Experiment-Atlanta",   "Lexington, KY",    "Atlanta, GA",       False),
 ]
 
-_TEST_START = date(2025, 5, 5)
-_TEST_END = date(2025, 7, 28)  # 12 weeks
+_TEST_START = WEEKS[0]
+_TEST_END = WEEKS[-1]
 
 
 def build_incrementality_pairs() -> pd.DataFrame:

@@ -28,6 +28,8 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import List
 
+from src.data.seeds._dates import NOW
+
 import pandas as pd
 import pandera.pandas as pa
 from pandera.pandas import Column, DataFrameSchema, Check
@@ -51,8 +53,8 @@ SEED = 42
 fake = Faker("en_US")
 fake.seed_instance(SEED)
 
-TODAY = datetime(2026, 5, 8, tzinfo=timezone.utc)
-WINDOW_START = TODAY - timedelta(days=30)
+TODAY = NOW
+WINDOW_START = TODAY - timedelta(days=29)
 
 SEVERITIES = ["info", "warning", "critical"]
 CATEGORIES = ["performance", "budget", "competitor", "system"]

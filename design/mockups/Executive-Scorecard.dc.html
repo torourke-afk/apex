@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(140,150,170,.22); border-radius:9px; }
+  ::-webkit-scrollbar-thumb:hover{ background:rgba(140,150,170,.36); }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  :root{ --bg:#06080C; --bg2:#0A0E14; --panel:#0D1118; --panel2:#10151E; --elev:#151B26; --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13); --text:#E8ECF4; --text2:#A4ADBF; --text3:#6B7587; --cyan:#34E1D4; --cyanInk:#04100F; --green:#4FD89B; --amber:#F2B14C; --red:#FF5C72; --grid:rgba(255,255,255,.04); --dot:rgba(170,205,230,.26); --dotStar:rgba(190,215,235,.7); --headerBg:rgba(10,13,19,.55); --aura1:rgba(52,225,212,.13); --aura2:rgba(38,96,210,.14); --aura3:rgba(108,70,200,.10); }
+  [data-theme="light"]{ --bg:#DDE2EA; --bg2:#EAEEF4; --panel:#FFFFFF; --panel2:#F4F6FA; --elev:#FFFFFF; --line:rgba(12,18,28,.13); --line2:rgba(12,18,28,.24); --text:#0A0E16; --text2:#414B5C; --text3:#5C6678; --cyan:#0B897E; --cyanInk:#FFFFFF; --green:#0F7A4D; --amber:#8A5E0A; --red:#C92F47; --grid:rgba(12,18,28,.055); --dot:rgba(40,70,110,.22); --dotStar:rgba(50,80,120,.6); --headerBg:rgba(255,255,255,.7); --aura1:rgba(11,137,126,.12); --aura2:rgba(38,96,210,.09); --aura3:rgba(120,90,200,.07); }
+  @keyframes ringkpi{ from{ opacity:1; } }
+  @keyframes ringhero{ from{ opacity:1; } }
+  @keyframes rise{ from{ opacity:1; } }
+  @keyframes wirein{ from{ opacity:1; } }
+  @keyframes pulseonce{ 0%,100%{ box-shadow:inset 0 0 0 0 rgba(255,92,114,0); } 35%{ box-shadow:inset 2px 0 0 0 var(--red), 0 0 18px -4px rgba(255,92,114,.5); } }
+  @keyframes blink{ 0%,48%{ opacity:1; } 50%,100%{ opacity:0; } }
+  @keyframes sweepx{ from{ transform:translateX(-120%); } to{ transform:translateX(260%); } }
+  @keyframes aura1{ 0%{ transform:translate(0,0) scale(1); } 100%{ transform:translate(7vw,6vh) scale(1.18); } }
+  @keyframes aura2{ 0%{ transform:translate(0,0) scale(1); } 100%{ transform:translate(-6vw,7vh) scale(1.12); } }
+  @keyframes aura3{ 0%{ transform:translate(0,0) scale(1); } 100%{ transform:translate(5vw,-6vh) scale(1.22); } }
+  @keyframes floatA{ 0%{ transform:translate(0,0); } 100%{ transform:translate(38px,-46px); } }
+  @keyframes floatB{ 0%{ transform:translate(0,0); } 100%{ transform:translate(-42px,34px); } }
+  @keyframes floatC{ 0%{ transform:translate(0,0); } 100%{ transform:translate(30px,40px); } }
+  @keyframes floatD{ 0%{ transform:translate(0,0); } 100%{ transform:translate(-34px,-30px); } }
+  @keyframes floatE{ 0%{ transform:translate(0,0); } 100%{ transform:translate(48px,12px); } }
+  @keyframes floatF{ 0%{ transform:translate(0,0); } 100%{ transform:translate(-22px,-44px); } }
+  @keyframes twinkle{ 0%,100%{ opacity:.35; } 50%{ opacity:.95; } }
+  input[type=range]{ -webkit-appearance:none; appearance:none; background:transparent; }
+  input[type=range]::-webkit-slider-runnable-track{ height:4px; border-radius:4px; background:var(--line2); }
+  input[type=range]::-moz-range-track{ height:4px; border-radius:4px; background:var(--line2); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:15px; height:15px; margin-top:-5.5px; border-radius:50%; background:var(--cyan); cursor:pointer; box-shadow:0 0 10px -1px var(--cyan); }
+  input[type=range]::-moz-range-thumb{ width:15px; height:15px; border:none; border-radius:50%; background:var(--cyan); cursor:pointer; box-shadow:0 0 10px -1px var(--cyan); }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</helmet>
+<div ref="{{ rootRef }}" data-theme="{{ theme }}" style="position:relative; height:100vh; width:100%; display:flex; overflow:hidden; font-family:'Space Grotesk',system-ui,sans-serif; color:var(--text); background:radial-gradient(120% 90% at 78% -10%, var(--bg2), var(--bg) 62%);">
+
+  <!-- ===== ATMOSPHERE ===== -->
+  <div aria-hidden="true" style="position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;">
+    <div style="position:absolute; width:62vw; height:62vw; left:-12vw; top:-22vw; border-radius:50%; background:radial-gradient(circle at center, var(--aura1), transparent 64%); filter:blur(36px); animation:aura1 26s ease-in-out infinite alternate;"></div>
+    <div style="position:absolute; width:56vw; height:56vw; right:-16vw; top:8vh; border-radius:50%; background:radial-gradient(circle at center, var(--aura2), transparent 64%); filter:blur(46px); animation:aura2 32s ease-in-out infinite alternate;"></div>
+    <div style="position:absolute; width:48vw; height:48vw; left:28vw; bottom:-26vh; border-radius:50%; background:radial-gradient(circle at center, var(--aura3), transparent 64%); filter:blur(52px); animation:aura3 38s ease-in-out infinite alternate;"></div>
+    <sc-for list="{{ dots }}" as="d" hint-placeholder-count="0">
+      <div style="{{ d.wrap }}"><div data-dot="1" data-px="{{ d.lx }}" data-py="{{ d.ly }}" style="{{ d.inner }}"></div></div>
+    </sc-for>
+    <div style="position:absolute; inset:0; background:radial-gradient(125% 105% at 50% -8%, transparent 52%, var(--bg) 100%);"></div>
+    <div style="position:absolute; inset:0; background:radial-gradient(125% 105% at 50% -8%, transparent 52%, var(--bg) 100%);"></div>
+  </div>
+
+  <!-- ===== LEFT ICON RAIL ===== -->
+  <nav style="position:relative; z-index:1; width:{{ railWidth }}; flex:none; display:flex; flex-direction:column; gap:4px; padding:14px 10px; border-right:1px solid var(--line); background:linear-gradient(180deg, var(--panel), var(--bg2)); transition:width .26s cubic-bezier(.4,0,.2,1); overflow:hidden;">
+    <div style="display:flex; align-items:center; gap:10px; padding:4px 6px 16px 6px;">
+      <div style="width:26px; height:26px; flex:none; border-radius:7px; background:var(--cyan); display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px -2px var(--cyan);">
+        <div style="width:9px; height:9px; background:var(--cyanInk); border-radius:2px; transform:rotate(45deg);"></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; letter-spacing:.22em; white-space:nowrap; opacity:{{ labelOpacity }}; transition:opacity .2s;">APEX</div>
+    </div>
+
+    <sc-for list="{{ railItems }}" as="r" hint-placeholder-count="8">
+      <button onClick="{{ r.onClick }}" style="{{ r.style }}" style-hover="background:var(--elev); color:var(--text);">
+        <div style="{{ r.tileStyle }}">{{ r.code }}</div>
+        <span style="white-space:nowrap; font-size:13px; font-weight:500; opacity:{{ labelOpacity }}; transition:opacity .2s;">{{ r.name }}</span>
+        <span style="{{ r.badgeStyle }}">{{ r.badge }}</span>
+      </button>
+    </sc-for>
+
+    <div style="flex:1;"></div>
+    <button onClick="{{ toggleRail }}" style="display:flex; align-items:center; gap:12px; padding:9px 9px; background:none; border:none; border-radius:9px; color:var(--text3); cursor:pointer; font-family:'JetBrains Mono',monospace;" style-hover="color:var(--text);">
+      <div style="width:30px; flex:none; text-align:center; font-size:15px;">{{ railIcon }}</div>
+      <span style="font-size:11px; letter-spacing:.1em; white-space:nowrap; opacity:{{ labelOpacity }};">COLLAPSE</span>
+    </button>
+  </nav>
+
+  <!-- ===== MAIN COLUMN ===== -->
+  <div style="position:relative; z-index:1; flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;">
+
+    <!-- top context bar -->
+    <header style="flex:none; height:60px; display:flex; align-items:center; gap:18px; padding:0 22px; border-bottom:1px solid var(--line); background:var(--panel);">
+      <div style="min-width:0;">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.2em; color:var(--text3);">{{ crumb }}</div>
+          <div style="font-size:18px; font-weight:600; letter-spacing:-.01em; line-height:1.15;">{{ title }}</div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+
+      <div style="display:flex; align-items:center; gap:7px; padding:6px 11px; border-radius:8px; border:1px solid var(--line); background:var(--panel2);">
+        <div style="width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 9px var(--green);"></div>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em; color:var(--text2);">SYNCED · 4m AGO</span>
+      </div>
+
+      <button style="display:flex; align-items:center; gap:9px; padding:6px 12px; border-radius:8px; border:1px solid var(--line); background:var(--panel2); color:var(--text); cursor:pointer; font-family:inherit;" style-hover="border-color:var(--line2);">
+        <div style="width:18px; height:18px; flex:none; border-radius:5px; background:linear-gradient(135deg,#1d4ed8,#0ea5b7);"></div>
+        <div style="text-align:left; line-height:1.1;">
+          <div style="font-size:12.5px; font-weight:600;">Fifth Third Bank</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; color:var(--text3);">+ 2 RV VALIDATION</div>
+        </div>
+        <span style="color:var(--text3); font-size:11px; margin-left:2px;">▾</span>
+      </button>
+
+      <div style="display:flex; padding:3px; border-radius:9px; border:1px solid var(--line); background:var(--panel2); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em;">
+        <button onClick="{{ setBD }}" style="{{ bdStyle }}">BD</button>
+        <button onClick="{{ setClient }}" style="{{ clientStyle }}">CLIENT</button>
+      </div>
+
+      <button onClick="{{ toggleTheme }}" style="width:36px; height:36px; flex:none; display:flex; align-items:center; justify-content:center; border-radius:9px; border:1px solid var(--line); background:var(--panel2); color:var(--text2); cursor:pointer; font-size:15px;" style-hover="color:var(--cyan); border-color:var(--line2);">{{ themeIcon }}</button>
+    </header>
+
+    <!-- global filter bar -->
+    <sc-if value="{{ isScorecard }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none; display:flex; align-items:center; gap:10px; padding:11px 22px; border-bottom:1px solid var(--line); background:var(--bg2);">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.18em; color:var(--text3); margin-right:2px;">FILTER</span>
+      <div style="position:relative;">
+        <button onClick="{{ toggleDate }}" style="{{ dateChipStyle }}" style-hover="border-color:var(--cyan);">
+          <span style="color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em;">RANGE</span>
+          <span style="font-weight:500;">{{ dateValue }}</span>
+          <span style="color:var(--text3); font-size:10px;">▾</span>
+        </button>
+        <sc-if value="{{ dateOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; top:42px; left:0; z-index:30; width:190px; padding:6px; border-radius:11px; border:1px solid var(--line2); background:var(--elev); box-shadow:0 20px 44px -12px rgba(0,0,0,.6);">
+            <sc-for list="{{ dateOptions }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.onClick }}" style="{{ o.style }}" style-hover="background:var(--panel2);">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <button style="display:flex; align-items:center; gap:8px; padding:8px 13px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--text); cursor:pointer; font-family:inherit; font-size:12.5px;" style-hover="border-color:var(--cyan);">
+        <span style="color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em;">PRODUCT</span><span style="font-weight:500;">All products</span><span style="color:var(--text3); font-size:10px;">▾</span>
+      </button>
+      <button style="display:flex; align-items:center; gap:8px; padding:8px 13px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--text); cursor:pointer; font-family:inherit; font-size:12.5px;" style-hover="border-color:var(--cyan);">
+        <span style="color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em;">DMA</span><span style="font-weight:500;">All markets · 210</span><span style="color:var(--text3); font-size:10px;">▾</span>
+      </button>
+      <button style="display:flex; align-items:center; gap:8px; padding:8px 13px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--text); cursor:pointer; font-family:inherit; font-size:12.5px;" style-hover="border-color:var(--cyan);">
+        <span style="color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em;">CHANNEL</span><span style="font-weight:500;">All channels</span><span style="color:var(--text3); font-size:10px;">▾</span>
+      </button>
+      <div style="flex:1;"></div>
+      <button style="display:flex; align-items:center; gap:7px; padding:8px 13px; border-radius:9px; border:1px dashed var(--line2); background:none; color:var(--text2); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em;" style-hover="color:var(--text); border-color:var(--text2);">↺ RESET</button>
+    </div>
+    </sc-if>
+
+    <!-- scroll canvas -->
+    <main style="flex:1; min-height:0; overflow:auto; padding:18px 22px 28px 22px;">
+
+      <sc-if value="{{ isScorecard }}" hint-placeholder-val="{{ true }}">
+      <div style="display:contents;">
+
+      <!-- HUD ribbon -->
+      <div style="display:flex; align-items:center; gap:16px; padding:9px 16px; margin-bottom:16px; border-radius:11px; border:1px solid var(--line); background:linear-gradient(90deg, rgba(52,225,212,.06), transparent 40%); font-family:'JetBrains Mono',monospace; animation:rise .5s ease-out both;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 9px var(--green);"></div>
+          <span style="font-size:10.5px; letter-spacing:.16em; color:var(--text);">MISSION STATUS — ON PACE</span>
+        </div>
+        <div style="width:1px; height:14px; background:var(--line2);"></div>
+        <span style="font-size:10px; letter-spacing:.1em; color:var(--text2);">WEEK 11 / 12 · CONTRACT CYCLE Q3</span>
+        <div style="flex:1;"></div>
+        <span style="font-size:9.5px; letter-spacing:.12em; color:var(--text3);">AUTOPILOT: ASSIST</span>
+        <span style="font-size:9.5px; letter-spacing:.12em; color:var(--text3);">MODELS: 6 LIVE</span>
+        <span style="font-size:9.5px; letter-spacing:.12em; color:var(--cyan);">3 ALERTS</span>
+      </div>
+
+      <!-- HERO + KPI DECK -->
+      <div style="display:flex; gap:16px; align-items:stretch; margin-bottom:16px; flex-wrap:wrap;">
+
+        <!-- hero gauge -->
+        <section style="flex:1 1 290px; max-width:330px; min-width:290px; display:flex; flex-direction:column; padding:22px; border-radius:16px; border:1px solid var(--line); background:radial-gradient(120% 80% at 50% 0%, rgba(52,225,212,.07), var(--panel) 55%); animation:rise .55s ease-out both;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; color:var(--text2);">CONTRACT HEALTH</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--cyan); padding:3px 7px; border-radius:5px; background:rgba(52,225,212,.1);">COMPOSITE</span>
+          </div>
+          <div style="position:relative; align-self:center; margin:14px 0 8px;">
+            <svg width="220" height="220" viewBox="0 0 220 220">
+              <circle cx="110" cy="110" r="88" fill="none" stroke="var(--line)" stroke-width="13"></circle>
+              <circle cx="110" cy="110" r="88" fill="none" stroke="var(--cyan)" stroke-width="13" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="66.35" transform="rotate(-90 110 110)" style="animation:ringhero 1.6s cubic-bezier(.22,1,.36,1) both; filter:drop-shadow(0 0 7px rgba(52,225,212,.5));"></circle>
+            </svg>
+            <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div style="font-size:58px; font-weight:600; letter-spacing:-.03em; line-height:1;">88<span style="font-size:24px; color:var(--text2); font-weight:500;">%</span></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3); margin-top:4px;">TO TARGET · +12% TO GO</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:9px; margin-top:6px;">
+            <div style="display:flex; align-items:center; gap:10px;"><span style="flex:none; width:78px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.08em; color:var(--text3);">ACQUISITION</span><div style="flex:1; height:5px; border-radius:5px; background:var(--line); overflow:hidden;"><div style="width:91%; height:100%; border-radius:5px; background:var(--cyan);"></div></div><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;">91</span></div>
+            <div style="display:flex; align-items:center; gap:10px;"><span style="flex:none; width:78px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.08em; color:var(--text3);">EFFICIENCY</span><div style="flex:1; height:5px; border-radius:5px; background:var(--line); overflow:hidden;"><div style="width:84%; height:100%; border-radius:5px; background:var(--amber);"></div></div><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;">84</span></div>
+            <div style="display:flex; align-items:center; gap:10px;"><span style="flex:none; width:78px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.08em; color:var(--text3);">RETENTION</span><div style="flex:1; height:5px; border-radius:5px; background:var(--line); overflow:hidden;"><div style="width:89%; height:100%; border-radius:5px; background:var(--cyan);"></div></div><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;">89</span></div>
+          </div>
+        </section>
+
+        <!-- KPI deck -->
+        <section style="flex:3 1 560px; min-width:300px; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px;">
+
+          <!-- KPI 1 Funded Accounts -->
+          <div style="display:flex; flex-direction:column; padding:16px; border-radius:14px; border:1px solid var(--line); background:var(--panel); animation:rise .5s ease-out .05s both;" style-hover="border-color:var(--line2);">
+            <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text2);">FUNDED ACCOUNTS</span><div style="width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 7px var(--cyan);"></div></div>
+            <div style="display:flex; align-items:baseline; gap:5px; margin-top:10px;"><span style="font-size:30px; font-weight:600; letter-spacing:-.02em;">18,420</span></div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; color:var(--green);">↑ 6.2%</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3);">vs target 21,000</span></div>
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-top:14px;">
+              <svg width="92" height="28" viewBox="0 0 92 28" fill="none"><polyline points="0,22 13,20 26,21 39,15 52,16 65,10 78,11 92,4" stroke="var(--cyan)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+              <svg width="56" height="56" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="var(--line)" stroke-width="5"></circle><circle cx="30" cy="30" r="24" fill="none" stroke="var(--cyan)" stroke-width="5" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="18.1" transform="rotate(-90 30 30)" style="animation:ringkpi 1.4s cubic-bezier(.22,1,.36,1) .2s both;"></circle><text x="30" y="34" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="500" fill="var(--text)">88</text></svg>
+            </div>
+          </div>
+
+          <!-- KPI 2 CPIHH -->
+          <div style="display:flex; flex-direction:column; padding:16px; border-radius:14px; border:1px solid var(--line); background:var(--panel); animation:rise .5s ease-out .1s both;" style-hover="border-color:var(--line2);">
+            <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text2);">CPIHH</span><div style="width:6px; height:6px; border-radius:50%; background:var(--amber); box-shadow:0 0 7px var(--amber);"></div></div>
+            <div style="display:flex; align-items:baseline; gap:5px; margin-top:10px;"><span style="font-size:30px; font-weight:600; letter-spacing:-.02em;">$312</span></div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; color:var(--amber);">↑ 7.6%</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3);">over target $290</span></div>
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-top:14px;">
+              <svg width="92" height="28" viewBox="0 0 92 28" fill="none"><polyline points="0,8 13,11 26,9 39,14 52,13 65,18 78,16 92,20" stroke="var(--amber)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+              <svg width="56" height="56" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="var(--line)" stroke-width="5"></circle><circle cx="30" cy="30" r="24" fill="none" stroke="var(--amber)" stroke-width="5" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="10.6" transform="rotate(-90 30 30)" style="animation:ringkpi 1.4s cubic-bezier(.22,1,.36,1) .25s both;"></circle><text x="30" y="34" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="500" fill="var(--text)">93</text></svg>
+            </div>
+          </div>
+
+          <!-- KPI 3 Portfolio LTV -->
+          <div style="display:flex; flex-direction:column; padding:16px; border-radius:14px; border:1px solid var(--line); background:var(--panel); animation:rise .5s ease-out .15s both;" style-hover="border-color:var(--line2);">
+            <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text2);">PORTFOLIO LTV</span><div style="width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 7px var(--green);"></div></div>
+            <div style="display:flex; align-items:baseline; gap:5px; margin-top:10px;"><span style="font-size:30px; font-weight:600; letter-spacing:-.02em;">$4,180</span></div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; color:var(--green);">↑ 4.5%</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3);">target met · $4,000</span></div>
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-top:14px;">
+              <svg width="92" height="28" viewBox="0 0 92 28" fill="none"><polyline points="0,20 13,18 26,19 39,14 52,12 65,11 78,7 92,5" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+              <svg width="56" height="56" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="var(--line)" stroke-width="5"></circle><circle cx="30" cy="30" r="24" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="0" transform="rotate(-90 30 30)" style="animation:ringkpi 1.4s cubic-bezier(.22,1,.36,1) .3s both;"></circle><text x="30" y="34" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="500" fill="var(--text)">✓</text></svg>
+            </div>
+          </div>
+
+          <!-- KPI 4 Blended ROAS -->
+          <div style="display:flex; flex-direction:column; padding:16px; border-radius:14px; border:1px solid var(--line); background:var(--panel); animation:rise .5s ease-out .2s both;" style-hover="border-color:var(--line2);">
+            <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text2);">BLENDED ROAS</span><div style="width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 7px var(--green);"></div></div>
+            <div style="display:flex; align-items:baseline; gap:5px; margin-top:10px;"><span style="font-size:30px; font-weight:600; letter-spacing:-.02em;">3.8×</span></div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; color:var(--green);">↑ 0.3</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3);">over target 3.5×</span></div>
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-top:14px;">
+              <svg width="92" height="28" viewBox="0 0 92 28" fill="none"><polyline points="0,18 13,17 26,15 39,16 52,12 65,13 78,9 92,7" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+              <svg width="56" height="56" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="var(--line)" stroke-width="5"></circle><circle cx="30" cy="30" r="24" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="0" transform="rotate(-90 30 30)" style="animation:ringkpi 1.4s cubic-bezier(.22,1,.36,1) .35s both;"></circle><text x="30" y="34" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="500" fill="var(--text)">✓</text></svg>
+            </div>
+          </div>
+
+          <!-- KPI 5 MOB6 Retention -->
+          <div style="display:flex; flex-direction:column; padding:16px; border-radius:14px; border:1px solid var(--line); background:var(--panel); animation:rise .5s ease-out .25s both;" style-hover="border-color:var(--line2);">
+            <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text2);">MOB6 RETENTION</span><div style="width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 7px var(--cyan);"></div></div>
+            <div style="display:flex; align-items:baseline; gap:5px; margin-top:10px;"><span style="font-size:30px; font-weight:600; letter-spacing:-.02em;">71.4<span style="font-size:18px; color:var(--text2);">%</span></span></div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; color:var(--amber);">↓ 0.4</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3);">vs target 74%</span></div>
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-top:14px;">
+              <svg width="92" height="28" viewBox="0 0 92 28" fill="none"><polyline points="0,8 13,9 26,11 39,10 52,13 65,12 78,15 92,14" stroke="var(--cyan)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+              <svg width="56" height="56" viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" fill="none" stroke="var(--line)" stroke-width="5"></circle><circle cx="30" cy="30" r="24" fill="none" stroke="var(--cyan)" stroke-width="5" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="5.4" transform="rotate(-90 30 30)" style="animation:ringkpi 1.4s cubic-bezier(.22,1,.36,1) .4s both;"></circle><text x="30" y="34" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="13" font-weight="500" fill="var(--text)">96</text></svg>
+            </div>
+          </div>
+
+          <!-- OperatingStreak -->
+          <div style="display:flex; flex-direction:column; justify-content:space-between; padding:16px; border-radius:14px; border:1px solid rgba(52,225,212,.28); background:radial-gradient(130% 100% at 100% 0%, rgba(52,225,212,.1), var(--panel) 60%); animation:rise .5s ease-out .3s both;">
+            <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--cyan);">OPERATING STREAK</span><span style="font-size:13px;">▲</span></div>
+            <div style="display:flex; align-items:baseline; gap:6px; margin-top:6px;"><span style="font-size:34px; font-weight:700; letter-spacing:-.02em;">7</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text2);">WEEKS ON PACE</span></div>
+            <div style="display:flex; gap:3px; margin-top:11px;">
+              <div style="flex:1; height:6px; border-radius:3px; background:var(--cyan);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--cyan);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--cyan);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--cyan);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--cyan);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--cyan);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--cyan);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--line);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--line);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--line);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--line);"></div><div style="flex:1; height:6px; border-radius:3px; background:var(--line);"></div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; color:var(--text2); margin-top:11px;">ALERTS CLEARED · 3 DAYS</div>
+          </div>
+
+        </section>
+      </div>
+
+      <!-- FINANCIAL SUMMARY STRIP -->
+      <section style="display:flex; flex-wrap:wrap; margin-bottom:16px; border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden; animation:rise .5s ease-out .12s both;">
+        <div style="flex:1; min-width:150px; padding:16px 20px; border-right:1px solid var(--line);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">TOTAL SPEND</div>
+          <div style="font-size:25px; font-weight:600; margin-top:6px; letter-spacing:-.02em;">$24.6M</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:3px;">62% of $39.4M plan</div>
+        </div>
+        <div style="flex:1; min-width:150px; padding:16px 20px; border-right:1px solid var(--line);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">ATTRIB. REVENUE</div>
+          <div style="font-size:25px; font-weight:600; margin-top:6px; letter-spacing:-.02em;">$93.4M</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--green); margin-top:3px;">↑ 11.2% QoQ</div>
+        </div>
+        <div style="flex:1; min-width:150px; padding:16px 20px; border-right:1px solid var(--line);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">NET MARGIN</div>
+          <div style="font-size:25px; font-weight:600; margin-top:6px; letter-spacing:-.02em;">38.2%</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--green); margin-top:3px;">↑ 1.4 pts</div>
+        </div>
+        <div style="flex:1; min-width:150px; padding:16px 20px; border-right:1px solid var(--line);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">EFFICIENCY</div>
+          <div style="font-size:25px; font-weight:600; margin-top:6px; letter-spacing:-.02em;">3.8×</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:3px;">blended ROAS</div>
+        </div>
+        <div style="flex:1; min-width:150px; padding:16px 20px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">PACING</div>
+          <div style="font-size:25px; font-weight:600; margin-top:6px; letter-spacing:-.02em;">96%</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:3px;">on plan · wk 11/12</div>
+        </div>
+      </section>
+
+      <!-- LEADERBOARD + ALERT WIRE -->
+      <div style="display:flex; gap:16px; align-items:stretch; flex-wrap:wrap;">
+
+        <!-- Campaign leaderboard -->
+        <section style="flex:1.5 1 480px; min-width:340px; border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden; animation:rise .5s ease-out .18s both;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--line);">
+            <div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Campaign Performance</span></div>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">TOP BY ROAS</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 88px 80px 76px; gap:8px; padding:9px 18px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--text3);">
+            <span>CAMPAIGN</span><span>CHANNEL</span><span style="text-align:right;">SPEND</span><span style="text-align:right;">ROAS</span>
+          </div>
+          <sc-for list="{{ campaigns }}" as="c" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:1fr 88px 80px 76px; gap:8px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--line);" style-hover="background:var(--panel2);">
+              <span style="font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.name }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2);">{{ c.channel }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right; color:var(--text);">{{ c.spend }}</span>
+              <span style="{{ c.badgeStyle }}">{{ c.roas }}</span>
+            </div>
+          </sc-for>
+        </section>
+
+        <!-- Alert wire -->
+        <section style="flex:1 1 320px; min-width:300px; display:flex; flex-direction:column; border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden; animation:rise .5s ease-out .24s both;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--line);">
+            <div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--red); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Alert Wire</span></div>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">{{ alertCount }} ACTIVE</span>
+          </div>
+          <div style="flex:1; min-height:0; overflow:auto;">
+            <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="6">
+              <div style="{{ a.rowStyle }}">
+                <div style="width:3px; height:30px; border-radius:3px; flex:none; background:{{ a.barColor }};"></div>
+                <div style="flex:none; width:60px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.06em; padding:3px 0; border-radius:5px; color:{{ a.tagColor }}; background:{{ a.tagBg }};">{{ a.tag }}</div>
+                <div style="flex:1; min-width:0; font-size:12px; line-height:1.35; color:var(--text);">{{ a.text }}</div>
+                <span style="flex:none; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text3);">{{ a.time }}</span>
+                <button onClick="{{ a.onAck }}" style="flex:none; padding:4px 8px; border-radius:6px; border:1px solid var(--line); background:none; color:var(--text3); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.08em;" style-hover="color:var(--cyan); border-color:var(--cyan);">ACK</button>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noAlerts }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:48px 20px; text-align:center;">
+                <div style="width:34px; height:34px; border-radius:50%; border:2px solid var(--green); display:flex; align-items:center; justify-content:center; color:var(--green); font-size:16px;">✓</div>
+                <div style="font-size:13px; color:var(--text2);">Wire clear — all thresholds nominal</div>
+              </div>
+            </sc-if>
+          </div>
+        </section>
+      </div>
+
+      </div>
+      </sc-if>
+
+      <!-- ===================== SPEND & BUDGET ===================== -->
+      <sc-if value="{{ isSpend }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px;">
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">ANNUAL BUDGET</div><div style="font-size:26px; font-weight:600; margin-top:6px;">$39.4M</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:3px;">FY26 committed plan</div></div>
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">SPENT TO DATE</div><div style="font-size:26px; font-weight:600; margin-top:6px;">$24.6M</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan); margin-top:3px;">62.4% of plan</div></div>
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">REMAINING</div><div style="font-size:26px; font-weight:600; margin-top:6px;">$14.8M</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:3px;">across 4 weeks left</div></div>
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid rgba(52,225,212,.28); background:radial-gradient(130% 100% at 100% 0%, rgba(52,225,212,.1), var(--panel) 60%);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--cyan);">PACE INDEX</div><div style="font-size:26px; font-weight:600; margin-top:6px;">0.96<span style="font-size:14px; color:var(--text2);">×</span></div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--amber); margin-top:3px;">4% under glide path</div></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:16px;">
+          <!-- pacing chart -->
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Budget Pacing</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">CUMULATIVE · PLAN vs ACTUAL</span></div>
+            <svg viewBox="0 0 560 220" width="100%" height="220" preserveAspectRatio="none" style="margin-top:8px;">
+              <defs><linearGradient id="spendfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--cyan)" stop-opacity="0.28"></stop><stop offset="1" stop-color="var(--cyan)" stop-opacity="0"></stop></linearGradient></defs>
+              <line x1="0" y1="55" x2="560" y2="55" stroke="var(--line)" stroke-width="1"></line><line x1="0" y1="110" x2="560" y2="110" stroke="var(--line)" stroke-width="1"></line><line x1="0" y1="165" x2="560" y2="165" stroke="var(--line)" stroke-width="1"></line>
+              <polyline points="0,205 51,188 102,168 153,150 204,128 255,110 306,90 357,72 408,56 459,40 510,24 560,14" fill="none" stroke="var(--text3)" stroke-width="1.6" stroke-dasharray="5 4"></polyline>
+              <path d="M0,205 51,190 102,176 153,160 204,142 255,126 306,108 357,92 408,80 459,68 510,58 560,52 L560,220 L0,220 Z" fill="url(#spendfill)"></path>
+              <polyline points="0,205 51,190 102,176 153,160 204,142 255,126 306,108 357,92 408,80 459,68 510,58 560,52" fill="none" stroke="var(--cyan)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            </svg>
+            <div style="display:flex; gap:18px; margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2);"><span style="display:flex; align-items:center; gap:6px;"><span style="width:14px; height:2px; background:var(--cyan);"></span>ACTUAL SPEND</span><span style="display:flex; align-items:center; gap:6px;"><span style="width:14px; border-top:2px dashed var(--text3);"></span>GLIDE PLAN</span></div>
+          </section>
+          <!-- allocation -->
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Channel Allocation</span></div>
+            <sc-for list="{{ spendAlloc }}" as="a" hint-placeholder-count="5">
+              <div style="margin-bottom:13px;"><div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;"><span style="font-weight:500;">{{ a.name }}</span><span style="font-family:'JetBrains Mono',monospace; color:var(--text2);">{{ a.amt }}</span></div><div style="height:7px; border-radius:5px; background:var(--line); overflow:hidden;"><div style="{{ a.barStyle }}"></div></div></div>
+            </sc-for>
+          </section>
+        </div>
+
+        <!-- reallocation ledger -->
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--line);"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Next-Best-Dollar Reallocation Ledger</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">LAST 7 DIRECTIVES</span></div>
+          <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 96px 90px; gap:8px; padding:9px 18px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--text3);"><span>FROM → TO</span><span>RATIONALE</span><span style="text-align:right;">DELTA</span><span style="text-align:right;">Δ ROAS</span><span style="text-align:right;">STATUS</span></div>
+          <sc-for list="{{ reallocRows }}" as="r" hint-placeholder-count="5">
+            <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr 96px 90px; gap:8px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--line);" style-hover="background:var(--panel2);"><span style="font-size:12.5px; font-weight:500;">{{ r.move }}</span><span style="font-size:11.5px; color:var(--text2);">{{ r.why }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right;">{{ r.delta }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right; color:var(--green);">{{ r.roas }}</span><span style="{{ r.statusStyle }}">{{ r.status }}</span></div>
+          </sc-for>
+        </section>
+      </div>
+      </sc-if>
+
+      <!-- ===================== MEDIA PERFORMANCE ===================== -->
+      <sc-if value="{{ isMedia }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--line);"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Channel Performance</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">ROLLING 4 WEEKS</span></div>
+          <div style="display:grid; grid-template-columns:1.3fr 90px 96px 88px 88px 90px; gap:8px; padding:9px 18px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--text3);"><span>CHANNEL</span><span style="text-align:right;">SPEND</span><span style="text-align:right;">CPIHH</span><span style="text-align:right;">CVR</span><span style="text-align:right;">ROAS</span><span style="text-align:right;">TREND</span></div>
+          <sc-for list="{{ mediaRows }}" as="m" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:1.3fr 90px 96px 88px 88px 90px; gap:8px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--line);" style-hover="background:var(--panel2);"><span style="display:flex; align-items:center; gap:9px; font-size:13px; font-weight:500;"><span style="width:8px; height:8px; border-radius:2px; background:{{ m.color }};"></span>{{ m.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right;">{{ m.spend }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right; color:var(--text2);">{{ m.cpihh }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right; color:var(--text2);">{{ m.cvr }}</span><span style="{{ m.roasStyle }}">{{ m.roas }}</span><span style="text-align:right;"><svg width="64" height="22" viewBox="0 0 64 22" style="overflow:visible;"><polyline points="{{ m.spark }}" fill="none" stroke="{{ m.color }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></span></div>
+          </sc-for>
+        </section>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Saturation Curves</span></div>
+            <div style="font-size:11.5px; color:var(--text3); margin-bottom:6px;">Diminishing-returns response by channel · current spend marked</div>
+            <svg viewBox="0 0 520 220" width="100%" height="220">
+              <line x1="0" y1="200" x2="520" y2="200" stroke="var(--line2)" stroke-width="1"></line><line x1="2" y1="0" x2="2" y2="200" stroke="var(--line2)" stroke-width="1"></line>
+              <path d="M2,200 C120,120 220,70 360,52 C430,44 480,42 518,41" fill="none" stroke="var(--cyan)" stroke-width="2.4"></path>
+              <path d="M2,200 C140,150 260,110 380,92 C440,84 490,82 518,81" fill="none" stroke="var(--amber)" stroke-width="2.4"></path>
+              <path d="M2,200 C160,170 280,140 400,126 C450,120 495,118 518,117" fill="none" stroke="var(--green)" stroke-width="2.4"></path>
+              <circle cx="300" cy="58" r="4" fill="var(--cyan)" stroke="var(--bg)" stroke-width="2"></circle>
+              <circle cx="280" cy="98" r="4" fill="var(--amber)" stroke="var(--bg)" stroke-width="2"></circle>
+              <circle cx="250" cy="135" r="4" fill="var(--green)" stroke="var(--bg)" stroke-width="2"></circle>
+            </svg>
+            <div style="display:flex; gap:16px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2);"><span style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:2px; background:var(--cyan);"></span>SEM</span><span style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:2px; background:var(--amber);"></span>SOCIAL</span><span style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:2px; background:var(--green);"></span>BRAND</span></div>
+          </section>
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Efficiency Frontier</span></div>
+            <div style="font-size:11.5px; color:var(--text3); margin-bottom:6px;">ROAS vs spend share · bubble = funded volume</div>
+            <svg viewBox="0 0 520 220" width="100%" height="220">
+              <line x1="0" y1="200" x2="520" y2="200" stroke="var(--line2)" stroke-width="1"></line><line x1="40" y1="0" x2="40" y2="200" stroke="var(--line2)" stroke-width="1"></line>
+              <line x1="40" y1="90" x2="520" y2="90" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"></line>
+              <circle cx="160" cy="58" r="26" fill="rgba(52,225,212,.18)" stroke="var(--cyan)" stroke-width="1.5"></circle><text x="160" y="62" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text)">SEM</text>
+              <circle cx="300" cy="78" r="34" fill="rgba(79,216,155,.15)" stroke="var(--green)" stroke-width="1.5"></circle><text x="300" y="82" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text)">BRAND</text>
+              <circle cx="240" cy="132" r="20" fill="rgba(242,177,76,.16)" stroke="var(--amber)" stroke-width="1.5"></circle><text x="240" y="136" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--text)">SOCIAL</text>
+              <circle cx="120" cy="150" r="14" fill="rgba(124,139,255,.16)" stroke="#7C8BFF" stroke-width="1.5"></circle><text x="120" y="153" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8" fill="var(--text)">MAIL</text>
+            </svg>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text3);">↑ ROAS · → SPEND SHARE · ┄ PORTFOLIO AVG 3.5×</div>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== CREATIVE & MESSAGING ===================== -->
+      <sc-if value="{{ isCreative }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Top Creative Units</span><span style="flex:1;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">RANKED BY CTR · FATIGUE-ADJUSTED</span></div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px;">
+          <sc-for list="{{ creativeCards }}" as="c" hint-placeholder-count="6">
+            <div style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;" style-hover="border-color:var(--line2);">
+              <div style="height:118px; background:{{ c.thumb }}; position:relative; display:flex; align-items:flex-end; padding:11px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; padding:3px 7px; border-radius:5px; background:rgba(6,8,12,.55); color:#fff;">{{ c.fmt }}</span><span style="{{ c.fatigueStyle }}">{{ c.fatigue }}</span></div>
+              <div style="padding:13px 14px;"><div style="font-size:13px; font-weight:600; margin-bottom:3px;">{{ c.name }}</div><div style="font-size:11px; color:var(--text3); margin-bottom:11px;">{{ c.theme }}</div>
+                <div style="display:flex; gap:14px;"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; color:var(--text3);">CTR</div><div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:500;">{{ c.ctr }}</div></div><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; color:var(--text3);">CVR</div><div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:500;">{{ c.cvr }}</div></div><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.1em; color:var(--text3);">SPEND</div><div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:500;">{{ c.spend }}</div></div></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;"><div style="width:3px; height:15px; background:var(--amber); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Message Theme Resonance</span></div>
+          <sc-for list="{{ messageThemes }}" as="t" hint-placeholder-count="5">
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;"><span style="flex:none; width:160px; font-size:12.5px; font-weight:500;">{{ t.name }}</span><div style="flex:1; height:8px; border-radius:5px; background:var(--line); overflow:hidden;"><div style="{{ t.barStyle }}"></div></div><span style="flex:none; width:54px; text-align:right; font-family:'JetBrains Mono',monospace; font-size:12px;">{{ t.score }}</span></div>
+          </sc-for>
+        </section>
+      </div>
+      </sc-if>
+
+      <!-- ===================== AUDIENCE & GEO ===================== -->
+      <sc-if value="{{ isAudience }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:16px;">
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">DMA Performance Grid</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">210 MARKETS · ROAS INTENSITY</span></div>
+            <div style="display:grid; grid-template-columns:repeat(14,1fr); gap:4px;">
+              <sc-for list="{{ dmaCells }}" as="d" hint-placeholder-count="70"><div title="{{ d.title }}" style="{{ d.style }}"></div></sc-for>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text3);">LOW<span style="display:flex; gap:3px;"><span style="width:14px; height:9px; border-radius:2px; background:rgba(52,225,212,.12);"></span><span style="width:14px; height:9px; border-radius:2px; background:rgba(52,225,212,.32);"></span><span style="width:14px; height:9px; border-radius:2px; background:rgba(52,225,212,.55);"></span><span style="width:14px; height:9px; border-radius:2px; background:rgba(52,225,212,.8);"></span><span style="width:14px; height:9px; border-radius:2px; background:var(--cyan);"></span></span>HIGH</div>
+          </section>
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Top Markets</span></div>
+            <sc-for list="{{ topMarkets }}" as="m" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--line);"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); width:24px;">{{ m.rank }}</span><div style="flex:1;"><div style="font-size:12.5px; font-weight:500;">{{ m.name }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text3);">{{ m.code }}</div></div><div style="text-align:right;"><div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--green);">{{ m.roas }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text3);">{{ m.funded }}</div></div></div>
+            </sc-for>
+          </section>
+        </div>
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Audience Segments</span></div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px;">
+            <sc-for list="{{ segments }}" as="s" hint-placeholder-count="4">
+              <div style="padding:15px; border-radius:12px; border:1px solid var(--line); background:var(--panel2);"><div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:12.5px; font-weight:600;">{{ s.name }}</span><span style="{{ s.tagStyle }}">{{ s.tag }}</span></div><div style="font-size:22px; font-weight:600; margin-top:9px;">{{ s.share }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:2px;">{{ s.note }}</div></div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+      </sc-if>
+
+      <!-- ===================== PRODUCT & CONVERSION ===================== -->
+      <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--line);"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Product Line Performance</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">FUNDED · CPIHH · LTV</span></div>
+          <div style="display:grid; grid-template-columns:1.3fr 96px 96px 96px 110px; gap:8px; padding:9px 18px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--text3);"><span>PRODUCT</span><span style="text-align:right;">FUNDED</span><span style="text-align:right;">CPIHH</span><span style="text-align:right;">LTV</span><span style="text-align:right;">MARGIN</span></div>
+          <sc-for list="{{ productRows }}" as="p" hint-placeholder-count="5">
+            <div style="display:grid; grid-template-columns:1.3fr 96px 96px 96px 110px; gap:8px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--line);" style-hover="background:var(--panel2);"><span style="font-size:13px; font-weight:500;">{{ p.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right;">{{ p.funded }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right; color:var(--text2);">{{ p.cpihh }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right; color:var(--text2);">{{ p.ltv }}</span><span style="text-align:right;"><span style="{{ p.marginStyle }}">{{ p.margin }}</span></span></div>
+          </sc-for>
+        </section>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
+          <sc-for list="{{ convFunnels }}" as="f" hint-placeholder-count="3">
+            <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+              <div style="font-size:13px; font-weight:600; margin-bottom:2px;">{{ f.name }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3); margin-bottom:14px;">CONVERSION PATH</div>
+              <sc-for list="{{ f.stages }}" as="st" hint-placeholder-count="4">
+                <div style="margin-bottom:9px;"><div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;"><span style="color:var(--text2);">{{ st.label }}</span><span style="font-family:'JetBrains Mono',monospace;">{{ st.val }}</span></div><div style="height:6px; border-radius:4px; background:var(--line); overflow:hidden;"><div style="{{ st.barStyle }}"></div></div></div>
+              </sc-for>
+            </section>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== ACQUISITION FUNNEL (SANKEY) ===================== -->
+      <sc-if value="{{ isFunnel }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <section style="border-radius:14px; border:1px solid var(--line); background:radial-gradient(120% 120% at 12% 0%, rgba(52,225,212,.05), var(--panel) 55%); padding:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Acquisition Flow</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">CHANNEL → VISIT → LEAD → APPLICATION → FUNDED</span></div>
+          <svg viewBox="0 0 980 340" width="100%" style="display:block;">
+            <!-- ribbons channel->visits -->
+            <path d="M24,20 C150,20 150,20 266,20 L266,90 C150,90 150,90 24,90 Z" fill="var(--cyan)" opacity="0.22"></path>
+            <path d="M24,90 C150,90 150,90 266,90 L266,145 C150,145 150,145 24,145 Z" fill="var(--amber)" opacity="0.22"></path>
+            <path d="M24,145 C150,145 150,145 266,145 L266,225 C150,225 150,225 24,225 Z" fill="var(--green)" opacity="0.22"></path>
+            <path d="M24,225 C150,225 150,225 266,225 L266,260 C150,260 150,260 24,260 Z" fill="#7C8BFF" opacity="0.22"></path>
+            <path d="M24,260 C150,260 150,260 266,260 L266,305 C150,305 150,305 24,305 Z" fill="var(--text3)" opacity="0.28"></path>
+            <!-- visits->leads -->
+            <path d="M266,20 C373,20 373,70 480,70 L480,280 C373,280 373,305 266,305 Z" fill="var(--cyan)" opacity="0.16"></path>
+            <!-- leads->apps -->
+            <path d="M496,70 C598,70 598,110 700,110 L700,230 C598,230 598,280 496,280 Z" fill="var(--cyan)" opacity="0.2"></path>
+            <!-- apps->funded -->
+            <path d="M716,110 C823,110 823,150 930,150 L930,210 C823,210 823,230 716,230 Z" fill="var(--cyan)" opacity="0.32"></path>
+            <!-- nodes -->
+            <rect x="10" y="20" width="14" height="70" rx="3" fill="var(--cyan)"></rect>
+            <rect x="10" y="90" width="14" height="55" rx="3" fill="var(--amber)"></rect>
+            <rect x="10" y="145" width="14" height="80" rx="3" fill="var(--green)"></rect>
+            <rect x="10" y="225" width="14" height="35" rx="3" fill="#7C8BFF"></rect>
+            <rect x="10" y="260" width="14" height="45" rx="3" fill="var(--text3)"></rect>
+            <rect x="250" y="20" width="16" height="285" rx="3" fill="var(--text2)"></rect>
+            <rect x="480" y="70" width="16" height="210" rx="3" fill="var(--cyan)"></rect>
+            <rect x="700" y="110" width="16" height="120" rx="3" fill="var(--cyan)"></rect>
+            <rect x="930" y="150" width="16" height="60" rx="3" fill="var(--cyan)"></rect>
+            <!-- channel labels -->
+            <text x="32" y="58" font-family="'JetBrains Mono',monospace" font-size="11" fill="var(--text)">SEM · 41%</text>
+            <text x="32" y="121" font-family="'JetBrains Mono',monospace" font-size="11" fill="var(--text)">Social · 22%</text>
+            <text x="32" y="188" font-family="'JetBrains Mono',monospace" font-size="11" fill="var(--text)">Brand · 24%</text>
+            <text x="32" y="245" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text2)">Email</text>
+            <text x="32" y="288" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text2)">Direct</text>
+            <!-- stage labels -->
+            <text x="258" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text3)">VISITS</text><text x="258" y="14" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="600" fill="var(--text)">1.42M</text>
+            <text x="488" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text3)">LEADS</text><text x="488" y="62" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="600" fill="var(--text)">91.0K</text>
+            <text x="708" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--text3)">APPLICATIONS</text><text x="708" y="102" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="600" fill="var(--text)">32.0K</text>
+            <text x="938" y="328" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--cyan)">FUNDED</text><text x="938" y="142" text-anchor="middle" font-family="'Space Grotesk'" font-size="13" font-weight="700" fill="var(--cyan)">18.4K</text>
+          </svg>
+        </section>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px;">
+          <sc-for list="{{ funnelStages }}" as="s" hint-placeholder-count="4">
+            <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">{{ s.label }}</div><div style="display:flex; align-items:baseline; gap:7px; margin-top:7px;"><span style="font-size:24px; font-weight:600;">{{ s.rate }}</span><span style="{{ s.deltaStyle }}">{{ s.delta }}</span></div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:3px;">vs benchmark {{ s.bench }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== RETENTION & LTV ===================== -->
+      <sc-if value="{{ isRetention }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px;">
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">MOB6 RETENTION</div><div style="font-size:26px; font-weight:600; margin-top:6px;">71.4%</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--amber); margin-top:3px;">↓ 0.4 vs target 74%</div></div>
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">AVG PORTFOLIO LTV</div><div style="font-size:26px; font-weight:600; margin-top:6px;">$4,180</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--green); margin-top:3px;">↑ 4.5% · target met</div></div>
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">90-DAY CHURN</div><div style="font-size:26px; font-weight:600; margin-top:6px;">8.2%</div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--green); margin-top:3px;">↓ 0.6 pts QoQ</div></div>
+          <div style="padding:16px 18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--text3);">PAYBACK PERIOD</div><div style="font-size:26px; font-weight:600; margin-top:6px;">9.4<span style="font-size:14px; color:var(--text2);">mo</span></div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); margin-top:3px;">CPIHH $312 / LTV curve</div></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px;">
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Cohort Retention</span><span style="flex:1;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--text3);">MONTHS ON BOOK →</span></div>
+            <div style="display:grid; grid-template-columns:62px repeat(8,1fr); gap:4px;">
+              <sc-for list="{{ cohortCells }}" as="c" hint-placeholder-count="72"><div style="{{ c.style }}">{{ c.label }}</div></sc-for>
+            </div>
+          </section>
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;"><div style="width:3px; height:15px; background:var(--green); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Cumulative LTV Accrual</span></div>
+            <div style="font-size:11.5px; color:var(--text3); margin-bottom:6px;">Per-household value vs acquisition cost recovery</div>
+            <svg viewBox="0 0 460 220" width="100%" height="220">
+              <line x1="0" y1="200" x2="460" y2="200" stroke="var(--line2)" stroke-width="1"></line>
+              <line x1="0" y1="150" x2="460" y2="150" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"></line><text x="4" y="146" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--text3)">CPIHH $312</text>
+              <defs><linearGradient id="ltvfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--green)" stop-opacity="0.25"></stop><stop offset="1" stop-color="var(--green)" stop-opacity="0"></stop></linearGradient></defs>
+              <path d="M0,200 60,176 120,150 180,124 240,100 300,78 360,58 420,42 460,34 L460,200 L0,200 Z" fill="url(#ltvfill)"></path>
+              <polyline points="0,200 60,176 120,150 180,124 240,100 300,78 360,58 420,42 460,34" fill="none" stroke="var(--green)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+              <circle cx="120" cy="150" r="4" fill="var(--amber)" stroke="var(--bg)" stroke-width="2"></circle><text x="128" y="166" font-family="'JetBrains Mono',monospace" font-size="9" fill="var(--amber)">breakeven · MOB9</text>
+            </svg>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== MODELING & ATTRIBUTION ===================== -->
+      <sc-if value="{{ isModeling }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; animation:rise .4s ease-out both;">
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Incremental Contribution</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">MMM + MTA BLEND · FUNDED ATTRIBUTION</span></div>
+          <div style="display:flex; align-items:flex-end; gap:10px; height:200px; padding-bottom:24px;">
+            <sc-for list="{{ attribBars }}" as="b" hint-placeholder-count="6">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%;"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; margin-bottom:6px;">{{ b.val }}</span><div style="{{ b.barStyle }}"></div><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.05em; color:var(--text3); margin-top:8px; text-align:center;">{{ b.name }}</span></div>
+            </sc-for>
+          </div>
+        </section>
+        <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:16px;">
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--line);"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Model Registry</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">6 LIVE</span></div>
+            <div style="display:grid; grid-template-columns:1.4fr 1fr 80px 84px; gap:8px; padding:9px 18px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--text3);"><span>MODEL</span><span>TYPE</span><span style="text-align:right;">R²</span><span style="text-align:right;">STATUS</span></div>
+            <sc-for list="{{ modelRows }}" as="m" hint-placeholder-count="6">
+              <div style="display:grid; grid-template-columns:1.4fr 1fr 80px 84px; gap:8px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--line);" style-hover="background:var(--panel2);"><div><div style="font-size:12.5px; font-weight:500;">{{ m.name }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text3);">trained {{ m.trained }}</div></div><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2);">{{ m.type }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right;">{{ m.r2 }}</span><span style="{{ m.statusStyle }}">{{ m.status }}</span></div>
+            </sc-for>
+          </section>
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:18px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;"><div style="width:3px; height:15px; background:var(--green); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Incrementality Tests</span></div>
+            <sc-for list="{{ incrTests }}" as="t" hint-placeholder-count="3">
+              <div style="padding:13px 0; border-bottom:1px solid var(--line);"><div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:12.5px; font-weight:500;">{{ t.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--green);">{{ t.lift }}</span></div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); margin-top:3px;">{{ t.method }} · p={{ t.p }}</div></div>
+            </sc-for>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== OPERATIONS COMMAND (APPROVAL QUEUE) ===================== -->
+      <sc-if value="{{ isOperations }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:minmax(320px,420px) 1fr; gap:16px; animation:rise .4s ease-out both; align-items:start;">
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; border-bottom:1px solid var(--line);"><div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Approval Queue</span></div><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.08em; color:var(--amber); padding:3px 8px; border-radius:6px; background:rgba(242,177,76,.14);">{{ pendingCount }} PENDING</span></div>
+          <sc-for list="{{ queueItems }}" as="q" hint-placeholder-count="4">
+            <div onClick="{{ q.onClick }}" style="{{ q.rowStyle }}">
+              <div style="display:flex; align-items:center; gap:8px;"><div style="{{ q.dotStyle }}"></div><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.08em; color:var(--text3);">{{ q.tool }}</span><span style="flex:1;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text3);">CONF {{ q.conf }}</span><span style="{{ q.statusStyle }}">{{ q.statusLabel }}</span></div>
+              <div style="font-size:12.5px; font-weight:500; line-height:1.35;">{{ q.title }}</div>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="border-radius:14px; border:1px solid var(--line); background:radial-gradient(120% 100% at 100% 0%, rgba(52,225,212,.05), var(--panel) 55%); overflow:hidden; min-height:480px; display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; gap:10px; padding:15px 20px; border-bottom:1px solid var(--line);"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Directive Review</span><span style="flex:1;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 10px; border-radius:6px; color:{{ selDir.statusColor }}; background:rgba(255,255,255,.04); border:1px solid var(--line);">{{ selDir.statusLabel }}</span></div>
+          <div style="flex:1; padding:22px 24px; display:flex; flex-direction:column; gap:18px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--cyan); padding:3px 8px; border-radius:5px; background:rgba(52,225,212,.1);">{{ selDir.tool }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text3);">CONFIDENCE {{ selDir.conf }}</span><span style="{{ selDir.riskStyle }}">RISK {{ selDir.risk }}</span></div>
+              <div style="font-size:19px; font-weight:600; line-height:1.3; letter-spacing:-.01em;">{{ selDir.title }}</div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--text3); margin-bottom:7px;">AGENT RATIONALE</div>
+              <div style="font-size:13.5px; line-height:1.6; color:var(--text2);">{{ selDir.why }}</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div style="padding:15px; border-radius:12px; border:1px solid rgba(52,225,212,.22); background:rgba(52,225,212,.05);"><div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--cyan); margin-bottom:6px;">PROJECTED IMPACT</div><div style="font-size:14px; font-weight:500; line-height:1.4;">{{ selDir.impact }}</div></div>
+              <div style="padding:15px; border-radius:12px; border:1px solid var(--line); background:var(--panel2);"><div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.1em; color:var(--text3); margin-bottom:8px;">TOOL CHAIN</div><sc-for list="{{ dirToolSteps }}" as="s" hint-placeholder-count="3"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text2); padding:2px 0;">› {{ s.text }}</div></sc-for></div>
+            </div>
+            <div style="flex:1;"></div>
+            <div style="display:flex; gap:11px; align-items:center;">
+              <button onClick="{{ selDir.onApprove }}" style="padding:11px 22px; border-radius:10px; border:none; background:var(--cyan); color:var(--cyanInk); cursor:pointer; font-family:inherit; font-size:13px; font-weight:700; letter-spacing:.02em;" style-hover="filter:brightness(1.08);">✓ Approve &amp; Execute</button>
+              <button onClick="{{ selDir.onReject }}" style="padding:11px 20px; border-radius:10px; border:1px solid var(--line2); background:none; color:var(--text); cursor:pointer; font-family:inherit; font-size:13px; font-weight:500;" style-hover="border-color:var(--red); color:var(--red);">Reject</button>
+              <button onClick="{{ selDir.onDefer }}" style="padding:11px 20px; border-radius:10px; border:1px solid var(--line); background:none; color:var(--text2); cursor:pointer; font-family:inherit; font-size:13px; font-weight:500;" style-hover="border-color:var(--text2); color:var(--text);">Defer</button>
+              <span style="flex:1;"></span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--text3);">ETA · {{ selDir.eta }}</span>
+            </div>
+          </div>
+        </section>
+      </div>
+      </sc-if>
+
+      <!-- ===================== FULL-FUNNEL SIMULATOR ===================== -->
+      <sc-if value="{{ isSimulator }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:minmax(320px,400px) 1fr; gap:16px; animation:rise .4s ease-out both; align-items:start;">
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:20px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Scenario Inputs</span></div>
+          <div style="font-size:11.5px; color:var(--text3); margin-bottom:18px;">Adjust the plan — projections recompute live</div>
+          <sc-for list="{{ simSliders }}" as="s" hint-placeholder-count="4">
+            <div style="margin-bottom:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;"><span style="font-size:12.5px; font-weight:500;">{{ s.label }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:var(--cyan);">{{ s.disp }}</span></div>
+              <input type="range" min="{{ s.min }}" max="{{ s.max }}" step="{{ s.step }}" value="{{ s.val }}" onInput="{{ s.onInput }}" style="width:100%;" />
+            </div>
+          </sc-for>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:13px 15px; border-radius:11px; border:1px solid var(--line); background:var(--panel2);">
+            <span style="font-size:12px; color:var(--text2);">Email / CRM (residual)</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:{{ mixValid }};">{{ emailDisp }}</span>
+          </div>
+          <button onClick="{{ resetSim }}" style="margin-top:16px; width:100%; padding:10px; border-radius:10px; border:1px dashed var(--line2); background:none; color:var(--text2); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em;" style-hover="color:var(--text); border-color:var(--text2);">↺ RESET TO PLAN OF RECORD</button>
+        </section>
+
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <section style="border-radius:14px; border:1px solid rgba(52,225,212,.28); background:radial-gradient(120% 100% at 80% 0%, rgba(52,225,212,.08), var(--panel) 55%); padding:20px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Projected Outcome</span><span style="flex:1;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.08em; color:var(--text3);">vs PLAN OF RECORD</span></div>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:16px;">
+              <sc-for list="{{ simOutputs }}" as="o" hint-placeholder-count="4">
+                <div style="padding:16px 18px; border-radius:12px; border:1px solid var(--line); background:var(--panel);"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">{{ o.label }}</div><div style="display:flex; align-items:baseline; gap:9px; margin-top:8px;"><span style="font-size:28px; font-weight:600; letter-spacing:-.02em;">{{ o.val }}</span><span style="{{ o.deltaStyle }}">{{ o.delta }}</span></div></div>
+              </sc-for>
+            </div>
+          </section>
+          <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); padding:20px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;"><div style="width:3px; height:15px; background:var(--green); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Funded Trajectory</span></div>
+            <svg viewBox="0 0 620 180" width="100%" height="180">
+              <line x1="0" y1="160" x2="620" y2="160" stroke="var(--line2)" stroke-width="1"></line>
+              <polyline points="0,150 88,138 176,128 264,120 352,108 440,96 528,86 620,78" fill="none" stroke="var(--text3)" stroke-width="1.8" stroke-dasharray="5 4"></polyline>
+              <polyline points="0,150 88,132 176,116 264,98 352,80 440,60 528,42 620,28" fill="none" stroke="var(--cyan)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>
+              <circle cx="620" cy="28" r="4.5" fill="var(--cyan)" stroke="var(--bg)" stroke-width="2"></circle>
+            </svg>
+            <div style="display:flex; gap:18px; margin-top:8px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2);"><span style="display:flex; align-items:center; gap:6px;"><span style="width:14px; height:2px; background:var(--cyan);"></span>SCENARIO</span><span style="display:flex; align-items:center; gap:6px;"><span style="width:14px; border-top:2px dashed var(--text3);"></span>PLAN OF RECORD</span></div>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===================== SETTINGS VIEW ===================== -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; max-width:1240px; animation:rise .4s ease-out both;">
+
+        <!-- row: Mode / Appearance / Data & Export -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:14px;">
+
+          <!-- Application Mode -->
+          <section style="display:flex; flex-direction:column; gap:15px; padding:18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);">
+            <div style="display:flex; align-items:center; gap:9px;"><div style="width:3px; height:14px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Application Mode</span></div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--text3); margin-bottom:8px;">PERSPECTIVE</div>
+              <div style="display:flex; gap:4px; padding:4px; border-radius:10px; border:1px solid var(--line); background:var(--panel2);">
+                <sc-for list="{{ modeSeg }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+              </div>
+              <div style="font-size:11px; color:var(--text3); margin-top:7px; line-height:1.4;">{{ modeHint }}</div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--text3); margin-bottom:8px;">AGENT AUTOPILOT</div>
+              <div style="display:flex; gap:4px; padding:4px; border-radius:10px; border:1px solid var(--line); background:var(--panel2);">
+                <sc-for list="{{ autopilotSeg }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+              </div>
+            </div>
+          </section>
+
+          <!-- Appearance -->
+          <section style="display:flex; flex-direction:column; gap:15px; padding:18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);">
+            <div style="display:flex; align-items:center; gap:9px;"><div style="width:3px; height:14px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Appearance</span></div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--text3); margin-bottom:8px;">THEME</div>
+              <div style="display:flex; gap:4px; padding:4px; border-radius:10px; border:1px solid var(--line); background:var(--panel2);">
+                <sc-for list="{{ themeSeg }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--text3); margin-bottom:8px;">DENSITY</div>
+              <div style="display:flex; gap:4px; padding:4px; border-radius:10px; border:1px solid var(--line); background:var(--panel2);">
+                <sc-for list="{{ densitySeg }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--text3); margin-bottom:9px;">SIGNAL ACCENT</div>
+              <div style="display:flex; gap:11px;">
+                <sc-for list="{{ accentSwatches }}" as="s" hint-placeholder-count="5"><button onClick="{{ s.onClick }}" style="{{ s.style }}"></button></sc-for>
+              </div>
+            </div>
+          </section>
+
+          <!-- Data & Export -->
+          <section style="display:flex; flex-direction:column; gap:15px; padding:18px; border-radius:14px; border:1px solid var(--line); background:var(--panel);">
+            <div style="display:flex; align-items:center; gap:9px;"><div style="width:3px; height:14px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Data &amp; Export</span></div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--text3); margin-bottom:8px;">DEFAULT EXPORT FORMAT</div>
+              <div style="display:flex; gap:4px; padding:4px; border-radius:10px; border:1px solid var(--line); background:var(--panel2);">
+                <sc-for list="{{ exportSeg }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div><div style="font-size:13px; font-weight:500;">Response cache</div><div style="font-size:11px; color:var(--text3);">Reuse query results for 15 min</div></div>
+              <button onClick="{{ cacheToggle }}" style="{{ cacheStyle }}"><span style="{{ cacheKnob }}"></span></button>
+            </div>
+            <button style="margin-top:2px; padding:9px; border-radius:9px; border:1px dashed var(--line2); background:none; color:var(--text2); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.08em;" style-hover="color:var(--red); border-color:var(--red);">↺ CLEAR CACHE &amp; RESYNC</button>
+          </section>
+        </div>
+
+        <!-- Integrations -->
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px; border-bottom:1px solid var(--line);">
+            <div style="display:flex; align-items:center; gap:10px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Data Source Integrations</span></div>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--text3);">{{ connSummary }}</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(330px, 1fr)); gap:13px; padding:16px 18px;">
+            <sc-for list="{{ connectors }}" as="c" hint-placeholder-count="6">
+              <div style="display:flex; flex-direction:column; gap:13px; padding:15px; border-radius:13px; border:1px solid var(--line); background:var(--panel2);" style-hover="border-color:var(--line2);">
+                <div style="display:flex; align-items:center; gap:11px;">
+                  <div style="width:38px; height:38px; flex:none; border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px; color:#fff; background:{{ c.iconBg }};">{{ c.initials }}</div>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.name }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.03em; color:var(--text3);">{{ c.sub }}</div>
+                  </div>
+                  <span style="{{ c.pillStyle }}"><span style="width:6px; height:6px; border-radius:50%; flex:none; background:{{ c.dot }}; box-shadow:0 0 7px {{ c.dot }};"></span>{{ c.statusLabel }}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div style="flex:1; min-width:0; display:flex; align-items:center; gap:8px; padding:8px 11px; border-radius:8px; border:1px solid var(--line); background:var(--panel); font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text2);"><span style="color:var(--text3); flex:none;">KEY</span><span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ c.keyMask }}</span></div>
+                  <button onClick="{{ c.onToggle }}" style="{{ c.btnStyle }}" style-hover="filter:brightness(1.08);">{{ c.btnLabel }}</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <!-- Benchmark editor -->
+        <section style="border-radius:14px; border:1px solid var(--line); background:var(--panel); overflow:hidden;">
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; padding:15px 18px 0 18px;">
+            <div style="display:flex; align-items:center; gap:10px; padding-bottom:13px;"><div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div><span style="font-size:14px; font-weight:600;">Benchmark Configuration</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.08em; color:var(--cyan); padding:3px 7px; border-radius:5px; background:rgba(52,225,212,.12);">GOVERNED · METRIC LAYER</span></div>
+          </div>
+          <div style="display:flex; gap:3px; padding:0 18px; border-bottom:1px solid var(--line); overflow-x:auto;">
+            <sc-for list="{{ benchTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+          </div>
+          <div style="padding:8px 18px 6px 18px; font-size:12px; color:var(--text3); line-height:1.4;">{{ benchBlurb }}</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(270px, 1fr)); gap:13px; padding:8px 18px 18px 18px;">
+            <sc-for list="{{ benchSliders }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex; flex-direction:column; gap:9px; padding:14px 15px; border-radius:12px; border:1px solid var(--line); background:var(--panel2);">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:12px; color:var(--text2);">{{ s.label }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:700; color:var(--cyan);">{{ s.display }}</span>
+                </div>
+                <input type="range" min="{{ s.min }}" max="{{ s.max }}" step="{{ s.step }}" value="{{ s.value }}" onInput="{{ s.onInput }}" style="width:100%; height:15px; cursor:pointer;" />
+                <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.04em; color:var(--text3);"><span>{{ s.minLabel }}</span><span>{{ s.maxLabel }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:0 18px 18px 18px;">
+            <button onClick="{{ resetBench }}" style="padding:9px 16px; border-radius:9px; border:1px solid var(--line2); background:none; color:var(--text2); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em;" style-hover="color:var(--text); border-color:var(--text2);">RESET DEFAULTS</button>
+            <button style="padding:9px 18px; border-radius:9px; border:none; background:var(--cyan); color:var(--cyanInk); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.06em;" style-hover="filter:brightness(1.08);">SAVE TO METRIC LAYER</button>
+          </div>
+        </section>
+
+      </div>
+      </sc-if>
+
+    </main>
+
+    <!-- AGENT CONSOLE -->
+    <sc-if value="{{ showConsole }}" hint-placeholder-val="{{ true }}">
+      <footer style="flex:none; display:flex; align-items:center; gap:12px; padding:11px 22px; border-top:1px solid var(--line); background:linear-gradient(180deg, var(--panel), var(--bg2));">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--cyan); font-weight:700;">›</span>
+        <div style="position:relative; flex:1; display:flex; align-items:center;">
+          <div style="width:2px; height:15px; background:var(--cyan); margin-right:7px; animation:blink 1.1s step-end infinite;"></div>
+          <input value="{{ consoleVal }}" onInput="{{ onConsole }}" placeholder="ask Apex or issue a directive…  e.g. simulate +8% brand budget in DMA 602" style="flex:1; background:none; border:none; outline:none; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12.5px; padding:5px 0;" />
+        </div>
+        <div style="display:flex; gap:7px;">
+          <span style="display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:7px; background:var(--panel2); border:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2);"><span style="width:5px; height:5px; border-radius:50%; background:var(--cyan);"></span>query_metrics</span>
+          <span style="display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:7px; background:var(--panel2); border:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2);"><span style="width:5px; height:5px; border-radius:50%; background:var(--amber);"></span>simulate_geo</span>
+          <span style="display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:7px; background:var(--panel2); border:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2);"><span style="width:5px; height:5px; border-radius:50%; background:var(--green);"></span>propose_action</span>
+        </div>
+        <button style="flex:none; padding:7px 16px; border-radius:8px; border:none; background:var(--cyan); color:var(--cyanInk); cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.06em;" style-hover="filter:brightness(1.08);">SEND ↵</button>
+      </footer>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#34E1D4&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#34E1D4&quot;,&quot;#7C8BFF&quot;,&quot;#4FD89B&quot;,&quot;#F2B14C&quot;]},&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dark&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;showConsole&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = {
+    rail: true,
+    theme: (this.props && this.props.defaultTheme) || 'dark',
+    mode: 'Client',
+    dateOpen: false,
+    dateValue: 'Last 12 weeks',
+    consoleVal: '',
+    acked: [],
+    view: 'scorecard',
+    benchTab: 'Funnel',
+    benchVals: {},
+    connStatus: {},
+    density: 'Comfortable',
+    autopilot: 'Assist',
+    exportFmt: 'XLSX',
+    cacheOn: true,
+    accentSel: null,
+    dirStatus: {},
+    dirSel: 'd1',
+    sim: { budget: 39.4, brand: 42, sem: 33, social: 18 },
+  };
+
+  rootRef = (el) => { this._root = el; this.applyAccent(); };
+  applyAccent = () => {
+    const a = this.state.accentSel || (this.props && this.props.accent);
+    if (this._root && a) this._root.style.setProperty('--cyan', a);
+  };
+  _dots = (() => {
+    const kf = ['floatA','floatB','floatC','floatD','floatE','floatF'];
+    const rnd = (a,b) => a + Math.random() * (b - a);
+    const out = [];
+    for (let i = 0; i < 450; i++) {
+      const accent = Math.random() < 0.18;
+      const sz = accent ? rnd(1.8, 2.6) : rnd(0.7, 1.6);
+      const dur = rnd(16, 42).toFixed(1);
+      const delay = (-rnd(0, 42)).toFixed(1);
+      const tw = rnd(5, 11).toFixed(1);
+      const twd = (-rnd(0, 8)).toFixed(1);
+      const col = accent ? 'var(--cyan)' : 'var(--dotStar)';
+      const glow = accent ? rnd(5, 8).toFixed(0) : rnd(2, 4).toFixed(0);
+      const lx = rnd(0.4, 99.6), ly = rnd(0.4, 99.6);
+      out.push({
+        lx: lx.toFixed(2),
+        ly: ly.toFixed(2),
+        wrap: 'position:absolute; left:' + lx.toFixed(2) + '%; top:' + ly.toFixed(2)
+          + '%; will-change:transform; animation:' + kf[(Math.random() * kf.length) | 0] + ' ' + dur
+          + 's ease-in-out ' + delay + 's infinite alternate;',
+        inner: 'width:' + sz.toFixed(2) + 'px; height:' + sz.toFixed(2) + 'px; border-radius:50%; background:'
+          + col + '; box-shadow:0 0 ' + glow + 'px ' + col
+          + '; transition:transform .4s cubic-bezier(.22,1,.36,1); will-change:transform; animation:twinkle '
+          + tw + 's ease-in-out ' + twd + 's infinite;',
+      });
+    }
+    return out;
+  })();
+  componentDidMount(){
+    this.applyAccent();
+    this._onMove = (e) => { this._mx = e.clientX; this._my = e.clientY; if (!this._raf) this._raf = requestAnimationFrame(this._repel); };
+    this._repel = () => {
+      this._raf = null;
+      const root = this._root; if (!root) return;
+      const els = root.querySelectorAll('[data-dot]'); if (!els.length) return;
+      const rect = root.getBoundingClientRect();
+      const mx = this._mx - rect.left, my = this._my - rect.top;
+      const R = 130, MAX = 40;
+      for (let i = 0; i < els.length; i++) {
+        const el = els[i];
+        const px = parseFloat(el.dataset.px) / 100 * rect.width;
+        const py = parseFloat(el.dataset.py) / 100 * rect.height;
+        const dx = px - mx, dy = py - my;
+        const dist = Math.hypot(dx, dy) || 1;
+        if (dist < R) {
+          const f = (R - dist) / R;
+          const p = f * MAX;
+          el.style.transform = 'translate(' + (dx / dist * p).toFixed(1) + 'px,' + (dy / dist * p).toFixed(1) + 'px)';
+        } else if (el.style.transform) {
+          el.style.transform = '';
+        }
+      }
+    };
+    window.addEventListener('mousemove', this._onMove, { passive: true });
+  }
+  componentWillUnmount(){
+    if (this._onMove) window.removeEventListener('mousemove', this._onMove);
+    if (this._raf) cancelAnimationFrame(this._raf);
+  }
+  componentDidUpdate(){ this.applyAccent(); }
+
+  toggleRail = () => this.setState(s => ({ rail: !s.rail }));
+  toggleTheme = () => this.setState(s => ({ theme: s.theme === 'dark' ? 'light' : 'dark' }));
+  setBD = () => this.setState({ mode: 'BD' });
+  setClient = () => this.setState({ mode: 'Client' });
+  toggleDate = () => this.setState(s => ({ dateOpen: !s.dateOpen }));
+  pickDate = (v) => () => this.setState({ dateValue: v, dateOpen: false });
+  onConsole = (e) => this.setState({ consoleVal: e.target.value });
+  ack = (id) => () => this.setState(s => ({ acked: [...s.acked, id] }));
+
+  setView = (v) => () => this.setState({ view: v, dateOpen: false });
+  setBenchTab = (t) => () => this.setState({ benchTab: t });
+  setBench = (id) => (e) => { const v = parseFloat(e.target.value); this.setState(s => ({ benchVals: { ...s.benchVals, [id]: v } })); };
+  setDensity = (d) => () => this.setState({ density: d });
+  setAutopilot = (a) => () => this.setState({ autopilot: a });
+  setExport = (f) => () => this.setState({ exportFmt: f });
+  setMode = (m) => () => this.setState({ mode: m });
+  setThemeName = (n) => () => this.setState({ theme: n === 'Dark' ? 'dark' : 'light' });
+  toggleCache = () => this.setState(s => ({ cacheOn: !s.cacheOn }));
+  setAccent = (c) => () => this.setState({ accentSel: c }, this.applyAccent);
+  toggleConn = (id) => () => this.setState(s => {
+    const cur = s.connStatus[id] || (this.connDefs.find(c => c.id === id) || {}).status;
+    const next = (cur === 'synced' || cur === 'syncing') ? 'disconnected' : 'synced';
+    return { connStatus: { ...s.connStatus, [id]: next } };
+  });
+  resetBench = () => this.setState({ benchVals: this.defaultBench() });
+
+  defaultBench = () => {
+    const o = {};
+    Object.keys(this.benchDefs).forEach(k => this.benchDefs[k].forEach(d => { o[d.id] = d.val; }));
+    return o;
+  };
+  componentWillMount(){ if (!Object.keys(this.state.benchVals).length) this.state.benchVals = this.defaultBench(); }
+
+  setDirSel = (id) => () => this.setState({ dirSel: id });
+  setDirStatus = (id, st) => () => this.setState(s => ({ dirStatus: { ...s.dirStatus, [id]: st } }));
+  setSim = (k) => (e) => { const v = parseFloat(e.target.value); this.setState(s => ({ sim: { ...s.sim, [k]: v } })); };
+  resetSim = () => this.setState({ sim: { budget: 39.4, brand: 42, sem: 33, social: 18 } });
+
+  directiveDefs = [
+    { id: 'd1', tool: 'simulate_geo', conf: 0.91, title: 'Shift $420K from Social prospecting to SEM non-brand in DMA 602',
+      why: 'SEM non-brand in Chicago is 18% under its saturation point while Social prospecting has crossed into diminishing returns. Reallocating captures incremental funded volume at a lower CPIHH.',
+      impact: '+142 funded HH · −$11 CPIHH · +0.3× ROAS', risk: 'LOW', eta: 'this week',
+      steps: ['query_metrics(dma=602, channel=social)', 'simulate_geo(move=420000, to=sem_nonbrand)', 'propose_action(reallocate)'] },
+    { id: 'd2', tool: 'propose_action', conf: 0.84, title: 'Pause Meta Advantage+ prospecting set #7 — ROAS below 2.5× floor',
+      why: 'Advantage+ set #7 has run 9 days below the 2.5× ROAS floor with rising frequency (4.8) indicating audience fatigue. Pausing preserves $86K/wk for higher-yield sets.',
+      impact: '−$86K/wk waste · protects blended ROAS', risk: 'LOW', eta: 'immediate',
+      steps: ['query_metrics(campaign=adv7)', 'propose_action(pause)'] },
+    { id: 'd3', tool: 'simulate_geo', conf: 0.78, title: 'Raise SEM brand budget +8% across top-20 funded DMAs',
+      why: 'Brand search impression share dropped to 71% in top funded markets as a competitor increased bids. Defending share protects the highest-LTV acquisition path.',
+      impact: '+0.8 pt impression share · +64 funded HH', risk: 'MED', eta: 'next cycle',
+      steps: ['query_metrics(channel=sem_brand, top=20)', 'simulate_geo(budget=+8%)', 'propose_action(increase)'] },
+    { id: 'd4', tool: 'propose_action', conf: 0.69, title: 'Refresh creative for Mortgage Refi non-brand — fatigue detected',
+      why: 'CTR on the Mortgage Refi non-brand unit declined 22% over 3 weeks with stable spend, a fatigue signature. A refresh from the approved variant library should recover CTR.',
+      impact: '+0.4 pt CTR · −$9 CPL est.', risk: 'MED', eta: 'next cycle',
+      steps: ['query_metrics(unit=refi_nb)', 'propose_action(creative_refresh)'] },
+  ];
+
+  railDef = [
+    { code: 'SC', name: 'Scorecard',  view: 'scorecard', crumb: 'COMMAND / SCORECARD',     title: 'Executive Scorecard',      badge: '' },
+    { code: 'SB', name: 'Spend',      view: 'spend',     crumb: 'PLAN / SPEND & BUDGET',    title: 'Spend & Budget',           badge: '' },
+    { code: 'MP', name: 'Media',      view: 'media',     crumb: 'PERFORMANCE / MEDIA',      title: 'Media Performance',        badge: '' },
+    { code: 'CR', name: 'Creative',   view: 'creative',  crumb: 'PERFORMANCE / CREATIVE',   title: 'Creative & Messaging',     badge: '' },
+    { code: 'AG', name: 'Audience',   view: 'audience',  crumb: 'PERFORMANCE / AUDIENCE',   title: 'Audience & Geo',           badge: '' },
+    { code: 'PC', name: 'Product',    view: 'product',   crumb: 'PERFORMANCE / PRODUCT',    title: 'Product & Conversion',     badge: '' },
+    { code: 'FN', name: 'Funnel',     view: 'funnel',    crumb: 'ANALYZE / ACQUISITION',    title: 'Acquisition Funnel',       badge: '' },
+    { code: 'RL', name: 'Retention',  view: 'retention', crumb: 'ANALYZE / RETENTION',      title: 'Retention & LTV',          badge: '' },
+    { code: 'OP', name: 'Operations', view: 'operations',crumb: 'CONTROL / OPERATIONS',     title: 'Operations Command',       badge: '3' },
+    { code: 'SM', name: 'Simulator',  view: 'simulator', crumb: 'MODEL / SIMULATOR',        title: 'Full-Funnel Simulator',    badge: '' },
+    { code: 'MA', name: 'Modeling',   view: 'modeling',  crumb: 'MODEL / ATTRIBUTION',      title: 'Modeling & Attribution',   badge: '' },
+    { code: 'ST', name: 'Settings',   view: 'settings',  crumb: 'SYSTEM / SETTINGS',        title: 'Settings & Configuration', badge: '' },
+  ];
+
+  alertDef = [
+    { id: 1, sev: 'crit', text: 'SEM non-brand CPL breached $145 ceiling — Mortgage Refi', time: '2m' },
+    { id: 2, sev: 'warn', text: 'Brand Media pacing 12% under Q3 plan', time: '18m' },
+    { id: 3, sev: 'crit', text: 'Meta Advantage+ ROAS fell below 2.5× floor', time: '41m' },
+    { id: 4, sev: 'info', text: 'AEO visibility +8 pts vs competitor set', time: '1h' },
+    { id: 5, sev: 'warn', text: 'DMA 602 (Chicago) spend 9% over approved band', time: '2h' },
+    { id: 6, sev: 'info', text: 'MOB6 retention cohort refreshed — +0.4 pts', time: '3h' },
+    { id: 7, sev: 'crit', text: 'GA4 ingestion delayed — Funnel data stale', time: '4h' },
+  ];
+
+  campaignDef = [
+    { name: 'Spring HELOC — National', channel: 'BRAND', spend: '$4.2M', roas: 5.2 },
+    { name: 'Checking Acq — Midwest DMA', channel: 'SEM', spend: '$3.1M', roas: 4.7 },
+    { name: 'Life Event: New Mover', channel: 'SOCIAL', spend: '$1.8M', roas: 4.1 },
+    { name: 'Savings Boost — CRM', channel: 'EMAIL', spend: '$0.6M', roas: 3.6 },
+    { name: 'Mortgage Refi — Non-Brand', channel: 'SEM', spend: '$2.6M', roas: 2.9 },
+    { name: 'Prospecting — Meta Adv+', channel: 'SOCIAL', spend: '$1.4M', roas: 2.4 },
+  ];
+
+  sevMap = {
+    crit: { bar: 'var(--red)', tag: 'CRITICAL', color: 'var(--red)', bg: 'rgba(255,92,114,.14)' },
+    warn: { bar: 'var(--amber)', tag: 'WARNING', color: 'var(--amber)', bg: 'rgba(242,177,76,.14)' },
+    info: { bar: 'var(--cyan)', tag: 'INFO', color: 'var(--cyan)', bg: 'rgba(52,225,212,.13)' },
+  };
+
+  connDefs = [
+    { id: 'google', name: 'Google Ads', sub: 'Search · PMax · Display', initials: 'GA', iconBg: 'linear-gradient(135deg,#4285F4,#34A853)', status: 'synced' },
+    { id: 'msft', name: 'Microsoft Ads', sub: 'Bing · Audience Net', initials: 'MS', iconBg: 'linear-gradient(135deg,#00A4EF,#0078D4)', status: 'synced' },
+    { id: 'meta', name: 'Meta', sub: 'Advantage+ · Prospecting', initials: 'MT', iconBg: 'linear-gradient(135deg,#0866FF,#7C3AED)', status: 'syncing' },
+    { id: 'ga4', name: 'Google Analytics 4', sub: 'Web + app events', initials: 'G4', iconBg: 'linear-gradient(135deg,#E8710A,#F9AB00)', status: 'error' },
+    { id: 'snowflake', name: 'Snowflake', sub: 'Metric layer warehouse', initials: 'SF', iconBg: 'linear-gradient(135deg,#29B5E8,#1D7FB8)', status: 'synced' },
+    { id: 'salesforce', name: 'Salesforce CRM', sub: 'Lead + funded sync', initials: 'SC', iconBg: 'linear-gradient(135deg,#00A1E0,#0B5CAB)', status: 'disconnected' },
+  ];
+
+  benchDefs = {
+    Funnel: [
+      { id: 'imp_visit', label: 'Impression → Visit', min: 0.5, max: 5, step: 0.1, val: 2.1, unit: '%' },
+      { id: 'visit_lead', label: 'Visit → Lead', min: 1, max: 15, step: 0.1, val: 6.4, unit: '%' },
+      { id: 'lead_app', label: 'Lead → Application', min: 5, max: 40, step: 0.5, val: 22, unit: '%' },
+      { id: 'app_funded', label: 'Application → Funded', min: 20, max: 90, step: 1, val: 61, unit: '%' },
+    ],
+    Media: [
+      { id: 'brand_coef', label: 'Brand Media Coefficient', min: 0.1, max: 2, step: 0.05, val: 0.85, unit: '×' },
+      { id: 'sem_sat', label: 'SEM Saturation Point', min: 50, max: 100, step: 1, val: 78, unit: '%' },
+      { id: 'social_decay', label: 'Social Decay Rate', min: 0.1, max: 1, step: 0.05, val: 0.35, unit: '' },
+      { id: 'email_lift', label: 'Email Incremental Lift', min: 1, max: 25, step: 0.5, val: 9, unit: '%' },
+    ],
+    Defaults: [
+      { id: 'media_spend', label: 'Annual Media Spend', min: 10, max: 80, step: 1, val: 39, unit: '$M' },
+      { id: 'brand_pct', label: 'Brand Media Allocation', min: 10, max: 70, step: 1, val: 42, unit: '%' },
+      { id: 'base_ltv', label: 'Base LTV / HH', min: 2000, max: 8000, step: 50, val: 4000, unit: '$' },
+      { id: 'mob6', label: 'MOB6 Retention Target', min: 50, max: 95, step: 0.5, val: 74, unit: '%' },
+    ],
+    Efficiency: [
+      { id: 'eff_sem', label: 'SEM Efficiency Score', min: 0, max: 100, step: 1, val: 84, unit: '' },
+      { id: 'eff_social', label: 'Social Efficiency Score', min: 0, max: 100, step: 1, val: 71, unit: '' },
+      { id: 'eff_brand', label: 'Brand Efficiency Score', min: 0, max: 100, step: 1, val: 88, unit: '' },
+      { id: 'eff_email', label: 'Email Efficiency Score', min: 0, max: 100, step: 1, val: 92, unit: '' },
+    ],
+    NBD: [
+      { id: 'nbd_min', label: 'Min Channel Allocation', min: 0, max: 30, step: 1, val: 5, unit: '%' },
+      { id: 'nbd_max', label: 'Max Channel Allocation', min: 30, max: 80, step: 1, val: 55, unit: '%' },
+      { id: 'nbd_cap', label: 'Weekly Reallocation Cap', min: 1, max: 25, step: 1, val: 12, unit: '%' },
+    ],
+  };
+
+  benchBlurbs = {
+    Funnel: 'Stage-to-stage conversion baselines the metric layer compares live funnel performance against.',
+    Media: 'Response-curve coefficients feeding the simulator and media-mix optimizer.',
+    Defaults: 'Seed values pre-filled into the Full-Funnel Simulator for new scenarios.',
+    Efficiency: 'Channel efficiency scores (0–100) driving the blended-ROAS rollup and NBD allocation.',
+    NBD: 'Next-best-dollar allocation bounds — the guardrails on automated budget reallocation directives.',
+  };
+
+  renderVals() {
+    const expanded = this.state.rail;
+    const segBase = 'padding:5px 12px; border-radius:6px; border:none; cursor:pointer; font-family:inherit; font-weight:700; letter-spacing:.08em; background:none;';
+    const railItems = this.railDef.map((r, i) => {
+      const active = this.state.view === r.view;
+      const onClick = this.setView(r.view);
+      const tileBase = 'width:30px; height:30px; flex:none; display:flex; align-items:center; justify-content:center; border-radius:8px; font-family:\'JetBrains Mono\',monospace; font-size:10px; font-weight:700; letter-spacing:.04em;';
+      return {
+        code: r.code,
+        name: r.name,
+        badge: r.badge,
+        onClick: onClick,
+        style: 'display:flex; align-items:center; gap:12px; padding:6px; border:none; border-radius:10px; cursor:pointer; font-family:inherit; text-align:left; transition:background .18s, color .18s; background:' + (active ? 'rgba(52,225,212,.1)' : 'none') + '; color:' + (active ? 'var(--text)' : 'var(--text2)') + ';',
+        tileStyle: tileBase + (active ? 'background:var(--cyan); color:var(--cyanInk); box-shadow:0 0 14px -2px var(--cyan);' : 'background:var(--elev); color:var(--text2);'),
+        badgeStyle: r.badge ? 'margin-left:auto; flex:none; min-width:18px; height:18px; padding:0 5px; display:flex; align-items:center; justify-content:center; border-radius:9px; background:var(--red); color:#fff; font-family:\'JetBrains Mono\',monospace; font-size:9px; font-weight:700; opacity:' + (expanded ? '1' : '0') + ';' : 'display:none;',
+      };
+    });
+
+    const alerts = this.alertDef
+      .filter(a => !this.state.acked.includes(a.id))
+      .map((a, i) => {
+        const s = this.sevMap[a.sev];
+        const pulse = a.sev === 'crit' ? ', pulseonce 1.7s ease-out .5s 1' : '';
+        return {
+          ...a,
+          barColor: s.bar, tag: s.tag, tagColor: s.color, tagBg: s.bg,
+          onAck: this.ack(a.id),
+          rowStyle: 'display:flex; align-items:center; gap:11px; padding:11px 16px; border-bottom:1px solid var(--line); animation:wirein .45s cubic-bezier(.22,1,.36,1) ' + (i * 0.05) + 's both' + pulse + ';',
+        };
+      });
+
+    const campaigns = this.campaignDef.map(c => {
+      const crit = c.roas < 3.5;
+      return {
+        ...c,
+        roas: c.roas.toFixed(1) + '×',
+        badgeStyle: 'justify-self:end; font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:700; padding:3px 9px; border-radius:6px; color:' + (crit ? 'var(--red)' : 'var(--green)') + '; background:' + (crit ? 'rgba(255,92,114,.14)' : 'rgba(79,216,155,.14)') + ';',
+      };
+    });
+
+    const dateOpts = ['Last 7 days', 'Last 4 weeks', 'Last 12 weeks', 'Quarter to date', 'Year to date'].map(v => ({
+      label: v,
+      onClick: this.pickDate(v),
+      style: 'display:block; width:100%; text-align:left; padding:8px 11px; border:none; border-radius:7px; background:' + (v === this.state.dateValue ? 'var(--panel2)' : 'none') + '; color:' + (v === this.state.dateValue ? 'var(--cyan)' : 'var(--text)') + '; cursor:pointer; font-family:inherit; font-size:12.5px;',
+    }));
+
+    // ---------- screen data ----------
+    const posNeg = (v) => 'font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:500; color:' + (v >= 0 ? 'var(--green)' : 'var(--red)') + ';';
+    const pill = (color, bg) => 'justify-self:end; text-align:center; font-family:\'JetBrains Mono\',monospace; font-size:9px; letter-spacing:.06em; padding:3px 8px; border-radius:6px; color:' + color + '; background:' + bg + ';';
+
+    // Spend
+    const allocData = [
+      { name: 'SEM', amt: '$10.3M', pct: 42, color: 'var(--cyan)' },
+      { name: 'Brand Media', amt: '$5.9M', pct: 24, color: 'var(--green)' },
+      { name: 'Social', amt: '$5.4M', pct: 22, color: 'var(--amber)' },
+      { name: 'Email / CRM', amt: '$1.7M', pct: 7, color: '#7C8BFF' },
+      { name: 'Other', amt: '$1.3M', pct: 5, color: 'var(--text3)' },
+    ];
+    const spendAlloc = allocData.map(a => ({ name: a.name, amt: a.amt, barStyle: 'width:' + a.pct + '%; height:100%; border-radius:5px; background:' + a.color + ';' }));
+    const reallocRows = [
+      { move: 'Social → SEM · DMA 602', why: 'Below saturation', delta: '+$420K', roas: '+0.3×', status: 'applied' },
+      { move: 'Display → Brand · Nat\'l', why: 'Share defense', delta: '+$210K', roas: '+0.2×', status: 'applied' },
+      { move: 'Meta Adv+ → Email', why: 'Fatigue detected', delta: '+$86K', roas: '+0.4×', status: 'pending' },
+      { move: 'SEM nb → SEM brand', why: 'Intent quality', delta: '+$140K', roas: '+0.1×', status: 'applied' },
+      { move: 'Affiliate → Social', why: 'CPL ceiling hit', delta: '+$55K', roas: '+0.2×', status: 'review' },
+    ].map(r => ({ ...r, statusStyle: pill(
+      r.status === 'applied' ? 'var(--green)' : r.status === 'pending' ? 'var(--amber)' : 'var(--text2)',
+      r.status === 'applied' ? 'rgba(79,216,155,.14)' : r.status === 'pending' ? 'rgba(242,177,76,.14)' : 'var(--panel2)'),
+      status: r.status.toUpperCase() }));
+
+    // Media
+    const mediaRaw = [
+      { name: 'SEM Brand', spend: '$4.1M', cpihh: '$198', cvr: '7.2%', roas: 5.2, color: 'var(--cyan)', spark: '0,18 16,15 32,11 48,8 64,5' },
+      { name: 'SEM Non-Brand', spend: '$6.2M', cpihh: '$340', cvr: '3.1%', roas: 2.9, color: 'var(--amber)', spark: '0,8 16,11 32,9 48,13 64,16' },
+      { name: 'Brand Media', spend: '$5.9M', cpihh: '$286', cvr: '4.8%', roas: 4.1, color: 'var(--green)', spark: '0,16 16,13 32,12 48,9 64,7' },
+      { name: 'Paid Social', spend: '$5.4M', cpihh: '$372', cvr: '2.6%', roas: 2.4, color: '#7C8BFF', spark: '0,6 16,9 32,11 48,10 64,14' },
+      { name: 'Email / CRM', spend: '$1.7M', cpihh: '$94', cvr: '9.4%', roas: 3.6, color: 'var(--cyan)', spark: '0,14 16,12 32,10 48,9 64,6' },
+      { name: 'Affiliate', spend: '$1.3M', cpihh: '$268', cvr: '3.9%', roas: 3.1, color: 'var(--text2)', spark: '0,12 16,11 32,12 48,10 64,9' },
+    ];
+    const mediaRows = mediaRaw.map(m => ({ ...m, roas: m.roas.toFixed(1) + '×',
+      roasStyle: 'justify-self:end; text-align:right; font-family:\'JetBrains Mono\',monospace; font-size:12px; font-weight:700; color:' + (m.roas >= 3.5 ? 'var(--green)' : 'var(--red)') + ';' }));
+
+    // Creative
+    const creativeCards = [
+      { name: 'HELOC — "Unlock"', theme: 'Home equity / aspiration', fmt: 'VIDEO 15s', ctr: '2.8%', cvr: '6.1%', spend: '$840K', thumb: 'linear-gradient(135deg,#0e7490,#155e75)', fatigue: 'FRESH', fg: 'var(--green)' },
+      { name: 'Checking — "No Fees"', theme: 'Value / switching', fmt: 'STATIC', ctr: '2.3%', cvr: '5.4%', spend: '$610K', thumb: 'linear-gradient(135deg,#1d4ed8,#1e3a8a)', fatigue: 'FRESH', fg: 'var(--green)' },
+      { name: 'New Mover — "Welcome"', theme: 'Life event', fmt: 'CAROUSEL', ctr: '2.1%', cvr: '4.9%', spend: '$420K', thumb: 'linear-gradient(135deg,#7c3aed,#5b21b6)', fatigue: 'AGING', fg: 'var(--amber)' },
+      { name: 'Savings — "Grow"', theme: 'Rate / yield', fmt: 'STATIC', ctr: '1.9%', cvr: '4.2%', spend: '$380K', thumb: 'linear-gradient(135deg,#0f766e,#134e4a)', fatigue: 'AGING', fg: 'var(--amber)' },
+      { name: 'Refi — "Lower"', theme: 'Savings / urgency', fmt: 'VIDEO 30s', ctr: '1.4%', cvr: '3.1%', spend: '$520K', thumb: 'linear-gradient(135deg,#b45309,#92400e)', fatigue: 'FATIGUED', fg: 'var(--red)' },
+      { name: 'Brand — "Fifth Third"', theme: 'Awareness', fmt: 'VIDEO 6s', ctr: '1.2%', cvr: '2.8%', spend: '$1.1M', thumb: 'linear-gradient(135deg,#334155,#1e293b)', fatigue: 'FRESH', fg: 'var(--green)' },
+    ].map(c => ({ ...c, fatigueStyle: 'margin-left:auto; font-family:\'JetBrains Mono\',monospace; font-size:8.5px; letter-spacing:.08em; padding:3px 7px; border-radius:5px; color:' + c.fg + '; background:rgba(6,8,12,.55);' }));
+    const messageThemes = [
+      { name: 'No-fee / value', score: 92, pct: 92 }, { name: 'Rate & yield', score: 84, pct: 84 },
+      { name: 'Life event', score: 78, pct: 78 }, { name: 'Aspiration', score: 71, pct: 71 },
+      { name: 'Urgency / savings', score: 58, pct: 58 },
+    ].map(t => ({ name: t.name, score: t.score, barStyle: 'width:' + t.pct + '%; height:100%; border-radius:5px; background:linear-gradient(90deg,var(--cyan),var(--green));' }));
+
+    // Audience
+    const dmaSeed = [3,5,2,4,1,5,3,2,4,5,1,3,2,4, 2,4,5,3,1,2,4,5,3,2,1,4,3,5, 5,3,1,2,4,3,5,2,1,4,2,3,5,1, 1,2,4,5,3,2,1,4,5,3,2,4,1,5, 4,5,3,1,2,5,4,3,2,1,5,3,4,2];
+    const intensity = [0.12, 0.32, 0.55, 0.8, 1];
+    const dmaCells = dmaSeed.map((lvl, i) => ({ title: 'DMA · ROAS tier ' + lvl, style: 'aspect-ratio:1; border-radius:3px; background:rgba(52,225,212,' + intensity[lvl - 1] + ');' }));
+    const topMarkets = [
+      { rank: '01', name: 'Chicago', code: 'DMA 602', roas: '5.4×', funded: '2,140 HH' },
+      { rank: '02', name: 'Cincinnati', code: 'DMA 515', roas: '5.1×', funded: '1,880 HH' },
+      { rank: '03', name: 'Columbus', code: 'DMA 535', roas: '4.8×', funded: '1,510 HH' },
+      { rank: '04', name: 'Detroit', code: 'DMA 505', roas: '4.5×', funded: '1,320 HH' },
+      { rank: '05', name: 'Cleveland', code: 'DMA 510', roas: '4.3×', funded: '1,090 HH' },
+      { rank: '06', name: 'Indianapolis', code: 'DMA 527', roas: '4.0×', funded: '960 HH' },
+    ];
+    const segments = [
+      { name: 'Mass Affluent', share: '34%', note: 'highest LTV', tag: 'CORE', tc: 'var(--cyan)' },
+      { name: 'Young Prof.', share: '28%', note: 'fastest growth', tag: 'GROW', tc: 'var(--green)' },
+      { name: 'New Movers', share: '21%', note: 'life-event trigger', tag: 'TRIGGER', tc: 'var(--amber)' },
+      { name: 'Established', share: '17%', note: 'cross-sell focus', tag: 'RETAIN', tc: '#7C8BFF' },
+    ].map(s => ({ ...s, tagStyle: 'font-family:\'JetBrains Mono\',monospace; font-size:8px; letter-spacing:.08em; padding:2px 6px; border-radius:5px; color:' + s.tc + '; background:rgba(52,225,212,.1);' }));
+
+    // Product
+    const productRows = [
+      { name: 'Checking', funded: '7,420', cpihh: '$214', ltv: '$3,100', margin: 41 },
+      { name: 'Savings / MMA', funded: '4,180', cpihh: '$188', ltv: '$2,640', margin: 38 },
+      { name: 'HELOC', funded: '2,910', cpihh: '$486', ltv: '$8,200', margin: 52 },
+      { name: 'Mortgage Refi', funded: '2,140', cpihh: '$612', ltv: '$6,900', margin: 34 },
+      { name: 'Credit Card', funded: '1,770', cpihh: '$142', ltv: '$2,180', margin: 29 },
+    ].map(p => ({ ...p, margin: p.margin + '%', marginStyle: 'font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:700; padding:3px 9px; border-radius:6px; color:' + (p.margin >= 40 ? 'var(--green)' : 'var(--amber)') + '; background:' + (p.margin >= 40 ? 'rgba(79,216,155,.14)' : 'rgba(242,177,76,.14)') + ';' }));
+    const mkFunnel = (stages) => stages.map(s => ({ label: s[0], val: s[1], barStyle: 'width:' + s[2] + '%; height:100%; border-radius:4px; background:linear-gradient(90deg,var(--cyan),var(--green));' }));
+    const convFunnels = [
+      { name: 'Checking', stages: mkFunnel([['Visit', '420K', 100], ['Lead', '38K', 60], ['Application', '14K', 38], ['Funded', '7.4K', 22]]) },
+      { name: 'HELOC', stages: mkFunnel([['Visit', '180K', 100], ['Lead', '12K', 44], ['Application', '5.1K', 28], ['Funded', '2.9K', 18]]) },
+      { name: 'Mortgage Refi', stages: mkFunnel([['Visit', '210K', 100], ['Lead', '9K', 32], ['Application', '3.6K', 18], ['Funded', '2.1K', 11]]) },
+    ];
+
+    // Funnel stage metrics
+    const funnelStages = [
+      { label: 'VISIT → LEAD', rate: '6.4%', delta: '+0.3', d: 1, bench: '6.1%' },
+      { label: 'LEAD → APP', rate: '35.2%', delta: '+1.8', d: 1, bench: '33.0%' },
+      { label: 'APP → FUNDED', rate: '57.5%', delta: '−2.1', d: -1, bench: '61.0%' },
+      { label: 'VISIT → FUNDED', rate: '1.30%', delta: '+0.04', d: 1, bench: '1.24%' },
+    ].map(s => ({ label: s.label, rate: s.rate, delta: s.delta, bench: s.bench, deltaStyle: 'font-family:\'JetBrains Mono\',monospace; font-size:11px; color:' + (s.d >= 0 ? 'var(--green)' : 'var(--red)') + ';' }));
+
+    // Retention cohort
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
+    const cohortCells = [];
+    cohortCells.push({ label: '', style: 'font-family:\'JetBrains Mono\',monospace; font-size:8px; color:var(--text3); display:flex; align-items:center;' });
+    for (let m = 0; m < 8; m++) cohortCells.push({ label: 'M' + m, style: 'font-family:\'JetBrains Mono\',monospace; font-size:8.5px; color:var(--text3); text-align:center; padding-bottom:3px;' });
+    months.forEach((mo, r) => {
+      cohortCells.push({ label: mo, style: 'font-family:\'JetBrains Mono\',monospace; font-size:9.5px; color:var(--text2); display:flex; align-items:center;' });
+      for (let c = 0; c < 8; c++) {
+        const val = Math.max(38, Math.round(100 - c * (7.5 + r * 0.5) + (r % 2 ? 2 : -1)));
+        const t = (val - 38) / 62;
+        cohortCells.push({ label: c === 0 ? '100' : val, style: 'aspect-ratio:1.6; border-radius:4px; display:flex; align-items:center; justify-content:center; font-family:\'JetBrains Mono\',monospace; font-size:9.5px; color:' + (t > 0.55 ? 'var(--cyanInk)' : 'var(--text)') + '; background:rgba(52,225,212,' + (0.1 + t * 0.85).toFixed(2) + ');' });
+      }
+    });
+
+    // Modeling
+    const attribRaw = [
+      { name: 'SEM Brand', val: '5,840', h: 92, color: 'var(--cyan)' },
+      { name: 'Brand Media', val: '4,120', h: 65, color: 'var(--green)' },
+      { name: 'SEM NB', val: '3,310', h: 52, color: 'var(--amber)' },
+      { name: 'Social', val: '2,460', h: 39, color: '#7C8BFF' },
+      { name: 'Email', val: '1,540', h: 24, color: 'var(--cyan)' },
+      { name: 'Organic', val: '1,150', h: 18, color: 'var(--text2)' },
+    ];
+    const attribBars = attribRaw.map(b => ({ name: b.name, val: b.val, barStyle: 'width:100%; height:' + b.h + '%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,' + b.color + ',transparent 220%); box-shadow:0 0 14px -4px ' + b.color + ';' }));
+    const modelRows = [
+      { name: 'Media Mix Model', type: 'Bayesian MMM', r2: '0.91', trained: '2d ago', status: 'live' },
+      { name: 'Multi-Touch Attrib', type: 'Markov', r2: '0.87', trained: '2d ago', status: 'live' },
+      { name: 'LTV Predictor', type: 'Gradient Boost', r2: '0.84', trained: '5d ago', status: 'live' },
+      { name: 'Churn Risk', type: 'Survival', r2: '0.79', trained: '5d ago', status: 'live' },
+      { name: 'Saturation Curves', type: 'Hill response', r2: '0.88', trained: '1w ago', status: 'live' },
+      { name: 'Geo Uplift', type: 'CausalImpact', r2: '0.73', trained: '1w ago', status: 'stale' },
+    ].map(m => ({ ...m, status: m.status.toUpperCase(), statusStyle: pill(m.status === 'live' ? 'var(--green)' : 'var(--amber)', m.status === 'live' ? 'rgba(79,216,155,.14)' : 'rgba(242,177,76,.14)') }));
+    const incrTests = [
+      { name: 'Brand Media holdout', lift: '+11.4%', method: 'Geo holdout', p: '0.02' },
+      { name: 'Social incrementality', lift: '+6.8%', method: 'Ghost ads', p: '0.04' },
+      { name: 'Email send-vs-hold', lift: '+9.1%', method: 'RCT', p: '0.01' },
+    ];
+
+    // ---------- operations (approval queue) ----------
+    const pendingDirs = this.directiveDefs.filter(d => !this.state.dirStatus[d.id]);
+    const dirSelId = this.state.dirStatus[this.state.dirSel] ? (pendingDirs[0] && pendingDirs[0].id) : this.state.dirSel;
+    const queueItems = this.directiveDefs.map((d, i) => {
+      const st = this.state.dirStatus[d.id];
+      const sel = d.id === dirSelId;
+      const toolColor = d.tool === 'simulate_geo' ? 'var(--amber)' : 'var(--green)';
+      return {
+        id: d.id, title: d.title, tool: d.tool, conf: Math.round(d.conf * 100) + '%',
+        onClick: this.setDirSel(d.id),
+        dotStyle: 'width:6px; height:6px; border-radius:50%; flex:none; background:' + toolColor + '; box-shadow:0 0 7px ' + toolColor + ';',
+        rowStyle: 'display:flex; flex-direction:column; gap:7px; padding:13px 15px; border-bottom:1px solid var(--line); cursor:pointer; border-left:3px solid ' + (sel ? 'var(--cyan)' : 'transparent') + '; background:' + (sel ? 'var(--panel2)' : 'none') + '; transition:background .15s;',
+        statusStyle: st ? pill(st === 'approved' ? 'var(--green)' : st === 'rejected' ? 'var(--red)' : 'var(--text2)', st === 'approved' ? 'rgba(79,216,155,.14)' : st === 'rejected' ? 'rgba(255,92,114,.14)' : 'var(--panel2)') : 'display:none;',
+        statusLabel: st ? st.toUpperCase() : '',
+      };
+    });
+    const sel = this.directiveDefs.find(d => d.id === dirSelId) || this.directiveDefs[0];
+    const selStatus = this.state.dirStatus[sel.id];
+    const selDir = {
+      ...sel, conf: Math.round(sel.conf * 100) + '%',
+      steps: sel.steps,
+      decided: !!selStatus,
+      statusLabel: selStatus ? selStatus.toUpperCase() : 'AWAITING DECISION',
+      statusColor: selStatus === 'approved' ? 'var(--green)' : selStatus === 'rejected' ? 'var(--red)' : 'var(--amber)',
+      onApprove: this.setDirStatus(sel.id, 'approved'),
+      onReject: this.setDirStatus(sel.id, 'rejected'),
+      onDefer: this.setDirStatus(sel.id, 'deferred'),
+      riskStyle: pill(sel.risk === 'LOW' ? 'var(--green)' : 'var(--amber)', sel.risk === 'LOW' ? 'rgba(79,216,155,.14)' : 'rgba(242,177,76,.14)'),
+    };
+    const dirToolSteps = sel.steps.map(s => ({ text: s }));
+    const pendingCount = pendingDirs.length;
+
+    // ---------- simulator ----------
+    const sim = this.state.sim;
+    const emailPct = Math.max(0, 100 - sim.brand - sim.sem - sim.social);
+    const baseFunded = 18420, baseBudget = 39.4;
+    const mixEff = (sim.sem * 0.052 + sim.brand * 0.041 + sim.social * 0.026 + emailPct * 0.036) / 100;
+    const baseEff = (33 * 0.052 + 42 * 0.041 + 18 * 0.026 + 7 * 0.036) / 100;
+    const budgetScale = sim.budget / baseBudget;
+    const satDamp = Math.pow(budgetScale, 0.88);
+    const projFunded = Math.round(baseFunded * satDamp * (mixEff / baseEff));
+    const projCPIHH = Math.round((sim.budget * 1e6 * 0.624) / Math.max(projFunded, 1) / 0.624 * 0.5 + 156);
+    const projRoas = (3.8 * (mixEff / baseEff)).toFixed(1);
+    const projLtv = Math.round(4180 * (0.96 + (mixEff / baseEff) * 0.04));
+    const fundedDelta = projFunded - baseFunded;
+    const simSliders = [
+      { k: 'budget', label: 'Total Budget', min: 20, max: 60, step: 0.5, val: sim.budget, disp: '$' + sim.budget.toFixed(1) + 'M' },
+      { k: 'brand', label: 'Brand Media %', min: 10, max: 70, step: 1, val: sim.brand, disp: sim.brand + '%' },
+      { k: 'sem', label: 'SEM %', min: 10, max: 70, step: 1, val: sim.sem, disp: sim.sem + '%' },
+      { k: 'social', label: 'Social %', min: 0, max: 50, step: 1, val: sim.social, disp: sim.social + '%' },
+    ].map(s => ({ ...s, onInput: this.setSim(s.k) }));
+    const simOutputs = [
+      { label: 'FUNDED ACCOUNTS', val: projFunded.toLocaleString(), delta: (fundedDelta >= 0 ? '+' : '') + fundedDelta.toLocaleString(), d: fundedDelta },
+      { label: 'CPIHH', val: '$' + projCPIHH, delta: (projCPIHH <= 312 ? '−' : '+') + '$' + Math.abs(projCPIHH - 312), d: 312 - projCPIHH },
+      { label: 'BLENDED ROAS', val: projRoas + '×', delta: (projRoas - 3.8 >= 0 ? '+' : '') + (projRoas - 3.8).toFixed(1), d: projRoas - 3.8 },
+      { label: 'PORTFOLIO LTV', val: '$' + projLtv.toLocaleString(), delta: (projLtv - 4180 >= 0 ? '+' : '') + '$' + Math.abs(projLtv - 4180), d: projLtv - 4180 },
+    ].map(o => ({ label: o.label, val: o.val, delta: o.delta, deltaStyle: 'font-family:\'JetBrains Mono\',monospace; font-size:11px; font-weight:500; color:' + (o.d >= 0 ? 'var(--green)' : 'var(--red)') + ';' }));
+    const emailDisp = emailPct + '%';
+    const mixValid = emailPct >= 0;
+
+    // ---------- settings computed ----------
+    const accent = this.state.accentSel || (this.props && this.props.accent) || '#34E1D4';
+    const benchVals = Object.keys(this.state.benchVals).length ? this.state.benchVals : this.defaultBench();
+
+    const segStyle = (on) => 'flex:1; padding:7px 6px; border:none; border-radius:7px; cursor:pointer; font-family:inherit; font-size:11.5px; font-weight:600; letter-spacing:.02em; transition:background .15s, color .15s; background:' + (on ? 'var(--cyan)' : 'none') + '; color:' + (on ? 'var(--cyanInk)' : 'var(--text2)') + ';';
+    const mkSeg = (opts, activeVal, pick) => opts.map(o => ({ label: o, onClick: pick(o), style: segStyle(o === activeVal) }));
+
+    const modeSeg = mkSeg(['BD', 'Client'], this.state.mode, this.setMode);
+    const autopilotSeg = mkSeg(['Manual', 'Assist', 'Auto'], this.state.autopilot, this.setAutopilot);
+    const themeSeg = mkSeg(['Dark', 'Light'], this.state.theme === 'dark' ? 'Dark' : 'Light', this.setThemeName);
+    const densitySeg = mkSeg(['Comfortable', 'Compact'], this.state.density, this.setDensity);
+    const exportSeg = mkSeg(['CSV', 'XLSX', 'PDF'], this.state.exportFmt, this.setExport);
+
+    const accentSwatches = ['#34E1D4', '#7C8BFF', '#4FD89B', '#F2B14C', '#FF5C72'].map(c => ({
+      onClick: this.setAccent(c),
+      style: 'width:30px; height:30px; border-radius:9px; cursor:pointer; padding:0; background:' + c + '; border:2px solid ' + (c === accent ? 'var(--text)' : 'transparent') + '; box-shadow:0 0 0 2px var(--panel)' + (c === accent ? ', 0 0 13px -1px ' + c : '') + ';',
+    }));
+
+    const cacheOn = this.state.cacheOn;
+    const cacheStyle = 'position:relative; width:44px; height:24px; flex:none; border:none; border-radius:13px; cursor:pointer; transition:background .2s; background:' + (cacheOn ? 'var(--cyan)' : 'var(--line2)') + ';';
+    const cacheKnob = 'position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .2s cubic-bezier(.4,0,.2,1); transform:translateX(' + (cacheOn ? '20px' : '0') + ');';
+
+    const connStatusMap = {
+      synced: { l: 'SYNCED', c: 'var(--green)', bg: 'rgba(79,216,155,.14)' },
+      syncing: { l: 'SYNCING', c: 'var(--amber)', bg: 'rgba(242,177,76,.14)' },
+      error: { l: 'ERROR', c: 'var(--red)', bg: 'rgba(255,92,114,.14)' },
+      disconnected: { l: 'OFFLINE', c: 'var(--text3)', bg: 'rgba(140,150,170,.13)' },
+    };
+    const connectors = this.connDefs.map(c => {
+      const st = this.state.connStatus[c.id] || c.status;
+      const m = connStatusMap[st];
+      const connected = st === 'synced' || st === 'syncing';
+      return {
+        name: c.name, sub: c.sub, initials: c.initials, iconBg: c.iconBg,
+        statusLabel: m.l, dot: m.c,
+        pillStyle: 'display:inline-flex; align-items:center; gap:6px; flex:none; padding:4px 9px; border-radius:7px; font-family:\'JetBrains Mono\',monospace; font-size:8.5px; letter-spacing:.08em; font-weight:700; color:' + m.c + '; background:' + m.bg + ';',
+        keyMask: connected ? '••••••••' + c.id.slice(0, 2).toUpperCase() + '9a' : 'not configured',
+        btnLabel: connected ? 'DISCONNECT' : (st === 'error' ? 'RECONNECT' : 'CONNECT'),
+        btnStyle: connected
+          ? 'flex:none; padding:8px 13px; border-radius:8px; border:1px solid var(--line2); background:none; color:var(--text2); cursor:pointer; font-family:\'JetBrains Mono\',monospace; font-size:9.5px; letter-spacing:.06em; font-weight:700;'
+          : 'flex:none; padding:8px 13px; border-radius:8px; border:none; background:var(--cyan); color:var(--cyanInk); cursor:pointer; font-family:\'JetBrains Mono\',monospace; font-size:9.5px; letter-spacing:.06em; font-weight:700;',
+        onToggle: this.toggleConn(c.id),
+      };
+    });
+    const connectedCount = this.connDefs.filter(c => { const st = this.state.connStatus[c.id] || c.status; return st === 'synced' || st === 'syncing'; }).length;
+
+    const benchTabs = ['Funnel', 'Media', 'Defaults', 'Efficiency', 'NBD'].map(t => ({
+      label: t, onClick: this.setBenchTab(t),
+      style: 'padding:9px 15px; border:none; background:none; cursor:pointer; font-family:\'JetBrains Mono\',monospace; font-size:10.5px; letter-spacing:.08em; font-weight:700; white-space:nowrap; color:' + (t === this.state.benchTab ? 'var(--cyan)' : 'var(--text3)') + '; border-bottom:2px solid ' + (t === this.state.benchTab ? 'var(--cyan)' : 'transparent') + ';',
+    }));
+    const fmtBench = (v, unit) => unit === '$' ? '$' + v.toLocaleString() : unit === '$M' ? '$' + v + 'M' : (v + unit);
+    const benchSliders = this.benchDefs[this.state.benchTab].map(d => {
+      const val = benchVals[d.id];
+      return { label: d.label, min: d.min, max: d.max, step: d.step, value: val, display: fmtBench(val, d.unit), minLabel: fmtBench(d.min, d.unit), maxLabel: fmtBench(d.max, d.unit), onInput: this.setBench(d.id) };
+    });
+
+    return {
+      rootRef: this.rootRef,
+      theme: this.state.theme,
+      dots: this._dots,
+      isScorecard: this.state.view === 'scorecard',
+      isSettings: this.state.view === 'settings',
+      isSpend: this.state.view === 'spend',
+      isMedia: this.state.view === 'media',
+      isCreative: this.state.view === 'creative',
+      isAudience: this.state.view === 'audience',
+      isProduct: this.state.view === 'product',
+      isFunnel: this.state.view === 'funnel',
+      isRetention: this.state.view === 'retention',
+      isOperations: this.state.view === 'operations',
+      isSimulator: this.state.view === 'simulator',
+      isModeling: this.state.view === 'modeling',
+      spendAlloc, reallocRows, mediaRows, creativeCards, messageThemes,
+      dmaCells, topMarkets, segments, productRows, convFunnels,
+      funnelStages, cohortCells, attribBars, modelRows, incrTests,
+      queueItems, selDir, dirToolSteps, pendingCount,
+      simSliders, simOutputs, emailDisp, mixValid, resetSim: this.resetSim,
+      crumb: (this.railDef.find(r => r.view === this.state.view) || this.railDef[0]).crumb,
+      title: (this.railDef.find(r => r.view === this.state.view) || this.railDef[0]).title,
+      modeSeg, autopilotSeg, themeSeg, densitySeg, exportSeg, accentSwatches,
+      modeHint: this.state.mode === 'BD' ? 'Business-development view — pre-contract validation accounts and pitch projections.' : 'Client view — the live Fifth Third Bank engagement.',
+      cacheToggle: this.toggleCache, cacheStyle, cacheKnob,
+      connectors, connSummary: connectedCount + ' / ' + this.connDefs.length + ' CONNECTED',
+      benchTabs, benchSliders, benchBlurb: this.benchBlurbs[this.state.benchTab], resetBench: this.resetBench,
+      railWidth: expanded ? '218px' : '64px',
+      labelOpacity: expanded ? 1 : 0,
+      railIcon: expanded ? '‹' : '›',
+      railItems,
+      themeIcon: this.state.theme === 'dark' ? '☾' : '☀',
+      bdStyle: segBase + (this.state.mode === 'BD' ? 'background:var(--cyan); color:var(--cyanInk);' : 'color:var(--text2);'),
+      clientStyle: segBase + (this.state.mode === 'Client' ? 'background:var(--cyan); color:var(--cyanInk);' : 'color:var(--text2);'),
+      toggleRail: this.toggleRail,
+      toggleTheme: this.toggleTheme,
+      setBD: this.setBD,
+      setClient: this.setClient,
+      dateOpen: this.state.dateOpen,
+      dateValue: this.state.dateValue,
+      dateOptions: dateOpts,
+      toggleDate: this.toggleDate,
+      dateChipStyle: 'display:flex; align-items:center; gap:8px; padding:8px 13px; border-radius:9px; border:1px solid ' + (this.state.dateOpen ? 'var(--cyan)' : 'var(--line)') + '; background:var(--panel); color:var(--text); cursor:pointer; font-family:inherit; font-size:12.5px;',
+      campaigns,
+      alerts,
+      alertCount: alerts.length,
+      noAlerts: alerts.length === 0,
+      showConsole: (this.props && this.props.showConsole !== undefined) ? this.props.showConsole : true,
+      consoleVal: this.state.consoleVal,
+      onConsole: this.onConsole,
+    };
+  }
+}
+</script>
+</body>
+</html>

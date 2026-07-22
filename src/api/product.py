@@ -3,6 +3,7 @@
 GET /api/product/pipeline          — product pipeline by stage with stage counts
 GET /api/product/roadmap           — roadmap initiatives by quarter / theme
 GET /api/product/testing-velocity  — A/B test velocity with baseline comparison
+GET /api/product/performance       — product line performance + conversion funnels
 """
 
 from __future__ import annotations
@@ -20,6 +21,84 @@ from src.data.product_queries import (
 )
 
 router = APIRouter(prefix="/api/product", tags=["product"])
+
+
+# ---------------------------------------------------------------------------
+# Seed data — Product Performance
+# ---------------------------------------------------------------------------
+
+_PRODUCT_PERFORMANCE = [
+    {
+        "name": "Essential Checking",
+        "funded": 6840,
+        "cpihh": 278.0,
+        "ltv": 3200.0,
+        "margin": 0.38,
+        "margin_status": "positive",
+    },
+    {
+        "name": "Preferred Checking",
+        "funded": 4120,
+        "cpihh": 312.0,
+        "ltv": 4800.0,
+        "margin": 0.42,
+        "margin_status": "positive",
+    },
+    {
+        "name": "Money Market",
+        "funded": 3280,
+        "cpihh": 345.0,
+        "ltv": 5100.0,
+        "margin": 0.35,
+        "margin_status": "positive",
+    },
+    {
+        "name": "Certificate of Deposit",
+        "funded": 2460,
+        "cpihh": 298.0,
+        "ltv": 4200.0,
+        "margin": 0.31,
+        "margin_status": "warning",
+    },
+    {
+        "name": "Savings Builder",
+        "funded": 1720,
+        "cpihh": 256.0,
+        "ltv": 2800.0,
+        "margin": 0.28,
+        "margin_status": "warning",
+    },
+]
+
+_CONV_FUNNELS = [
+    {
+        "name": "Essential Checking",
+        "stages": [
+            {"label": "Visit", "volume": "482K", "pct": 100},
+            {"label": "Start App", "volume": "38.6K", "pct": 42},
+            {"label": "Complete", "volume": "24.1K", "pct": 26},
+            {"label": "Funded", "volume": "6,840", "pct": 8},
+        ],
+    },
+    {
+        "name": "Preferred Checking",
+        "stages": [
+            {"label": "Visit", "volume": "310K", "pct": 100},
+            {"label": "Start App", "volume": "24.8K", "pct": 38},
+            {"label": "Complete", "volume": "14.9K", "pct": 23},
+            {"label": "Funded", "volume": "4,120", "pct": 6},
+        ],
+    },
+    {
+        "name": "Money Market",
+        "stages": [
+            {"label": "Visit", "volume": "228K", "pct": 100},
+            {"label": "Start App", "volume": "16.0K", "pct": 35},
+            {"label": "Complete", "volume": "10.2K", "pct": 22},
+            {"label": "Funded", "volume": "3,280", "pct": 7},
+        ],
+    },
+]
 
 
 # ---------------------------------------------------------------------------
@@ -111,6 +190,11 @@ def product_pipeline(
         default=None,
         description="Filter by product line: savings|checking|lending|investments|cards|digital|business",
     ),
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    product: str | None = Query(default=None, description="Comma-separated product filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
+    channel: str | None = Query(default=None, description="Comma-separated channel filter"),
 ):
     """Return product pipeline items with optional stage / product_line filters."""
     data = get_product_pipeline(stage=stage, product_line=product_line)
@@ -136,6 +220,11 @@ def product_roadmap(
         default=None,
         description="Filter by theme: acquisition|retention|engagement",
     ),
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    product: str | None = Query(default=None, description="Comma-separated product filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
+    channel: str | None = Query(default=None, description="Comma-separated channel filter"),
 ):
     """Return roadmap initiatives with optional quarter / product_line / theme filters."""
     data = get_product_roadmap(quarter=quarter, product_line=product_line, theme=theme)
@@ -154,6 +243,11 @@ def testing_velocity(
         default="30d",
         description="Look-back window: 30d | 60d | 90d",
     ),
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    product: str | None = Query(default=None, description="Comma-separated product filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
+    channel: str | None = Query(default=None, description="Comma-separated channel filter"),
 ):
     """Return A/B testing velocity metrics with baseline comparison.
 
@@ -162,3 +256,35 @@ def testing_velocity(
     """
     data = get_testing_velocity(period=period)
     return TestingVelocityResponse(**data)
+
+
+@router.get("/performance")
+def product_performance(
+    product: str | None = Query(
+        default=None,
+        description="Filter by product name (case-insensitive substring match)",
+    ),
+    date_start: str | None = Query(default=None, description="ISO date start filter"),
+    date_end: str | None = Query(default=None, description="ISO date end filter"),
+    dma: str | None = Query(default=None, description="Comma-separated DMA filter"),
+    channel: str | None = Query(default=None, description="Comma-separated channel filter"),
+):
+    """Return product line performance data with conversion funnels.
+
+    Each product includes funded count, CPIHH, LTV, margin, and margin
+    status.  ``conv_funnels`` provides per-product funnel stage breakdowns
+    where available.  Use the ``product`` query param to filter by name.
+    """
+    products = list(_PRODUCT_PERFORMANCE)
+    funnels = list(_CONV_FUNNELS)
+
+    if product:
+        needle = product.lower()
+        products = [p for p in products if needle in p["name"].lower()]
+        funnels = [f for f in funnels if needle in f["name"].lower()]
+
+    return {
+        "products": products,
+        "conv_funnels": funnels,
+        "count": len(products),
+    }

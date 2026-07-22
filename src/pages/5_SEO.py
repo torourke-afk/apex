@@ -1,130 +1,195 @@
 """
 SEO — Organic search rankings, traffic, and keyword performance
+Signal Deck design system
 """
 
 import streamlit as st
-import plotly.graph_objects as go
 
 from src.components.filter_bar import get_global_filters
-from src.components.card_container import card_container, card_container_end
-from src.components.chart_wrapper import branded_chart
 from src.components.page_chrome import page_chrome
 from src.components.chat_drawer import render_chat_drawer
-from src.config.brand import COLORS, CHART_PALETTE
 
-page_chrome(title="SEO")
+page_chrome(title="SEO", category="CHANNELS")
 filters = get_global_filters()
 
+_mono = "'JetBrains Mono',monospace"
+_ff = "'Space Grotesk',system-ui,sans-serif"
+
 # ---------------------------------------------------------------------------
-# Seed data (will be replaced with live connectors)
+# Sample data
 # ---------------------------------------------------------------------------
 
-_ORGANIC_KPI = [
-    ("Organic Sessions", "1.42M", "+8.3%", True),
-    ("Non-Brand Clicks", "312K", "+12.1%", True),
-    ("Avg Position", "14.2", "-1.8", True),
-    ("Click-Through Rate", "3.8%", "+0.4 pts", True),
-    ("Indexed Pages", "24.8K", "+1.2K", True),
-    ("Core Web Vitals Pass", "87%", "+3 pts", True),
+_KPI_DATA = [
+    {"label": "ORGANIC SESSIONS", "value": "1.42M", "delta": "+8.3%", "color": "var(--green)"},
+    {"label": "KEYWORD RANKINGS", "value": "312", "delta": "+24 new", "color": "var(--green)"},
+    {"label": "DOMAIN AUTHORITY", "value": "68", "delta": "+2 pts", "color": "var(--green)"},
+    {"label": "CLICK-THROUGH RATE", "value": "3.8%", "delta": "+0.4 pts", "color": "var(--cyan)"},
 ]
 
-_KEYWORD_RANKINGS = [
-    {"Keyword": "best checking account", "Position": 4, "Change": -2, "Volume": 18_100, "Page": "/checking"},
-    {"Keyword": "high yield savings", "Position": 8, "Change": 1, "Volume": 33_100, "Page": "/savings/high-yield"},
-    {"Keyword": "free checking account near me", "Position": 6, "Change": -3, "Volume": 12_400, "Page": "/checking/free"},
-    {"Keyword": "cd rates today", "Position": 12, "Change": 0, "Volume": 49_500, "Page": "/cd-rates"},
-    {"Keyword": "student checking account", "Position": 3, "Change": -1, "Volume": 8_100, "Page": "/checking/student"},
-    {"Keyword": "money market rates", "Position": 15, "Change": 2, "Volume": 27_100, "Page": "/money-market"},
-    {"Keyword": "bank near me", "Position": 7, "Change": -1, "Volume": 90_500, "Page": "/locations"},
-    {"Keyword": "mobile banking app", "Position": 11, "Change": -4, "Volume": 14_800, "Page": "/mobile"},
-    {"Keyword": "home equity loan rates", "Position": 18, "Change": 3, "Volume": 22_200, "Page": "/home-equity"},
-    {"Keyword": "online savings account", "Position": 9, "Change": -2, "Volume": 40_500, "Page": "/savings/online"},
+_KEYWORDS = [
+    {"kw": "best checking account", "pos": 4, "vol": "18,100", "ctr": "8.2%", "trend": "up"},
+    {"kw": "high yield savings", "pos": 8, "vol": "33,100", "ctr": "5.1%", "trend": "up"},
+    {"kw": "free checking near me", "pos": 6, "vol": "12,400", "ctr": "6.8%", "trend": "up"},
+    {"kw": "cd rates today", "pos": 12, "vol": "49,500", "ctr": "3.2%", "trend": "down"},
+    {"kw": "student checking account", "pos": 3, "vol": "8,100", "ctr": "9.4%", "trend": "up"},
+    {"kw": "money market rates", "pos": 15, "vol": "27,100", "ctr": "2.8%", "trend": "down"},
+    {"kw": "bank near me", "pos": 7, "vol": "90,500", "ctr": "5.6%", "trend": "up"},
+    {"kw": "mobile banking app", "pos": 11, "vol": "14,800", "ctr": "3.9%", "trend": "down"},
 ]
 
-_ORGANIC_TRAFFIC_WEEKS = list(range(1, 13))
-_ORGANIC_TRAFFIC_SESSIONS = [118_000, 121_000, 115_000, 128_000, 132_000, 125_000,
-                              138_000, 141_000, 135_000, 148_000, 152_000, 142_000]
-_ORGANIC_TRAFFIC_BRAND = [42_000, 43_000, 41_000, 45_000, 46_000, 44_000,
-                           48_000, 49_000, 47_000, 52_000, 53_000, 50_000]
-_ORGANIC_TRAFFIC_NONBRAND = [s - b for s, b in zip(_ORGANIC_TRAFFIC_SESSIONS, _ORGANIC_TRAFFIC_BRAND)]
-
-_TOP_PAGES = [
-    {"Page": "/checking", "Sessions": 245_000, "Bounce Rate": "32%", "Avg Time": "2:45", "Conversions": 4_120},
-    {"Page": "/savings/high-yield", "Sessions": 198_000, "Bounce Rate": "28%", "Avg Time": "3:12", "Conversions": 3_580},
-    {"Page": "/cd-rates", "Sessions": 156_000, "Bounce Rate": "35%", "Avg Time": "2:18", "Conversions": 2_210},
-    {"Page": "/locations", "Sessions": 142_000, "Bounce Rate": "45%", "Avg Time": "1:32", "Conversions": 890},
-    {"Page": "/mobile", "Sessions": 118_000, "Bounce Rate": "38%", "Avg Time": "2:55", "Conversions": 1_650},
+_RANKING_DIST = [
+    {"range": "1-3", "count": 42, "pct": 14},
+    {"range": "4-10", "count": 118, "pct": 38},
+    {"range": "11-20", "count": 89, "pct": 29},
+    {"range": "21-50", "count": 48, "pct": 15},
+    {"range": "51+", "count": 15, "pct": 5},
 ]
 
+_TECH_HEALTH = [
+    {"label": "Core Web Vitals", "pct": 87, "color": "var(--green)"},
+    {"label": "Mobile Usability", "pct": 94, "color": "var(--cyan)"},
+    {"label": "Crawlability", "pct": 91, "color": "var(--green)"},
+    {"label": "Schema Markup", "pct": 72, "color": "var(--amber)"},
+    {"label": "Page Speed (Avg)", "pct": 81, "color": "var(--green)"},
+]
 
-# ── KPI Strip ─────────────────────────────────────────────────────────────
-card_container(title="Organic Search Overview", subtitle="Last 30 days — Google Search Console + GA4")
-kpi_cols = st.columns(6)
-for col, (label, value, delta, is_good) in zip(kpi_cols, _ORGANIC_KPI):
-    color = COLORS["success"] if is_good else COLORS["error"]
-    with col:
-        st.markdown(
-            f"""<div style="padding:0.6rem 0;">
-            <div style="font-size:0.6rem;font-weight:600;text-transform:uppercase;color:{COLORS['text_secondary']};margin-bottom:0.25rem;">{label}</div>
-            <div style="font-size:1.4rem;font-weight:700;color:{COLORS['text_primary']};">{value}</div>
-            <div style="font-size:0.7rem;color:{color};">{delta}</div>
-            </div>""",
-            unsafe_allow_html=True,
-        )
-card_container_end()
+# ---------------------------------------------------------------------------
+# KPI Strip
+# ---------------------------------------------------------------------------
 
-# ── Organic Traffic Trend ─────────────────────────────────────────────────
-card_container(title="Organic Traffic Trend", subtitle="Weekly sessions — Brand vs Non-Brand")
-fig = go.Figure()
-fig.add_trace(go.Scatter(
-    x=_ORGANIC_TRAFFIC_WEEKS, y=_ORGANIC_TRAFFIC_NONBRAND,
-    name="Non-Brand", fill="tozeroy",
-    line=dict(color=COLORS["primary"], width=2),
-    fillcolor="rgba(0, 117, 255, 0.15)",
-))
-fig.add_trace(go.Scatter(
-    x=_ORGANIC_TRAFFIC_WEEKS, y=_ORGANIC_TRAFFIC_BRAND,
-    name="Brand", fill="tozeroy",
-    line=dict(color=COLORS["secondary"], width=2),
-    fillcolor="rgba(0, 210, 255, 0.10)",
-))
-fig.update_layout(
-    height=300,
-    xaxis_title="Week",
-    yaxis_title="Sessions",
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-)
-branded_chart(fig, height=300, key="seo_traffic_trend")
-card_container_end()
+kpi_cards = ""
+for i, k in enumerate(_KPI_DATA):
+    delay = f"{0.04 * (i + 1):.2f}"
+    kpi_cards += f"""
+    <div style="display:flex; flex-direction:column; padding:18px; border-radius:14px;
+      border:1px solid var(--line); background:var(--panel);
+      animation:rise .4s ease-out {delay}s both;">
+      <span style="font-family:{_mono}; font-size:9px; letter-spacing:.1em; color:var(--text3);">{k['label']}</span>
+      <span style="font-family:{_ff}; font-size:28px; font-weight:600; letter-spacing:-.02em; margin-top:8px;">{k['value']}</span>
+      <span style="font-family:{_mono}; font-size:11px; font-weight:500; color:{k['color']}; margin-top:4px;">{k['delta']}</span>
+    </div>"""
 
-# ── Keyword Rankings ──────────────────────────────────────────────────────
-card_container(title="Keyword Rankings", subtitle="Top tracked keywords — position changes vs prior period")
-import pandas as pd
-kw_df = pd.DataFrame(_KEYWORD_RANKINGS)
-# Add visual change indicator
-kw_df["Δ"] = kw_df["Change"].apply(lambda c: f"▲ {abs(c)}" if c < 0 else (f"▼ {abs(c)}" if c > 0 else "—"))
-kw_df["Volume"] = kw_df["Volume"].apply(lambda v: f"{v:,}")
-display_kw = kw_df[["Keyword", "Position", "Δ", "Volume", "Page"]]
-st.dataframe(display_kw, use_container_width=True, hide_index=True, height=360)
-card_container_end()
+st.markdown(f"""
+<style>
+@keyframes rise {{
+  from {{ opacity:0; transform:translateY(12px); }}
+  to   {{ opacity:1; transform:translateY(0); }}
+}}
+</style>
+<div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:18px;">
+  {kpi_cards}
+</div>
+""", unsafe_allow_html=True)
 
-# ── Top Pages by Organic Traffic ──────────────────────────────────────────
-card_container(title="Top Landing Pages", subtitle="Highest organic traffic pages with conversion data")
-pages_df = pd.DataFrame(_TOP_PAGES)
-pages_df["Sessions"] = pages_df["Sessions"].apply(lambda v: f"{v:,}")
-pages_df["Conversions"] = pages_df["Conversions"].apply(lambda v: f"{v:,}")
-st.dataframe(pages_df, use_container_width=True, hide_index=True)
-card_container_end()
+# ---------------------------------------------------------------------------
+# Ranking Distribution (SVG bar chart)
+# ---------------------------------------------------------------------------
 
-# ── Content Gap Callout ───────────────────────────────────────────────────
-st.markdown(
-    f"""<div style="background:{COLORS['surface_sunken']};border-left:3px solid {COLORS['warning']};border-radius:0 6px 6px 0;padding:0.65rem 0.9rem;margin-top:0.5rem;font-size:0.78rem;color:{COLORS['text_secondary']};">
-    <strong style="color:{COLORS['text_primary']};">Content Gap Alert:</strong>&nbsp;
-    12 high-volume keywords (10K+ monthly searches) have no dedicated landing page. Top opportunity:
-    <strong style="color:{COLORS['warning']};">"no fee checking account"</strong> (22K searches/mo, currently ranking position 34).
-    Creating a targeted page could capture an estimated 2,800 additional monthly visits.
-    </div>""",
-    unsafe_allow_html=True,
-)
+max_pct = max(r["pct"] for r in _RANKING_DIST)
+bars_svg = ""
+for i, r in enumerate(_RANKING_DIST):
+    bar_h = int(r["pct"] / max_pct * 130)
+    x = 40 + i * 120
+    y = 170 - bar_h
+    opacity = 1.0 if i < 2 else 0.6 if i < 4 else 0.35
+    bars_svg += f"""
+    <rect x="{x}" y="{y}" width="80" height="{bar_h}" rx="6" fill="var(--cyan)" opacity="{opacity}">
+      <animate attributeName="height" from="0" to="{bar_h}" dur="0.5s" begin="{0.08*i}s" fill="freeze"/>
+      <animate attributeName="y" from="170" to="{y}" dur="0.5s" begin="{0.08*i}s" fill="freeze"/>
+    </rect>
+    <text x="{x + 40}" y="{y - 8}" text-anchor="middle" font-family="{_mono}" font-size="11" font-weight="600" fill="var(--text)">{r['count']}</text>
+    <text x="{x + 40}" y="{y - 22}" text-anchor="middle" font-family="{_mono}" font-size="9" fill="var(--text3)">{r['pct']}%</text>
+    <text x="{x + 40}" y="192" text-anchor="middle" font-family="{_mono}" font-size="10" fill="var(--text3)">{r['range']}</text>"""
+
+st.markdown(f"""
+<section style="border-radius:14px; border:1px solid var(--line); background:var(--panel);
+  overflow:hidden; margin-bottom:18px; animation:rise .4s ease-out .12s both;">
+  <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px;
+    border-bottom:1px solid var(--line);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div>
+      <span style="font-size:14px; font-weight:600;">Ranking Distribution</span>
+    </div>
+    <span style="font-family:{_mono}; font-size:9px; letter-spacing:.1em; color:var(--text3);">TRACKED KEYWORDS</span>
+  </div>
+  <div style="padding:20px 12px 10px;">
+    <svg viewBox="0 0 640 210" width="100%" style="display:block;">
+      {bars_svg}
+    </svg>
+  </div>
+</section>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Top Keywords Table
+# ---------------------------------------------------------------------------
+
+kw_rows = ""
+for kw in _KEYWORDS:
+    trend_arrow = "↑" if kw["trend"] == "up" else "↓"
+    trend_color = "var(--green)" if kw["trend"] == "up" else "var(--red)"
+    kw_rows += f"""
+    <div style="display:grid; grid-template-columns:2fr 0.7fr 1fr 0.8fr 0.6fr; gap:8px;
+      align-items:center; padding:11px 18px; border-bottom:1px solid var(--line);">
+      <span style="font-size:13px; font-weight:500; color:var(--text);">{kw['kw']}</span>
+      <span style="font-family:{_mono}; font-size:13px; font-weight:600; color:var(--cyan);">{kw['pos']}</span>
+      <span style="font-family:{_mono}; font-size:12px; color:var(--text2);">{kw['vol']}</span>
+      <span style="font-family:{_mono}; font-size:12px; color:var(--text2);">{kw['ctr']}</span>
+      <span style="font-family:{_mono}; font-size:12px; font-weight:600; color:{trend_color};">{trend_arrow}</span>
+    </div>"""
+
+st.markdown(f"""
+<section style="border-radius:14px; border:1px solid var(--line); background:var(--panel);
+  overflow:hidden; margin-bottom:18px; animation:rise .4s ease-out .18s both;">
+  <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px;
+    border-bottom:1px solid var(--line);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div>
+      <span style="font-size:14px; font-weight:600;">Top Keywords</span>
+    </div>
+    <span style="font-family:{_mono}; font-size:9px; letter-spacing:.1em; color:var(--text3);">SEARCH CONSOLE</span>
+  </div>
+  <div style="display:grid; grid-template-columns:2fr 0.7fr 1fr 0.8fr 0.6fr; gap:8px; padding:9px 18px;
+    border-bottom:1px solid var(--line); font-family:{_mono}; font-size:9px;
+    letter-spacing:.1em; color:var(--text3);">
+    <span>KEYWORD</span><span>POSITION</span><span>VOLUME</span><span>CTR</span><span>TREND</span>
+  </div>
+  {kw_rows}
+</section>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Technical Health
+# ---------------------------------------------------------------------------
+
+health_bars = ""
+for i, h in enumerate(_TECH_HEALTH):
+    delay = f"{0.04 * (i + 1):.2f}"
+    health_bars += f"""
+    <div style="display:flex; align-items:center; gap:12px; animation:rise .4s ease-out {delay}s both;">
+      <span style="flex:none; width:110px; font-family:{_mono}; font-size:10px; letter-spacing:.06em; color:var(--text2);">{h['label']}</span>
+      <div style="flex:1; height:6px; border-radius:5px; background:var(--line); overflow:hidden;">
+        <div style="width:{h['pct']}%; height:100%; border-radius:5px; background:{h['color']};
+          transition:width .6s ease;"></div>
+      </div>
+      <span style="font-family:{_mono}; font-size:12px; font-weight:600; color:var(--text); min-width:32px; text-align:right;">{h['pct']}</span>
+    </div>"""
+
+st.markdown(f"""
+<section style="border-radius:14px; border:1px solid var(--line); background:var(--panel);
+  overflow:hidden; animation:rise .4s ease-out .24s both;">
+  <div style="display:flex; align-items:center; justify-content:space-between; padding:15px 18px;
+    border-bottom:1px solid var(--line);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:3px; height:15px; background:var(--cyan); border-radius:3px;"></div>
+      <span style="font-size:14px; font-weight:600;">Technical Health</span>
+    </div>
+    <span style="font-family:{_mono}; font-size:9px; letter-spacing:.1em; color:var(--text3);">SITE AUDIT</span>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:14px; padding:18px;">
+    {health_bars}
+  </div>
+</section>
+""", unsafe_allow_html=True)
 
 render_chat_drawer(page_key="seo")

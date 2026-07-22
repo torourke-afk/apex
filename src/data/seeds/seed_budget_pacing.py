@@ -36,6 +36,8 @@ import pandas as pd
 import pandera.pandas as pa
 from pandera.pandas import Column, DataFrameSchema, Check
 
+from src.data.seeds._dates import FY_MONTH_STARTS
+
 WORKSPACE = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
@@ -70,12 +72,8 @@ PACING_WEIGHTS = {
     "conversion_testing":  [0.075, 0.078, 0.082, 0.085, 0.082, 0.090, 0.095, 0.100, 0.085, 0.080, 0.072, 0.076],
 }
 
-MONTHS: List[date] = [
-    date(2025, 5, 1),  date(2025, 6, 1),  date(2025, 7, 1),
-    date(2025, 8, 1),  date(2025, 9, 1),  date(2025, 10, 1),
-    date(2025, 11, 1), date(2025, 12, 1), date(2026, 1, 1),
-    date(2026, 2, 1),  date(2026, 3, 1),  date(2026, 4, 1),
-]
+# Fiscal-year month starts (12 months, computed from _dates anchor)
+MONTHS: List[date] = [ts.date() for ts in FY_MONTH_STARTS]
 
 VALID_CHANNELS = [c[0] for c in CATEGORIES]
 VALID_STATUSES = ["on_track", "over", "under"]

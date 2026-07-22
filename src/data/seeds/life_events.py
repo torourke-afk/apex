@@ -57,6 +57,7 @@ if WORKSPACE not in sys.path:
     sys.path.insert(0, WORKSPACE)
 
 from src.config.settings import DB_PATH  # noqa: E402
+from src.data.seeds._dates import TRAILING_90D_START as START_DATE, TRAILING_90D_END as END_DATE
 
 # ---------------------------------------------------------------------------
 # RNG
@@ -65,10 +66,8 @@ SEED = 42
 rng = np.random.default_rng(SEED)
 
 # ---------------------------------------------------------------------------
-# Date range — 90 days ending 2026-05-08
+# Date range — trailing 90 days ending yesterday
 # ---------------------------------------------------------------------------
-END_DATE = date(2026, 5, 8)
-START_DATE = END_DATE - timedelta(days=89)
 DATES: List[date] = [START_DATE + timedelta(days=i) for i in range(90)]
 
 # ---------------------------------------------------------------------------

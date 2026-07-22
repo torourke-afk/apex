@@ -1,0 +1,66 @@
+/* Apex "Signal Deck" semantic tokens — source of truth: DESIGN.md + design/mockups/Executive-Scorecard.dc.html.
+   Values are ported verbatim from the delivered Design Component. Components reference the semantic
+   aliases (canvas, surface, accent, …) via Tailwind; a theme is a values block and components never change.
+   Dark is default; [data-theme="light"] is AAA-tuned. */
+
+:root,
+[data-theme="dark"] {
+  /* surfaces */
+  --color-bg-canvas: #06080c;        /* --bg */
+  --color-bg-base: #0a0e14;          /* --bg2 */
+  --color-bg-surface: #0d1118;       /* --panel */
+  --color-bg-raised: #10151e;        /* --panel2 */
+  --color-bg-elevated: #151b26;      /* --elev */
+  /* text */
+  --color-text-primary: #e8ecf4;     /* --text */
+  --color-text-secondary: #a4adbf;   /* --text2 */
+  --color-text-muted: #6b7587;       /* --text3 */
+  /* lines */
+  --color-border: rgba(255, 255, 255, 0.07);       /* --line */
+  --color-border-strong: rgba(255, 255, 255, 0.13);/* --line2 */
+  /* accent + semantics */
+  --color-accent: #34e1d4;           /* --cyan */
+  --color-accent-contrast: #04100f;  /* --cyanInk */
+  --color-signal: #34e1d4;
+  --color-positive: #4fd89b;         /* --green */
+  --color-warning: #f2b14c;          /* --amber */
+  --color-critical: #ff5c72;         /* --red */
+  --color-grid: rgba(255, 255, 255, 0.04);
+  /* atmosphere */
+  --dot: rgba(170, 205, 230, 0.26);
+  --dot-star: rgba(190, 215, 235, 0.7);
+  --header-bg: rgba(10, 13, 19, 0.55);
+  --aura1: rgba(52, 225, 212, 0.13);
+  --aura2: rgba(38, 96, 210, 0.14);
+  --aura3: rgba(108, 70, 200, 0.1);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] {
+  --color-bg-canvas: #dde2ea;        /* --bg */
+  --color-bg-base: #eaeef4;          /* --bg2 */
+  --color-bg-surface: #ffffff;       /* --panel */
+  --color-bg-raised: #f4f6fa;        /* --panel2 */
+  --color-bg-elevated: #ffffff;      /* --elev */
+  --color-text-primary: #0a0e16;     /* --text */
+  --color-text-secondary: #414b5c;   /* --text2 */
+  --color-text-muted: #5c6678;       /* --text3 */
+  --color-border: rgba(12, 18, 28, 0.13);          /* --line */
+  --color-border-strong: rgba(12, 18, 28, 0.24);   /* --line2 */
+  --color-accent: #0b897e;           /* --cyan (AAA-tuned) */
+  --color-accent-contrast: #ffffff;  /* --cyanInk */
+  --color-signal: #0b897e;
+  --color-positive: #0f7a4d;         /* --green */
+  --color-warning: #8a5e0a;          /* --amber */
+  --color-critical: #c92f47;         /* --red */
+  --color-grid: rgba(12, 18, 28, 0.055);
+  --dot: rgba(40, 70, 110, 0.22);
+  --dot-star: rgba(50, 80, 120, 0.6);
+  --header-bg: rgba(255, 255, 255, 0.7);
+  --aura1: rgba(11, 137, 126, 0.12);
+  --aura2: rgba(38, 96, 210, 0.09);
+  --aura3: rgba(120, 90, 200, 0.07);
+  --shadow-1: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-2: 0 8px 24px rgba(16, 24, 40, 0.1);
+}

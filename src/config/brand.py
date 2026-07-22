@@ -1,8 +1,16 @@
 """
-RVGT Brand System — Dark Glassmorphism Edition
+Apex Brand System — "Signal Deck" Edition
 -----------------------------------------------
-Inspired by Vision UI Dashboard. Deep navy backgrounds, glassmorphism cards,
-gradient accents, neon glows. RVGT Red remains the primary accent.
+Synced to the design system in DESIGN.md / design/Apex-Design-Memo-Combined.md and the
+delivered mockup design/mockups/Executive-Scorecard.dc.html.
+
+Calm, instrument-grade marketing console. Near-black ground with a soft radial glow,
+hairline borders + faint ledger grid, teal signal accent (#34E1D4 dark / #0C998D light).
+Red is reserved for critical/destructive only. Fonts: Space Grotesk (UI) + JetBrains Mono
+(numerals, tabular-nums). Light + dark via the apex_theme session key.
+
+NOTE: the new Apex front end is React + Tailwind over the BFF; this module keeps the legacy
+Streamlit app visually aligned to the same tokens during the transition.
 """
 
 __all__ = [
@@ -26,56 +34,59 @@ __all__ = [
 # Color palette — Dark Glassmorphism
 # ---------------------------------------------------------------------------
 
-# Core dark backgrounds
-_NAVY = "#060B26"         # deepest background
-_NAVY_CARD = "#0B1437"    # card / panel surface
-_NAVY_RAISED = "#111C44"  # elevated card, sidebar
-_NAVY_INPUT = "#0B1437"   # form input backgrounds
+# Core dark backgrounds (Signal Deck — mockup token set)
+_NAVY = "#06080C"         # --bg  : deepest background
+_NAVY_CARD = "#0D1118"    # --panel : card / panel surface
+_NAVY_RAISED = "#151B26"  # --elev : elevated card, sidebar
+_NAVY_INPUT = "#10151E"   # --panel2 : form input backgrounds
 
-# RVGT accent — kept from original brand
-_RED = "#FF0016"
-_SCARLET = "#C00A0A"
+# Accent — teal signal (replaces old RVGT-red-as-accent).
+# Red is now reserved for critical/destructive only.
+_RED = "#FF5C72"          # --red (dark) : critical / destructive
+_SCARLET = "#D4374F"      # --red (light) : critical (light theme)
 
-# Gradient accent (Vision UI signature blue-to-cyan)
-_BLUE = "#0075FF"
-_CYAN = "#2CD9FF"
+# Signal accent (teal)
+_BLUE = "#34E1D4"         # --cyan (dark)  : teal signal/active accent
+_CYAN = "#34E1D4"         # alias — single teal accent in the system
 
 # Text
 _WHITE = "#FFFFFF"
-_GRAY_100 = "#E9EDF7"     # primary text on dark
-_GRAY_300 = "#A0AEC0"     # secondary / muted text
-_GRAY_500 = "#718096"     # tertiary / disabled
+_GRAY_100 = "#E8ECF4"     # --text  : primary text on dark
+_GRAY_300 = "#969FB2"     # --text2 : secondary / muted text
+_GRAY_500 = "#586173"     # --text3 : tertiary / disabled
 
 # Semantic
-_GREEN = "#01B574"
-_YELLOW = "#FFB547"
-_RED_SOFT = "#E31A1A"
+_GREEN = "#4FD89B"        # --green
+_YELLOW = "#F2B14C"       # --amber
+_RED_SOFT = "#FF5C72"     # --red : critical
 
-# Borders & glass
-_BORDER = "rgba(226, 232, 240, 0.1)"
-_GLASS_BG = "rgba(11, 20, 55, 0.75)"
-_GLASS_BORDER = "rgba(226, 232, 240, 0.08)"
+# Borders & glass (hairline lines per Signal Deck)
+_BORDER = "rgba(255, 255, 255, 0.07)"      # --line
+_GLASS_BG = "rgba(13, 17, 24, 0.75)"        # panel surface @ 75%
+_GLASS_BORDER = "rgba(255, 255, 255, 0.07)" # --line
 
 # ---------------------------------------------------------------------------
 # Light mode palette
 # ---------------------------------------------------------------------------
 
-_LIGHT_BG = "#F7F8FC"
-_LIGHT_SURFACE = "#FFFFFF"
-_LIGHT_RAISED = "#F0F2F8"
+# Light palette (Signal Deck — mockup [data-theme="light"])
+_LIGHT_BG = "#DDE2EA"          # --bg
+_LIGHT_SURFACE = "#FFFFFF"     # --panel
+_LIGHT_RAISED = "#F4F6FA"      # --panel2
 _LIGHT_INPUT = "#FFFFFF"
-_LIGHT_TEXT_PRIMARY = "#1A202C"
-_LIGHT_TEXT_SECONDARY = "#718096"
-_LIGHT_TEXT_MUTED = "#A0AEC0"
-_LIGHT_BORDER = "rgba(0, 0, 0, 0.08)"
+_LIGHT_TEXT_PRIMARY = "#0A0E16"    # --text
+_LIGHT_TEXT_SECONDARY = "#414B5C"  # --text2
+_LIGHT_TEXT_MUTED = "#5C6678"      # --text3
+_LIGHT_BORDER = "rgba(12, 18, 28, 0.10)"   # --line
 _LIGHT_GLASS_BG = "rgba(255, 255, 255, 0.85)"
-_LIGHT_GLASS_BORDER = "rgba(0, 0, 0, 0.06)"
-_LIGHT_BORDER_SOLID = "#E2E8F0"
+_LIGHT_GLASS_BORDER = "rgba(12, 18, 28, 0.10)"
+_LIGHT_BORDER_SOLID = "#E0E4EC"
+_LIGHT_TEAL = "#0B897E"         # --cyan (light) : darkened teal for AA on white
 
 COLORS_LIGHT: dict[str, str] = {
-    "primary": _RED,
-    "secondary": _BLUE,
-    "accent": "#0066DD",
+    "primary": _LIGHT_TEAL,
+    "secondary": _LIGHT_TEAL,
+    "accent": _LIGHT_TEAL,
     "background": _LIGHT_BG,
     "surface": _LIGHT_SURFACE,
     "surface_raised": _LIGHT_RAISED,
@@ -111,8 +122,8 @@ COLORS_LIGHT: dict[str, str] = {
 }
 
 COLORS: dict[str, str] = {
-    # Brand primaries
-    "primary": _RED,
+    # Brand primaries — teal signal accent (red is critical-only, see "error")
+    "primary": _BLUE,
     "secondary": _BLUE,
     "accent": _CYAN,
 
@@ -165,24 +176,24 @@ COLORS: dict[str, str] = {
     "success_bg_light": "rgba(1, 181, 116, 0.10)",
 }
 
-# Chart palette
+# Chart palette — teal-led, distinct hues (Signal Deck)
 CHART_PALETTE: list[str] = [
-    _BLUE,
-    _CYAN,
-    _RED,
-    _GREEN,
-    _YELLOW,
+    _BLUE,       # teal accent
+    "#7C8BFF",   # periwinkle (mockup secondary series)
+    _GREEN,      # positive
+    _YELLOW,     # amber
+    _RED,        # critical
 ]
 
 CHART_PALETTE_EXTENDED: list[str] = [
-    _BLUE,
-    _CYAN,
-    _RED,
-    _GREEN,
-    _YELLOW,
-    "#7B61FF",   # purple
-    "#FF6B6B",   # coral
-    _GRAY_300,
+    _BLUE,       # teal
+    "#7C8BFF",   # periwinkle
+    _GREEN,      # green
+    _YELLOW,     # amber
+    _RED,        # red
+    "#0C998D",   # deep teal
+    "#1D4ED8",   # blue
+    _GRAY_300,   # neutral
 ]
 
 # ---------------------------------------------------------------------------
@@ -190,8 +201,9 @@ CHART_PALETTE_EXTENDED: list[str] = [
 # ---------------------------------------------------------------------------
 
 TYPOGRAPHY: dict = {
-    "font_family": "'Plus Jakarta Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif",
-    "heading_font": "'Plus Jakarta Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif",
+    "font_family": "'Space Grotesk', ui-sans-serif, system-ui, 'Helvetica Neue', Arial, sans-serif",
+    "heading_font": "'Space Grotesk', ui-sans-serif, system-ui, 'Helvetica Neue', Arial, sans-serif",
+    "mono_font": "'JetBrains Mono', ui-monospace, 'SF Mono', monospace",
     "sizes": {
         "sm": "0.75rem",
         "md": "0.875rem",
@@ -256,12 +268,14 @@ MOTION: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 GRADIENTS = {
-    "blue_cyan": f"linear-gradient(135deg, {_BLUE} 0%, {_CYAN} 100%)",
-    "card_bg": f"linear-gradient(127deg, rgba(6,11,38,0.94) 0%, rgba(26,35,82,0.50) 100%)",
+    # Signal Deck: teal accent + radial ground glow
+    "blue_cyan": f"linear-gradient(135deg, {_BLUE} 0%, #0C998D 100%)",  # teal accent ramp
+    "card_bg": "linear-gradient(127deg, rgba(13,17,24,0.94) 0%, rgba(21,27,38,0.50) 100%)",
     "sidebar": f"linear-gradient(180deg, {_NAVY_RAISED} 0%, {_NAVY} 100%)",
+    "ground": "radial-gradient(120% 90% at 78% -10%, #0A0E14 0%, #06080C 60%)",  # app background glow
     "red_accent": f"linear-gradient(135deg, {_RED} 0%, {_SCARLET} 100%)",
-    "success": f"linear-gradient(135deg, {_GREEN} 0%, #00D68F 100%)",
-    "warning": f"linear-gradient(135deg, {_YELLOW} 0%, #FFD93D 100%)",
+    "success": f"linear-gradient(135deg, {_GREEN} 0%, #2BD9A0 100%)",
+    "warning": f"linear-gradient(135deg, {_YELLOW} 0%, #FFD06B 100%)",
     "error": f"linear-gradient(135deg, {_RED_SOFT} 0%, {_RED} 100%)",
 }
 
@@ -287,11 +301,12 @@ def _brand_css() -> str:
     return f"""
 <style>
   /* ── Font imports ──────────────────────────────────────────────────── */
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
   @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
 
-  /* ── CSS custom properties ─────────────────────────────────────────── */
+  /* ── CSS custom properties (Signal Deck reference tokens) ──────────── */
   :root {{
+    /* Legacy aliases — keep for existing components */
     --color-primary: {primary};
     --color-secondary: {secondary};
     --color-accent: {COLORS["accent"]};
@@ -307,17 +322,98 @@ def _brand_css() -> str:
     --gradient-blue: {GRADIENTS["blue_cyan"]};
     --glass-bg: {COLORS["glass_bg"]};
     --glass-border: {COLORS["glass_border"]};
+
+    /* Signal Deck reference tokens (exact match to mockup) */
+    --bg: #06080C;
+    --bg2: #0A0E14;
+    --panel: #0D1118;
+    --panel2: #10151E;
+    --elev: #151B26;
+    --line: rgba(255,255,255,.07);
+    --line2: rgba(255,255,255,.13);
+    --text: #E8ECF4;
+    --text2: #A4ADBF;
+    --text3: #6B7587;
+    --cyan: #34E1D4;
+    --cyanInk: #04100F;
+    --green: #4FD89B;
+    --amber: #F2B14C;
+    --red: #FF5C72;
+    --dot: rgba(170,205,230,.26);
+    --dotStar: rgba(190,215,235,.7);
+    --headerBg: rgba(10,13,19,.55);
+    --aura1: rgba(52,225,212,.13);
+    --aura2: rgba(38,96,210,.14);
+    --aura3: rgba(108,70,200,.10);
+  }}
+
+  /* ── Keyframe animations (Signal Deck reference) ───────────────────── */
+  @keyframes ringkpi {{ from {{ opacity:1; }} }}
+  @keyframes ringhero {{ from {{ opacity:1; }} }}
+  @keyframes rise {{ from {{ opacity:1; }} }}
+  @keyframes wirein {{ from {{ opacity:1; }} }}
+  @keyframes pulseonce {{
+    0%,100% {{ box-shadow:inset 0 0 0 0 rgba(255,92,114,0); }}
+    35% {{ box-shadow:inset 2px 0 0 0 var(--red), 0 0 18px -4px rgba(255,92,114,.5); }}
+  }}
+  @keyframes blink {{
+    0%,48% {{ opacity:1; }}
+    50%,100% {{ opacity:0; }}
+  }}
+  @keyframes aura1 {{
+    0% {{ transform:translate(0,0) scale(1); }}
+    100% {{ transform:translate(7vw,6vh) scale(1.18); }}
+  }}
+  @keyframes aura2 {{
+    0% {{ transform:translate(0,0) scale(1); }}
+    100% {{ transform:translate(-6vw,7vh) scale(1.12); }}
+  }}
+  @keyframes aura3 {{
+    0% {{ transform:translate(0,0) scale(1); }}
+    100% {{ transform:translate(5vw,-6vh) scale(1.22); }}
+  }}
+  @keyframes floatA {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(12px,-8px); }}
+  }}
+  @keyframes floatB {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(-10px,6px); }}
+  }}
+  @keyframes floatC {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(8px,10px); }}
+  }}
+  @keyframes floatD {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(-6px,-12px); }}
+  }}
+  @keyframes floatE {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(14px,4px); }}
+  }}
+  @keyframes floatF {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(-8px,-6px); }}
+  }}
+  @keyframes twinkle {{
+    0%,100% {{ opacity:.35; }}
+    50% {{ opacity:.95; }}
+  }}
+  @keyframes shimmer {{
+    0% {{ background-position: 200% 0; }}
+    100% {{ background-position: -200% 0; }}
   }}
 
   /* ── Global resets ─────────────────────────────────────────────────── */
   html, body, [class*="css"] {{
     font-family: {ff} !important;
-    color: {text_p};
-    background-color: {bg} !important;
+    color: var(--text) !important;
+    background-color: var(--bg) !important;
   }}
 
   .stApp {{
-    background: {bg} !important;
+    background: radial-gradient(120% 90% at 78% -10%, var(--bg2), var(--bg) 62%) !important;
   }}
 
   /* ── Main content area ─────────────────────────────────────────────── */
@@ -329,7 +425,7 @@ def _brand_css() -> str:
   /* ── Headings ──────────────────────────────────────────────────────── */
   h1, h2, h3, h4, h5, h6 {{
     font-family: {ff} !important;
-    color: {text_p} !important;
+    color: var(--text) !important;
     font-weight: 700;
   }}
   p, span:not([data-testid="stIconMaterial"]), div, label {{
@@ -338,8 +434,8 @@ def _brand_css() -> str:
 
   /* ── Sidebar — dark gradient ───────────────────────────────────────── */
   section[data-testid="stSidebar"] {{
-    background: {GRADIENTS["sidebar"]} !important;
-    border-right: 1px solid {COLORS["glass_border"]} !important;
+    background: linear-gradient(180deg, var(--panel), var(--bg2)) !important;
+    border-right: 1px solid var(--line) !important;
     width: 260px !important;
     min-width: 260px !important;
     overflow-x: hidden !important;
@@ -378,12 +474,12 @@ def _brand_css() -> str:
   section[data-testid="stSidebar"] label,
   section[data-testid="stSidebar"] span,
   section[data-testid="stSidebar"] p {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
   section[data-testid="stSidebar"] h1,
   section[data-testid="stSidebar"] h2,
   section[data-testid="stSidebar"] h3 {{
-    color: {_WHITE} !important;
+    color: var(--text) !important;
   }}
 
   /* ── Sidebar nav items ─────────────────────────────────────────────── */
@@ -406,20 +502,20 @@ def _brand_css() -> str:
   [data-testid="stSidebarNav"] ul li {{
     width: 100% !important;
     min-width: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     box-sizing: border-box !important;
   }}
   [data-testid="stSidebarNavLink"] {{
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 0.125rem !important;
+    gap: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
     border-radius: {BORDER_RADIUS["md"]} !important;
     margin: 2px 0 !important;
     text-decoration: none !important;
     transition: background {t_fast} {ease_out} !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -428,7 +524,7 @@ def _brand_css() -> str:
   /* Text and icon color inside nav links */
   section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] p,
   section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] [data-testid="stIconMaterial"] {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
     font-weight: 500;
   }}
   [data-testid="stSidebarNavLink"]:hover {{
@@ -436,27 +532,36 @@ def _brand_css() -> str:
   }}
 
   /* ── Nav link inner layout ─────────────────────────────────────────── */
-  /* > span = icon wrapper (Ws), > div = label container (sc/qs) */
-  [data-testid="stSidebarNavLink"] > span {{
+  /* > span:first-child = icon wrapper, > span:last-child = label container */
+  [data-testid="stSidebarNavLink"] > span:first-child {{
     display: inline-flex !important;
     align-items: center !important;
     flex-shrink: 0 !important;
   }}
-  [data-testid="stSidebarNavLink"] > span::after {{ display: none !important; }}
+  [data-testid="stSidebarNavLink"] > span:first-child::after {{ display: none !important; }}
+  /* Label container — the second span with [label] attribute */
+  [data-testid="stSidebarNavLink"] > span[label],
+  [data-testid="stSidebarNavLink"] > span:last-child {{
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+    margin-left: 0 !important;
+    width: auto !important;
+  }}
   [data-testid="stSidebarNavLink"] > div {{
     flex: 1 1 0% !important;
     min-width: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     margin-left: 0 !important;
   }}
   [data-testid="stSidebarNavLink"] [data-testid="stMarkdownContainer"] {{
     min-width: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }}
   [data-testid="stSidebarNavLink"] [data-testid="stMarkdownContainer"] p {{
     white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
     margin: 0 !important;
     font-size: 0.85rem !important;
   }}
@@ -465,18 +570,16 @@ def _brand_css() -> str:
   /* Push the last visible nav item (Settings) to the bottom */
   [data-testid="stSidebarNav"] ul li:last-child {{
     margin-top: auto !important;
-    border-top: 1px solid {COLORS["glass_border"]} !important;
-    padding-top: 8px !important;
   }}
-  /* ── Active nav item — gradient badge ──────────────────────────────── */
+  /* ── Active nav item — subtle teal highlight (icon tile handles icon bg) ── */
   [data-testid="stSidebarNavLink"][aria-current="page"] {{
-    background: {GRADIENTS["blue_cyan"]} !important;
+    background: rgba(52, 225, 212, 0.10) !important;
     border-radius: {BORDER_RADIUS["md"]} !important;
+    border-left: 3px solid var(--cyan) !important;
   }}
-  [data-testid="stSidebarNavLink"][aria-current="page"] span,
-  [data-testid="stSidebarNavLink"][aria-current="page"] p {{
-    color: {_WHITE} !important;
-    font-weight: 700 !important;
+  section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"][aria-current="page"] p {{
+    color: var(--text) !important;
+    font-weight: 600 !important;
   }}
 
   /* ── Collapsed sidebar — 64px icon rail ─────────────────────────────── */
@@ -518,7 +621,7 @@ def _brand_css() -> str:
     justify-content: center !important;
   }}
   section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"][aria-current="page"] {{
-    background: {GRADIENTS["blue_cyan"]} !important;
+    background: rgba(52, 225, 212, 0.10) !important;
   }}
   [data-testid="stExpandSidebarButton"] button {{
     background: transparent !important;
@@ -563,7 +666,7 @@ def _brand_css() -> str:
     font-weight: 900 !important;
     font-size: 14px !important;
     content: "\\f0c9" !important;
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -574,56 +677,59 @@ def _brand_css() -> str:
     font-weight: 900 !important;
     font-size: 12px !important;
     content: "\\f053" !important;
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
 
   /* ── Metric cards (st.metric) ──────────────────────────────────────── */
   [data-testid="metric-container"] {{
-    background: {COLORS["glass_bg"]};
-    border: 1px solid {COLORS["glass_border"]};
-    border-radius: {BORDER_RADIUS["xl"]};
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
     padding: 1.25rem;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    transition: box-shadow {t_normal} {ease_in_out};
+    transition: border-color {t_normal} {ease_in_out};
   }}
   [data-testid="metric-container"]:hover {{
-    box-shadow: 0 4px 24px rgba(0, 117, 255, 0.12);
+    border-color: var(--line2);
   }}
   [data-testid="metric-container"] label {{
-    color: {_GRAY_300} !important;
-    font-size: 0.72rem;
-    font-weight: 600;
+    color: var(--text3) !important;
+    font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+    font-size: 9px;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.15em;
   }}
   [data-testid="metric-container"] [data-testid="stMetricValue"] {{
-    color: {_WHITE} !important;
+    color: var(--text) !important;
     font-weight: 700;
+    font-size: 30px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
   }}
 
   /* ── Primary buttons — gradient (skip filter-bar buttons) ───────────── */
   .stButton > button[kind="primary"] {{
     background: {GRADIENTS["blue_cyan"]} !important;
-    color: {_WHITE} !important;
+    color: var(--cyanInk) !important;
     border: none !important;
     font-weight: 600;
     border-radius: {BORDER_RADIUS["md"]};
     transition: all {t_fast} {ease_out};
-    box-shadow: 0 2px 12px rgba(0, 117, 255, 0.3);
+    box-shadow: 0 2px 12px rgba(52, 225, 212, 0.3);
   }}
   :not(.filter-bar-container) > .stButton > button {{
-    background: {COLORS["glass_bg"]} !important;
-    color: {_WHITE} !important;
-    border: 1px solid {COLORS["glass_border"]} !important;
+    background: var(--panel) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--line) !important;
     font-weight: 600;
     border-radius: {BORDER_RADIUS["md"]};
     transition: all {t_fast} {ease_out};
   }}
   :not(.filter-bar-container) > .stButton > button:hover {{
-    box-shadow: 0 4px 20px rgba(0, 117, 255, 0.2) !important;
+    border-color: var(--line2) !important;
     transform: translateY(-1px);
-    border-color: rgba(0, 117, 255, 0.3) !important;
   }}
 
   /* ── Form inputs — dark themed ─────────────────────────────────────── */
@@ -631,77 +737,77 @@ def _brand_css() -> str:
   .stMultiSelect > div > div,
   .stTextInput > div > div > input,
   [data-baseweb="select"] {{
-    background-color: {_NAVY_INPUT} !important;
-    border-color: {COLORS["glass_border"]} !important;
-    color: {_WHITE} !important;
+    background-color: var(--panel2) !important;
+    border-color: var(--line) !important;
+    color: var(--text) !important;
     border-radius: {BORDER_RADIUS["md"]} !important;
   }}
   [data-baseweb="select"] > div {{
-    background-color: {_NAVY_INPUT} !important;
-    border-color: {COLORS["glass_border"]} !important;
-    color: {_WHITE} !important;
+    background-color: var(--panel2) !important;
+    border-color: var(--line) !important;
+    color: var(--text) !important;
   }}
   .stSelectbox label, .stMultiSelect label, .stTextInput label {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
 
   /* ── Radio buttons ─────────────────────────────────────────────────── */
   .stRadio label {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
   .stRadio [data-testid="stMarkdownContainer"] p {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
 
   /* ── Toggle ────────────────────────────────────────────────────────── */
   [data-testid="stToggle"] label span {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
 
   /* ── Dataframe / table ─────────────────────────────────────────────── */
   .stDataFrame {{
-    border: 1px solid {COLORS["glass_border"]} !important;
+    border: 1px solid var(--line) !important;
     border-radius: {BORDER_RADIUS["md"]};
   }}
   .stDataFrame [data-testid="StyledDataFrameDataCell"],
   .stDataFrame td {{
-    color: {_WHITE} !important;
+    color: var(--text) !important;
     background-color: transparent !important;
-    border-color: {COLORS["glass_border"]} !important;
+    border-color: var(--line) !important;
   }}
   .stDataFrame th {{
-    color: {_GRAY_300} !important;
-    background-color: {_NAVY_RAISED} !important;
-    border-color: {COLORS["glass_border"]} !important;
+    color: var(--text2) !important;
+    background-color: var(--elev) !important;
+    border-color: var(--line) !important;
   }}
 
   /* ── AgGrid ────────────────────────────────────────────────────────── */
   .ag-theme-streamlit {{
-    --ag-background-color: {_NAVY_CARD} !important;
-    --ag-header-background-color: {_NAVY_RAISED} !important;
-    --ag-odd-row-background-color: rgba(11, 20, 55, 0.5) !important;
-    --ag-row-hover-color: rgba(0, 117, 255, 0.06) !important;
-    --ag-foreground-color: {_WHITE} !important;
-    --ag-header-foreground-color: {_GRAY_300} !important;
-    --ag-border-color: {COLORS["glass_border"]} !important;
+    --ag-background-color: var(--panel) !important;
+    --ag-header-background-color: var(--elev) !important;
+    --ag-odd-row-background-color: var(--panel2) !important;
+    --ag-row-hover-color: rgba(52, 225, 212, 0.06) !important;
+    --ag-foreground-color: var(--text) !important;
+    --ag-header-foreground-color: var(--text2) !important;
+    --ag-border-color: var(--line) !important;
   }}
 
   /* ── Tabs ──────────────────────────────────────────────────────────── */
   .stTabs [data-baseweb="tab-list"] {{
-    border-bottom: 1px solid {COLORS["glass_border"]};
+    border-bottom: 1px solid var(--line);
     background: transparent;
   }}
   .stTabs [data-baseweb="tab"] {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
   .stTabs [data-baseweb="tab"][aria-selected="true"] {{
-    color: {_WHITE} !important;
-    border-bottom: 2px solid {_BLUE};
+    color: var(--text) !important;
+    border-bottom: 2px solid var(--cyan);
   }}
 
   /* ── Dividers ──────────────────────────────────────────────────────── */
   hr {{
-    border-color: {COLORS["glass_border"]} !important;
+    border-color: var(--line) !important;
   }}
 
   /* ── Plotly chart backgrounds ──────────────────────────────────────── */
@@ -722,11 +828,11 @@ def _brand_css() -> str:
   }}
   /* Make the header bar transparent and minimal */
   header[data-testid="stHeader"] {{
-    background: transparent !important;
+    background: var(--headerBg) !important;
   }}
   /* Style the sidebar expand button (visible when sidebar is collapsed) */
   [data-testid="stExpandSidebarButton"] {{
-    color: {_GRAY_300} !important;
+    color: var(--text2) !important;
   }}
   /* Hide the decoration line */
   [data-testid="stDecoration"] {{
@@ -747,61 +853,140 @@ def _brand_css() -> str:
     letter-spacing: -0.02em;
   }}
 
-  /* ── Scrollbars — dark themed ──────────────────────────────────────── */
-  ::-webkit-scrollbar {{ width: 6px; height: 6px; }}
+  /* ── Section headers (Signal Deck) ─────────────────────────────────── */
+  .apex-section-header {{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }}
+  .apex-section-header .accent-bar {{
+    width: 3px;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--cyan);
+  }}
+  .apex-section-header .accent-bar.critical {{
+    background: var(--red);
+  }}
+  .apex-section-header .section-title {{
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }}
+  .apex-section-header .section-meta {{
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-left: auto;
+  }}
+
+  /* ── Segmented controls (Signal Deck) ──────────────────────────────── */
+  .apex-segmented-track {{
+    background: var(--panel2);
+    border-radius: 8px;
+    padding: 2px;
+    display: inline-flex;
+    gap: 2px;
+  }}
+  .apex-segmented-track .segment {{
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all {t_fast} {ease_out};
+  }}
+  .apex-segmented-track .segment.active {{
+    background: var(--cyan);
+    color: var(--cyanInk);
+  }}
+
+  /* ── Scrollbars (reference match) ──────────────────────────────────── */
+  ::-webkit-scrollbar {{ width: 9px; height: 9px; }}
   ::-webkit-scrollbar-track {{ background: transparent; }}
-  ::-webkit-scrollbar-thumb {{ background: {_GRAY_500}; border-radius: 3px; }}
-  ::-webkit-scrollbar-thumb:hover {{ background: {_BLUE}; }}
+  ::-webkit-scrollbar-thumb {{ background: rgba(140,150,170,.22); border-radius: 9px; }}
+  ::-webkit-scrollbar-thumb:hover {{ background: rgba(140,150,170,.36); }}
+
+  /* ── Range input styling (reference match) ─────────────────────────── */
+  input[type=range] {{
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }}
+  input[type=range]::-webkit-slider-runnable-track {{
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line2);
+  }}
+  input[type=range]::-webkit-slider-thumb {{
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    margin-top: -5.5px;
+    border-radius: 50%;
+    background: var(--cyan);
+    cursor: pointer;
+    box-shadow: 0 0 10px -1px var(--cyan);
+  }}
 
   /* ── Skeleton shimmer — dark ───────────────────────────────────────── */
   .apex-skeleton {{
-    background: linear-gradient(90deg, {_NAVY_CARD} 25%, {_NAVY_RAISED} 50%, {_NAVY_CARD} 75%);
+    background: linear-gradient(90deg, var(--panel) 25%, var(--elev) 50%, var(--panel) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: {BORDER_RADIUS["md"]};
   }}
-  @keyframes shimmer {{
-    0% {{ background-position: 200% 0; }}
-    100% {{ background-position: -200% 0; }}
-  }}
 
   /* ── Tooltip ───────────────────────────────────────────────────────── */
   [data-baseweb="tooltip"] {{
-    background-color: {_NAVY_RAISED} !important;
-    color: {_WHITE} !important;
+    background-color: var(--elev) !important;
+    color: var(--text) !important;
     border-radius: {BORDER_RADIUS["sm"]} !important;
-    border: 1px solid {COLORS["glass_border"]} !important;
+    border: 1px solid var(--line) !important;
     font-size: 0.75rem !important;
     padding: 0.35rem 0.65rem !important;
   }}
 
   /* ── Expander ──────────────────────────────────────────────────────── */
   .streamlit-expanderHeader {{
-    color: {_WHITE} !important;
-    background: {COLORS["glass_bg"]} !important;
-    border: 1px solid {COLORS["glass_border"]} !important;
+    color: var(--text) !important;
+    background: var(--panel) !important;
+    border: 1px solid var(--line) !important;
     border-radius: {BORDER_RADIUS["md"]} !important;
   }}
 
   /* ── Popover / dropdown menus ──────────────────────────────────────── */
   [data-baseweb="popover"] > div {{
-    background-color: {_NAVY_RAISED} !important;
-    border: 1px solid {COLORS["glass_border"]} !important;
+    background-color: var(--elev) !important;
+    border: 1px solid var(--line) !important;
   }}
   [data-baseweb="menu"] {{
-    background-color: {_NAVY_RAISED} !important;
+    background-color: var(--elev) !important;
   }}
   [data-baseweb="menu"] li {{
-    color: {_GRAY_100} !important;
+    color: var(--text) !important;
   }}
   [data-baseweb="menu"] li:hover {{
-    background-color: rgba(0, 117, 255, 0.1) !important;
+    background-color: rgba(52, 225, 212, 0.08) !important;
   }}
 
   /* ── Date input ────────────────────────────────────────────────────── */
   [data-baseweb="calendar"] {{
-    background-color: {_NAVY_RAISED} !important;
-    color: {_WHITE} !important;
+    background-color: var(--elev) !important;
+    color: var(--text) !important;
+  }}
+
+  /* ── Reduced motion ────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {{
+    * {{
+      animation: none !important;
+      transition: none !important;
+    }}
   }}
 </style>
 """
@@ -828,10 +1013,11 @@ def _brand_css_light() -> str:
 
     return f"""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
   @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
 
   :root {{
+    /* Legacy aliases — keep for existing components */
     --color-primary: {primary};
     --color-secondary: {secondary};
     --color-accent: {C["accent"]};
@@ -847,27 +1033,108 @@ def _brand_css_light() -> str:
     --gradient-blue: {GRADIENTS["blue_cyan"]};
     --glass-bg: {glass_bg};
     --glass-border: {glass_border};
+
+    /* Signal Deck reference tokens — light mode (exact match to mockup) */
+    --bg: #DDE2EA;
+    --bg2: #EAEEF4;
+    --panel: #FFFFFF;
+    --panel2: #F4F6FA;
+    --elev: #FFFFFF;
+    --line: rgba(12,18,28,.13);
+    --line2: rgba(12,18,28,.24);
+    --text: #0A0E16;
+    --text2: #414B5C;
+    --text3: #5C6678;
+    --cyan: #0B897E;
+    --cyanInk: #FFFFFF;
+    --green: #0F7A4D;
+    --amber: #8A5E0A;
+    --red: #C92F47;
+    --dot: rgba(40,70,110,.22);
+    --dotStar: rgba(50,80,120,.6);
+    --headerBg: rgba(255,255,255,.7);
+    --aura1: rgba(11,137,126,.12);
+    --aura2: rgba(38,96,210,.09);
+    --aura3: rgba(120,90,200,.07);
+  }}
+
+  /* ── Keyframe animations (Signal Deck reference) ───────────────────── */
+  @keyframes ringkpi {{ from {{ opacity:1; }} }}
+  @keyframes ringhero {{ from {{ opacity:1; }} }}
+  @keyframes rise {{ from {{ opacity:1; }} }}
+  @keyframes wirein {{ from {{ opacity:1; }} }}
+  @keyframes pulseonce {{
+    0%,100% {{ box-shadow:inset 0 0 0 0 rgba(255,92,114,0); }}
+    35% {{ box-shadow:inset 2px 0 0 0 var(--red), 0 0 18px -4px rgba(255,92,114,.5); }}
+  }}
+  @keyframes blink {{
+    0%,48% {{ opacity:1; }}
+    50%,100% {{ opacity:0; }}
+  }}
+  @keyframes aura1 {{
+    0% {{ transform:translate(0,0) scale(1); }}
+    100% {{ transform:translate(7vw,6vh) scale(1.18); }}
+  }}
+  @keyframes aura2 {{
+    0% {{ transform:translate(0,0) scale(1); }}
+    100% {{ transform:translate(-6vw,7vh) scale(1.12); }}
+  }}
+  @keyframes aura3 {{
+    0% {{ transform:translate(0,0) scale(1); }}
+    100% {{ transform:translate(5vw,-6vh) scale(1.22); }}
+  }}
+  @keyframes floatA {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(12px,-8px); }}
+  }}
+  @keyframes floatB {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(-10px,6px); }}
+  }}
+  @keyframes floatC {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(8px,10px); }}
+  }}
+  @keyframes floatD {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(-6px,-12px); }}
+  }}
+  @keyframes floatE {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(14px,4px); }}
+  }}
+  @keyframes floatF {{
+    0% {{ transform:translate(0,0); }}
+    100% {{ transform:translate(-8px,-6px); }}
+  }}
+  @keyframes twinkle {{
+    0%,100% {{ opacity:.35; }}
+    50% {{ opacity:.95; }}
+  }}
+  @keyframes shimmer {{
+    0% {{ background-position: 200% 0; }}
+    100% {{ background-position: -200% 0; }}
   }}
 
   html, body, [class*="css"] {{
     font-family: {ff} !important;
-    color: {text_p};
-    background-color: {bg} !important;
+    color: var(--text) !important;
+    background-color: var(--bg) !important;
   }}
-  .stApp {{ background: {bg} !important; }}
+  .stApp {{ background: var(--bg) !important; }}
   .block-container {{ max-width: 1600px; padding: 1.5rem 2rem; }}
 
   h1, h2, h3, h4, h5, h6 {{
     font-family: {ff} !important;
-    color: {text_p} !important;
+    color: var(--text) !important;
     font-weight: 700;
   }}
   p, span:not([data-testid="stIconMaterial"]), div, label {{ font-family: {ff} !important; }}
 
   /* Sidebar — light */
   section[data-testid="stSidebar"] {{
-    background: linear-gradient(180deg, {C["surface_raised"]} 0%, {C["surface"]} 100%) !important;
-    border-right: 1px solid {glass_border} !important;
+    background: linear-gradient(180deg, var(--panel), var(--bg2)) !important;
+    border-right: 1px solid var(--line) !important;
     width: 260px !important; min-width: 260px !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
@@ -882,10 +1149,10 @@ def _brand_css_light() -> str:
   section[data-testid="stSidebar"] .stMarkdown,
   section[data-testid="stSidebar"] label,
   section[data-testid="stSidebar"] span,
-  section[data-testid="stSidebar"] p {{ color: {text_s} !important; }}
+  section[data-testid="stSidebar"] p {{ color: var(--text2) !important; }}
   section[data-testid="stSidebar"] h1,
   section[data-testid="stSidebar"] h2,
-  section[data-testid="stSidebar"] h3 {{ color: {text_p} !important; }}
+  section[data-testid="stSidebar"] h3 {{ color: var(--text) !important; }}
 
   /* Sidebar nav */
   [data-testid="stSidebarNav"] {{
@@ -906,9 +1173,9 @@ def _brand_css_light() -> str:
   }}
   section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] p,
   section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"] [data-testid="stIconMaterial"] {{
-    color: {text_s} !important; font-weight: 500;
+    color: var(--text2) !important; font-weight: 500;
   }}
-  [data-testid="stSidebarNavLink"]:hover {{ background: rgba(0, 117, 255, 0.06) !important; }}
+  [data-testid="stSidebarNavLink"]:hover {{ background: rgba(11, 137, 126, 0.06) !important; }}
   [data-testid="stSidebarNavLink"] > span {{
     display: inline-flex !important; align-items: center !important; flex-shrink: 0 !important;
   }}
@@ -926,14 +1193,16 @@ def _brand_css_light() -> str:
 
   /* Pin Settings to bottom */
   [data-testid="stSidebarNav"] ul li:last-child {{
-    margin-top: auto !important; border-top: 1px solid {glass_border} !important; padding-top: 8px !important;
+    margin-top: auto !important; border-top: 1px solid var(--line) !important; padding-top: 8px !important;
   }}
-  /* Active nav */
+  /* Active nav — subtle teal highlight */
   [data-testid="stSidebarNavLink"][aria-current="page"] {{
-    background: {GRADIENTS["blue_cyan"]} !important; border-radius: {BORDER_RADIUS["md"]} !important;
+    background: rgba(11, 137, 126, 0.08) !important; border-radius: {BORDER_RADIUS["md"]} !important;
+    border-left: 3px solid var(--cyan) !important;
   }}
-  [data-testid="stSidebarNavLink"][aria-current="page"] span,
-  [data-testid="stSidebarNavLink"][aria-current="page"] p {{ color: #FFFFFF !important; font-weight: 700 !important; }}
+  section[data-testid="stSidebar"] [data-testid="stSidebarNavLink"][aria-current="page"] p {{
+    color: var(--text) !important; font-weight: 600 !important;
+  }}
 
   /* Collapsed sidebar — 64px icon rail */
   section[data-testid="stSidebar"][aria-expanded="false"] {{
@@ -952,7 +1221,7 @@ def _brand_css_light() -> str:
   section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"] > span {{
     display: inline-flex !important; align-items: center !important; justify-content: center !important;
   }}
-  section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"][aria-current="page"] {{ background: {GRADIENTS["blue_cyan"]} !important; }}
+  section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"][aria-current="page"] {{ background: rgba(11, 137, 126, 0.10) !important; }}
   [data-testid="stExpandSidebarButton"] button {{ background: transparent !important; border: none !important; box-shadow: none !important; }}
   [data-testid="stSidebarNavLink"] .e1lpckdq20 {{ margin-left: 0 !important; }}
   [data-testid="stSidebarNavLink"] [data-testid="stIconMaterial"] {{
@@ -969,41 +1238,45 @@ def _brand_css_light() -> str:
   }}
   [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"]::before {{
     font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; font-size: 14px !important;
-    content: "\\f0c9" !important; color: {text_s} !important;
+    content: "\\f0c9" !important; color: var(--text2) !important;
   }}
   [data-testid="stSidebarCollapseButton"] [data-testid="stIconMaterial"]::before {{
     font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; font-size: 12px !important;
-    content: "\\f053" !important; color: {text_s} !important;
+    content: "\\f053" !important; color: var(--text2) !important;
   }}
 
   /* Metrics */
   [data-testid="metric-container"] {{
-    background: {glass_bg}; border: 1px solid {glass_border};
-    border-radius: {BORDER_RADIUS["xl"]}; padding: 1.25rem;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 1.25rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    transition: box-shadow {t_normal} {ease_in_out};
+    transition: border-color {t_normal} {ease_in_out};
   }}
-  [data-testid="metric-container"]:hover {{ box-shadow: 0 4px 16px rgba(0,0,0,0.08); }}
+  [data-testid="metric-container"]:hover {{ border-color: var(--line2); }}
   [data-testid="metric-container"] label {{
-    color: {text_s} !important; font-size: 0.72rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text3) !important;
+    font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+    font-size: 9px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.15em;
   }}
-  [data-testid="metric-container"] [data-testid="stMetricValue"] {{ color: {text_p} !important; font-weight: 700; }}
+  [data-testid="metric-container"] [data-testid="stMetricValue"] {{
+    color: var(--text) !important; font-weight: 700;
+    font-size: 30px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  }}
 
   /* Buttons */
   .stButton > button[kind="primary"] {{
-    background: {GRADIENTS["blue_cyan"]} !important; color: #FFFFFF !important;
+    background: {GRADIENTS["blue_cyan"]} !important; color: var(--cyanInk) !important;
     border: none !important; font-weight: 600; border-radius: {BORDER_RADIUS["md"]};
-    box-shadow: 0 2px 8px rgba(0, 117, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(11, 137, 126, 0.2);
   }}
   :not(.filter-bar-container) > .stButton > button {{
-    background: {surface} !important; color: {text_p} !important;
-    border: 1px solid {border} !important; font-weight: 600; border-radius: {BORDER_RADIUS["md"]};
+    background: var(--panel) !important; color: var(--text) !important;
+    border: 1px solid var(--line) !important; font-weight: 600; border-radius: {BORDER_RADIUS["md"]};
     transition: all {t_fast} {ease_out};
   }}
   :not(.filter-bar-container) > .stButton > button:hover {{
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
-    border-color: rgba(0, 117, 255, 0.3) !important;
+    border-color: var(--line2) !important;
   }}
 
   /* Form inputs */
@@ -1011,39 +1284,39 @@ def _brand_css_light() -> str:
   .stMultiSelect > div > div,
   .stTextInput > div > div > input,
   [data-baseweb="select"] {{
-    background-color: {_LIGHT_INPUT} !important; border-color: {border} !important;
-    color: {text_p} !important; border-radius: {BORDER_RADIUS["md"]} !important;
+    background-color: var(--panel) !important; border-color: var(--line) !important;
+    color: var(--text) !important; border-radius: {BORDER_RADIUS["md"]} !important;
   }}
   [data-baseweb="select"] > div {{
-    background-color: {_LIGHT_INPUT} !important; border-color: {border} !important; color: {text_p} !important;
+    background-color: var(--panel) !important; border-color: var(--line) !important; color: var(--text) !important;
   }}
-  .stSelectbox label, .stMultiSelect label, .stTextInput label {{ color: {text_s} !important; }}
+  .stSelectbox label, .stMultiSelect label, .stTextInput label {{ color: var(--text2) !important; }}
 
-  .stRadio label {{ color: {text_s} !important; }}
-  .stRadio [data-testid="stMarkdownContainer"] p {{ color: {text_s} !important; }}
-  [data-testid="stToggle"] label span {{ color: {text_s} !important; }}
+  .stRadio label {{ color: var(--text2) !important; }}
+  .stRadio [data-testid="stMarkdownContainer"] p {{ color: var(--text2) !important; }}
+  [data-testid="stToggle"] label span {{ color: var(--text2) !important; }}
 
   /* Tables */
-  .stDataFrame {{ border: 1px solid {glass_border} !important; border-radius: {BORDER_RADIUS["md"]}; }}
+  .stDataFrame {{ border: 1px solid var(--line) !important; border-radius: {BORDER_RADIUS["md"]}; }}
   .stDataFrame [data-testid="StyledDataFrameDataCell"], .stDataFrame td {{
-    color: {text_p} !important; background-color: transparent !important; border-color: {glass_border} !important;
+    color: var(--text) !important; background-color: transparent !important; border-color: var(--line) !important;
   }}
   .stDataFrame th {{
-    color: {text_s} !important; background-color: {C["surface_raised"]} !important; border-color: {glass_border} !important;
+    color: var(--text2) !important; background-color: var(--panel2) !important; border-color: var(--line) !important;
   }}
 
   /* Tabs */
-  .stTabs [data-baseweb="tab-list"] {{ border-bottom: 1px solid {glass_border}; background: transparent; }}
-  .stTabs [data-baseweb="tab"] {{ color: {text_s} !important; }}
-  .stTabs [data-baseweb="tab"][aria-selected="true"] {{ color: {text_p} !important; border-bottom: 2px solid {_BLUE}; }}
+  .stTabs [data-baseweb="tab-list"] {{ border-bottom: 1px solid var(--line); background: transparent; }}
+  .stTabs [data-baseweb="tab"] {{ color: var(--text2) !important; }}
+  .stTabs [data-baseweb="tab"][aria-selected="true"] {{ color: var(--text) !important; border-bottom: 2px solid var(--cyan); }}
 
-  hr {{ border-color: {glass_border} !important; }}
+  hr {{ border-color: var(--line) !important; }}
   .stPlotlyChart {{ border-radius: {BORDER_RADIUS["md"]}; }}
 
   footer {{ visibility: hidden; }}
   [data-testid="stAppDeployButton"] {{ display: none !important; }}
   [data-testid="stMainMenu"] {{ display: none !important; }}
-  header[data-testid="stHeader"] {{ background: transparent !important; }}
+  header[data-testid="stHeader"] {{ background: var(--headerBg) !important; }}
   [data-testid="stDecoration"] {{ display: none !important; }}
 
   .stButton > button, [data-testid="stSidebarNavLink"], .stSelectbox, .stMultiSelect {{
@@ -1051,45 +1324,128 @@ def _brand_css_light() -> str:
   }}
   .apex-metric-value {{ font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }}
 
-  ::-webkit-scrollbar {{ width: 6px; height: 6px; }}
+  /* ── Section headers (Signal Deck) ─────────────────────────────────── */
+  .apex-section-header {{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }}
+  .apex-section-header .accent-bar {{
+    width: 3px;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--cyan);
+  }}
+  .apex-section-header .accent-bar.critical {{
+    background: var(--red);
+  }}
+  .apex-section-header .section-title {{
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }}
+  .apex-section-header .section-meta {{
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-left: auto;
+  }}
+
+  /* ── Segmented controls (Signal Deck) ──────────────────────────────── */
+  .apex-segmented-track {{
+    background: var(--panel2);
+    border-radius: 8px;
+    padding: 2px;
+    display: inline-flex;
+    gap: 2px;
+  }}
+  .apex-segmented-track .segment {{
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all {t_fast} {ease_out};
+  }}
+  .apex-segmented-track .segment.active {{
+    background: var(--cyan);
+    color: var(--cyanInk);
+  }}
+
+  /* ── Scrollbars (reference match) ──────────────────────────────────── */
+  ::-webkit-scrollbar {{ width: 9px; height: 9px; }}
   ::-webkit-scrollbar-track {{ background: transparent; }}
-  ::-webkit-scrollbar-thumb {{ background: #CBD5E0; border-radius: 3px; }}
-  ::-webkit-scrollbar-thumb:hover {{ background: {_BLUE}; }}
+  ::-webkit-scrollbar-thumb {{ background: rgba(140,150,170,.22); border-radius: 9px; }}
+  ::-webkit-scrollbar-thumb:hover {{ background: rgba(140,150,170,.36); }}
+
+  /* ── Range input styling (reference match) ─────────────────────────── */
+  input[type=range] {{
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }}
+  input[type=range]::-webkit-slider-runnable-track {{
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line2);
+  }}
+  input[type=range]::-webkit-slider-thumb {{
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    margin-top: -5.5px;
+    border-radius: 50%;
+    background: var(--cyan);
+    cursor: pointer;
+    box-shadow: 0 0 10px -1px var(--cyan);
+  }}
 
   .apex-skeleton {{
-    background: linear-gradient(90deg, {C["surface"]} 25%, {C["surface_raised"]} 50%, {C["surface"]} 75%);
+    background: linear-gradient(90deg, var(--panel) 25%, var(--panel2) 50%, var(--panel) 75%);
     background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: {BORDER_RADIUS["md"]};
   }}
-  @keyframes shimmer {{ 0% {{ background-position: 200% 0; }} 100% {{ background-position: -200% 0; }} }}
 
   [data-baseweb="tooltip"] {{
-    background-color: {surface} !important; color: {text_p} !important;
-    border-radius: {BORDER_RADIUS["sm"]} !important; border: 1px solid {border} !important;
+    background-color: var(--panel) !important; color: var(--text) !important;
+    border-radius: {BORDER_RADIUS["sm"]} !important; border: 1px solid var(--line) !important;
     font-size: 0.75rem !important; padding: 0.35rem 0.65rem !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
   }}
 
   .streamlit-expanderHeader {{
-    color: {text_p} !important; background: {glass_bg} !important;
-    border: 1px solid {glass_border} !important; border-radius: {BORDER_RADIUS["md"]} !important;
+    color: var(--text) !important; background: var(--panel) !important;
+    border: 1px solid var(--line) !important; border-radius: {BORDER_RADIUS["md"]} !important;
   }}
 
-  [data-baseweb="popover"] > div {{ background-color: {surface} !important; border: 1px solid {border} !important; box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important; }}
-  [data-baseweb="menu"] {{ background-color: {surface} !important; }}
-  [data-baseweb="menu"] li {{ color: {text_p} !important; }}
-  [data-baseweb="menu"] li:hover {{ background-color: rgba(0, 117, 255, 0.06) !important; }}
+  [data-baseweb="popover"] > div {{ background-color: var(--panel) !important; border: 1px solid var(--line) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important; }}
+  [data-baseweb="menu"] {{ background-color: var(--panel) !important; }}
+  [data-baseweb="menu"] li {{ color: var(--text) !important; }}
+  [data-baseweb="menu"] li:hover {{ background-color: rgba(11, 137, 126, 0.06) !important; }}
 
-  [data-baseweb="calendar"] {{ background-color: {surface} !important; color: {text_p} !important; }}
+  [data-baseweb="calendar"] {{ background-color: var(--panel) !important; color: var(--text) !important; }}
 
   /* AgGrid light */
   .ag-theme-streamlit {{
-    --ag-background-color: {surface} !important;
-    --ag-header-background-color: {C["surface_raised"]} !important;
-    --ag-odd-row-background-color: {C["surface_sunken"]} !important;
-    --ag-row-hover-color: rgba(0, 117, 255, 0.04) !important;
-    --ag-foreground-color: {text_p} !important;
-    --ag-header-foreground-color: {text_s} !important;
-    --ag-border-color: {glass_border} !important;
+    --ag-background-color: var(--panel) !important;
+    --ag-header-background-color: var(--panel2) !important;
+    --ag-odd-row-background-color: var(--bg2) !important;
+    --ag-row-hover-color: rgba(11, 137, 126, 0.04) !important;
+    --ag-foreground-color: var(--text) !important;
+    --ag-header-foreground-color: var(--text2) !important;
+    --ag-border-color: var(--line) !important;
+  }}
+
+  /* ── Reduced motion ────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {{
+    * {{
+      animation: none !important;
+      transition: none !important;
+    }}
   }}
 </style>
 """

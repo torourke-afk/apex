@@ -32,6 +32,7 @@ import numpy as np
 import pandas as pd
 
 from src.data.init_db import get_connection
+from src.data.seeds._dates import YESTERDAY
 
 __all__ = [
     "load_product_pipeline",
@@ -43,19 +44,20 @@ __all__ = [
 ]
 
 # Reference date used for on_track / is_overdue computations
-_TODAY = date(2026, 5, 8)
+_TODAY = YESTERDAY
 
-# Quarter-end lookup (YYYY-Qn → last day of that quarter)
-_QUARTER_END: dict[str, date] = {
-    "2025-Q1": date(2025, 3, 31),
-    "2025-Q2": date(2025, 6, 30),
-    "2025-Q3": date(2025, 9, 30),
-    "2025-Q4": date(2025, 12, 31),
-    "2026-Q1": date(2026, 3, 31),
-    "2026-Q2": date(2026, 6, 30),
-    "2026-Q3": date(2026, 9, 30),
-    "2026-Q4": date(2026, 12, 31),
-}
+# Quarter-end lookup — dynamically covers the year of _TODAY and the prior year
+def _build_quarter_ends() -> dict[str, date]:
+    """Build quarter-end mapping for the current and previous year."""
+    ends: dict[str, date] = {}
+    for y in (_TODAY.year - 1, _TODAY.year, _TODAY.year + 1):
+        ends[f"{y}-Q1"] = date(y, 3, 31)
+        ends[f"{y}-Q2"] = date(y, 6, 30)
+        ends[f"{y}-Q3"] = date(y, 9, 30)
+        ends[f"{y}-Q4"] = date(y, 12, 31)
+    return ends
+
+_QUARTER_END: dict[str, date] = _build_quarter_ends()
 
 _VALID_INITIATIVE_STATUSES = frozenset({"discovery", "in_progress", "launched", "paused", "cancelled"})
 _VALID_INITIATIVE_PRIORITIES = frozenset({"p0", "p1", "p2", "p3"})

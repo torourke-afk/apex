@@ -21,6 +21,7 @@ import streamlit as st
 
 from src.config.settings import APEX_DATA_REFRESH_INTERVAL_SECONDS
 from src.data import cache_metrics
+from src.data.seeds._dates import YESTERDAY
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -47,8 +48,9 @@ BEI_WEIGHTS = {
     "Social Engagement": 0.10,
 }
 
-# Acquisition months: 18 months ending ~May 2025
-_ACQ_MONTHS = pd.date_range(end="2025-05-01", periods=18, freq="MS")
+# Acquisition months: 18 months ending ~1 year before the latest data point
+_ACQ_END = (pd.Timestamp(YESTERDAY.replace(day=1)) - pd.DateOffset(years=1)).date()
+_ACQ_MONTHS = pd.date_range(end=_ACQ_END, periods=18, freq="MS")
 _ACQ_LABELS = [d.strftime("%b %Y") for d in _ACQ_MONTHS]
 
 # ---------------------------------------------------------------------------
@@ -183,7 +185,7 @@ def get_cohort_active_accounts(filters: dict[str, Any] | None = None) -> pd.Data
 # BEI Composite Score
 # ---------------------------------------------------------------------------
 
-_BEI_MONTHS = pd.date_range(end="2025-05-01", periods=12, freq="MS")
+_BEI_MONTHS = pd.date_range(end=_ACQ_END, periods=12, freq="MS")
 _BEI_LABELS = [d.strftime("%b %Y") for d in _BEI_MONTHS]
 
 # Tier baselines for each BEI component (0–100 scale)

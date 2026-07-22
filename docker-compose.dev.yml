@@ -1,0 +1,27 @@
+# Development overrides — hot-reload for both services
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  bff:
+    build:
+      context: .
+      dockerfile: Dockerfile.bff
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+    command: ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development

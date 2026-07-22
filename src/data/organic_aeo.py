@@ -19,10 +19,12 @@ from __future__ import annotations
 
 import math
 import random
-from datetime import date, timedelta
+from datetime import timedelta
 from typing import Any
 
 import pandas as pd
+
+from src.data.seeds._dates import YESTERDAY
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -61,8 +63,8 @@ DMA_MARKETS: list[str] = [
     "Denver",
 ]
 
-# 12 weekly periods ending on today (2026-05-08)
-_TODAY = date(2026, 5, 8)
+# 12 weekly periods ending on YESTERDAY (latest data point)
+_TODAY = YESTERDAY
 _WEEKS: list[str] = [
     (_TODAY - timedelta(weeks=11 - i)).strftime("%b %d")
     for i in range(12)
